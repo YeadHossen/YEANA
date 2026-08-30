@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "figma-dev-mode-mcp-server": {
+      "serverUrl": "http://127.0.0.1:3845/mcp"
+    },
+    "yeana-database-mcp": {
+      "command": "node",
+      "args": ["server/mcp-server.js"]
+    }
+  }
+}
