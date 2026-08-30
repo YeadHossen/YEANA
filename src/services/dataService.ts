@@ -62,10 +62,13 @@ function initializeLocalStorage() {
       localStorage.setItem(STORAGE_KEYS.TRANSPORTS, JSON.stringify(INITIAL_TRANSPORTS));
     }
 
-    if (!localStorage.getItem(STORAGE_KEYS.SHOPPING)) {
+    const savedShopping = localStorage.getItem(STORAGE_KEYS.SHOPPING);
+    if (!savedShopping || JSON.parse(savedShopping).length < INITIAL_SHOPPING.length) {
       localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(INITIAL_SHOPPING));
     }
-    if (!localStorage.getItem(STORAGE_KEYS.RIDES)) {
+
+    const savedRides = localStorage.getItem(STORAGE_KEYS.RIDES);
+    if (!savedRides || JSON.parse(savedRides).length < INITIAL_RIDES.length) {
       localStorage.setItem(STORAGE_KEYS.RIDES, JSON.stringify(INITIAL_RIDES));
     }
     if (!localStorage.getItem(STORAGE_KEYS.TRIPS)) {

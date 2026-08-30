@@ -31,9 +31,10 @@ export const RideView: React.FC = () => {
   const vehicleTypes = [
     { id: 'All', label: 'All Vehicles', icon: Car },
     { id: 'Bike', label: 'Motorcycles & Scooters', icon: Bike },
-    { id: 'Car', label: 'Sedan Cars', icon: Car },
-    { id: 'Microbus', label: 'AC Microbuses (Noah/HiAce)', icon: Car },
+    { id: 'Sedan', label: 'Sedan Cars', icon: Car },
+    { id: 'Microbus', label: 'AC Microbuses', icon: Car },
     { id: 'Chander Gari', label: '4x4 Mountain Jeeps', icon: Car },
+    { id: 'Boat', label: 'Boats & Houseboats', icon: Car },
   ];
 
   const filteredRides = rides.filter(ride => {

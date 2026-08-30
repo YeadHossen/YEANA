@@ -57,6 +57,8 @@ export const PlacesView: React.FC<PlacesViewProps> = ({
   const filteredPlaces = places.filter(place => {
     const matchesSearch = !searchQuery.trim() || 
       place.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (place.district_name && place.district_name.toLowerCase().includes(searchQuery.toLowerCase())) ||
+      (place.name_bn && place.name_bn.includes(searchQuery)) ||
       place.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
       place.short_description.toLowerCase().includes(searchQuery.toLowerCase());
 

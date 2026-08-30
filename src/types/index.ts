@@ -140,7 +140,7 @@ export interface Ride {
   id: string;
   district_id: string;
   district_name?: string;
-  vehicle_type: 'Bike' | 'Car' | 'Microbus' | 'Chander Gari';
+  vehicle_type: 'Bike' | 'Car' | 'Sedan' | 'Microbus' | 'Chander Gari' | 'Boat';
   model: string;
   rental_type: 'Self Drive' | 'With Driver' | 'Both';
   price_per_hour?: number;
