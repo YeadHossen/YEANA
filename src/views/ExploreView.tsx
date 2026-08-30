@@ -45,6 +45,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const [shopping, setShopping] = useState<ShoppingPlace[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
 
+  const [districtSearch, setDistrictSearch] = useState<string>('');
   const [selectedDivision, setSelectedDivision] = useState<string>('All');
   const [selectedDistrict, setSelectedDistrict] = useState<District | null>(null);
   const [activeDistrictTab, setActiveDistrictTab] = useState<'places' | 'hotels' | 'food' | 'shopping' | 'ride' | 'transport'>('places');
@@ -78,19 +79,24 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
   const divisions: (string | Division)[] = [
     'All',
-    'Sylhet',
-    'Chattogram',
     'Dhaka',
+    'Chattogram',
     'Khulna',
-    'Barishal',
     'Rajshahi',
     'Rangpur',
+    'Barishal',
+    'Sylhet',
     'Mymensingh'
   ];
 
-  const filteredDistricts = selectedDivision === 'All'
-    ? districts
-    : districts.filter(d => d.division === selectedDivision);
+  const filteredDistricts = districts.filter(d => {
+    const matchesDiv = selectedDivision === 'All' || d.division === selectedDivision;
+    const matchesSearch = !districtSearch.trim() || 
+      d.name.toLowerCase().includes(districtSearch.toLowerCase()) ||
+      d.name_bn.includes(districtSearch) ||
+      d.description.toLowerCase().includes(districtSearch.toLowerCase());
+    return matchesDiv && matchesSearch;
+  });
 
   // When a district is selected, filter its contents
   const districtPlaces = selectedDistrict 
@@ -135,28 +141,67 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               <span>Explore Bangladesh by Division & District</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-black text-slate-900 font-sans">
-              Choose Your Travel Destination
+              All 64 Districts of Bangladesh
             </h1>
             <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
-              Explore scenic districts across all 8 administrative divisions of Bangladesh. Select any district to view its tourist spots, hotels, local cuisine, transport routes, and vehicle rentals.
+              Explore scenic districts across all 8 administrative divisions. Select any district to view its tourist spots, hotels, local cuisine, transport routes, and vehicle rentals.
             </p>
           </div>
 
-          {/* Division Tabs */}
-          <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
-            {divisions.map(div => (
-              <button
-                key={div}
-                onClick={() => setSelectedDivision(div)}
-                className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                  selectedDivision === div 
-                    ? 'bg-brand-600 text-white shadow-md shadow-brand-700/20' 
-                    : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-                }`}
-              >
-                {div === 'All' ? 'All Bangladesh' : `${div} Division`}
-              </button>
-            ))}
+          {/* Search & Division Filter Controls */}
+          <div className="space-y-4">
+            {/* Live Search Input */}
+            <div className="relative max-w-md">
+              <input
+                type="text"
+                placeholder="🔍 Search any district (e.g. Cox's Bazar, Bogura, Panchagarh, Dinajpur)..."
+                value={districtSearch}
+                onChange={(e) => setDistrictSearch(e.target.value)}
+                className="w-full pl-4 pr-10 py-3 rounded-2xl bg-white border border-slate-200 shadow-2xs text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-500"
+              />
+              {districtSearch && (
+                <button
+                  onClick={() => setDistrictSearch('')}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 hover:text-slate-600 font-bold px-1.5 py-0.5 rounded-full"
+                >
+                  ✕
+                </button>
+              )}
+            </div>
+
+            {/* Division Tabs with Counts */}
+            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none">
+              {divisions.map(div => {
+                const count = div === 'All' 
+                  ? districts.length 
+                  : districts.filter(d => d.division === div).length;
+
+                return (
+                  <button
+                    key={div}
+                    onClick={() => setSelectedDivision(div)}
+                    className={`px-4 py-2.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-1.5 ${
+                      selectedDivision === div 
+                        ? 'bg-brand-600 text-white shadow-md shadow-brand-700/20' 
+                        : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                    }`}
+                  >
+                    <span>{div === 'All' ? 'All Bangladesh' : `${div} Division`}</span>
+                    <span className={`px-1.5 py-0.5 rounded-md text-[10px] ${
+                      selectedDivision === div ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-600'
+                    }`}>
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Counter Summary */}
+            <div className="flex items-center justify-between text-xs text-slate-500 font-medium">
+              <span>Showing <strong>{filteredDistricts.length}</strong> of <strong>{districts.length}</strong> Districts</span>
+              {districtSearch && <span>Filtered by search: "{districtSearch}"</span>}
+            </div>
           </div>
 
           {/* Districts Grid */}

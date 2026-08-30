@@ -1,17 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  Search, 
-  MapPin, 
-  Sparkles, 
-  TrendingUp, 
-  Hotel as HotelIcon, 
-  Utensils, 
-  Bus, 
-  ShoppingBag, 
-  Car, 
-  ArrowRight, 
-  Compass, 
-  ShieldCheck, 
+import {
+  Search,
+  MapPin,
+  Sparkles,
+  TrendingUp,
+  Hotel as HotelIcon,
+  Utensils,
+  Bus,
+  ShoppingBag,
+  Car,
+  ArrowRight,
+  Compass,
+  ShieldCheck,
   Calendar,
   Layers,
   Heart
@@ -78,9 +78,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const filteredPlaces = selectedDivision === 'All'
     ? places
     : places.filter(p => {
-        const dist = districts.find(d => d.id === p.district_id);
-        return dist?.division === selectedDivision || p.division === selectedDivision;
-      });
+      const dist = districts.find(d => d.id === p.district_id);
+      return dist?.division === selectedDivision || p.division === selectedDivision;
+    });
 
   const featuredPlaces = places.filter(p => p.is_featured).slice(0, 6);
   const featuredHotels = hotels.slice(0, 4);
@@ -104,10 +104,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
   return (
     <div className="space-y-16 pb-16">
-      
+
       {/* 1. HERO SECTION */}
       <section className="relative rounded-3xl overflow-hidden bg-slate-900 text-white min-h-[500px] sm:min-h-[560px] flex flex-col justify-center px-6 sm:px-12 py-12 sm:py-20 shadow-2xl">
-        
+
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0 z-0">
           <img
@@ -120,7 +120,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
         {/* Hero Content */}
         <div className="relative z-10 max-w-3xl space-y-6 mx-auto text-center">
-          
+
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-500/20 border border-brand-400/30 text-brand-300 text-xs font-bold backdrop-blur-md">
             <Sparkles className="w-3.5 h-3.5" />
             <span>{t('hero.tagline')}</span>
@@ -138,7 +138,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </p>
 
           {/* Hero Search Box */}
-          <form 
+          <form
             onSubmit={handleHeroSearch}
             className="p-2 sm:p-2.5 rounded-2xl bg-white/95 backdrop-blur-md shadow-2xl border border-white/40 max-w-xl mx-auto flex flex-col sm:flex-row items-center gap-2"
           >
@@ -212,7 +212,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
       {/* 3. DIVISION FILTER & FEATURED DESTINATIONS */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 space-y-6">
-        
+
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
           <div>
             <div className="flex items-center gap-2 text-brand-700 text-xs font-extrabold uppercase tracking-wider mb-1">
@@ -227,13 +227,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
             </p>
           </div>
 
-          <button
-            onClick={() => onNavigateTab('places')}
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-xl transition-colors self-start md:self-auto"
-          >
-            <span>View All Places</span>
-            <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          <div className="flex items-center gap-2 self-start md:self-auto">
+            <button
+              onClick={() => onNavigateTab('explore')}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-white bg-brand-600 hover:bg-brand-700 px-4 py-2 rounded-xl shadow-xs transition-all"
+            >
+              <MapPin className="w-3.5 h-3.5" />
+              <span>Explore 64 Districts</span>
+            </button>
+            <button
+              onClick={() => onNavigateTab('places')}
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-brand-700 hover:text-brand-800 bg-brand-50 hover:bg-brand-100 px-4 py-2 rounded-xl transition-colors"
+            >
+              <span>View Places</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </button>
+          </div>
         </div>
 
         {/* Division Selector Tabs */}
@@ -242,11 +251,10 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <button
               key={div}
               onClick={() => setSelectedDivision(div)}
-              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                selectedDivision === div 
-                  ? 'bg-brand-600 text-white shadow-sm shadow-brand-700/20' 
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
-              }`}
+              className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${selectedDivision === div
+                ? 'bg-brand-600 text-white shadow-sm shadow-brand-700/20'
+                : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                }`}
             >
               {div === 'All' ? 'All Divisions' : `${div} Division`}
             </button>
@@ -270,7 +278,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* 4. TRIP PLANNER PROMO BANNER */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="rounded-3xl bg-gradient-to-r from-brand-800 via-brand-700 to-teal-800 text-white p-8 sm:p-12 relative overflow-hidden shadow-xl flex flex-col md:flex-row items-center justify-between gap-8">
-          
+
           <div className="space-y-4 max-w-xl z-10">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-brand-200 text-xs font-bold border border-white/20">
               <Calendar className="w-3.5 h-3.5" />

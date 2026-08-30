@@ -34,34 +34,48 @@ const STORAGE_KEYS = {
   REVIEWS: 'yeana_reviews'
 };
 
-// Initialize LocalStorage with seed data if not present
+// Initialize LocalStorage with seed data and auto-upgrade if new districts/places added
 function initializeLocalStorage() {
-  if (!localStorage.getItem(STORAGE_KEYS.DISTRICTS)) {
-    localStorage.setItem(STORAGE_KEYS.DISTRICTS, JSON.stringify(INITIAL_DISTRICTS));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.PLACES)) {
-    localStorage.setItem(STORAGE_KEYS.PLACES, JSON.stringify(INITIAL_PLACES));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.HOTELS)) {
-    localStorage.setItem(STORAGE_KEYS.HOTELS, JSON.stringify(INITIAL_HOTELS));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.RESTAURANTS)) {
-    localStorage.setItem(STORAGE_KEYS.RESTAURANTS, JSON.stringify(INITIAL_RESTAURANTS));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.TRANSPORTS)) {
-    localStorage.setItem(STORAGE_KEYS.TRANSPORTS, JSON.stringify(INITIAL_TRANSPORTS));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.SHOPPING)) {
-    localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(INITIAL_SHOPPING));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.RIDES)) {
-    localStorage.setItem(STORAGE_KEYS.RIDES, JSON.stringify(INITIAL_RIDES));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.TRIPS)) {
-    localStorage.setItem(STORAGE_KEYS.TRIPS, JSON.stringify([SAMPLE_TRIP]));
-  }
-  if (!localStorage.getItem(STORAGE_KEYS.REVIEWS)) {
-    localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify([]));
+  try {
+    const savedDistricts = localStorage.getItem(STORAGE_KEYS.DISTRICTS);
+    if (!savedDistricts || JSON.parse(savedDistricts).length < INITIAL_DISTRICTS.length) {
+      localStorage.setItem(STORAGE_KEYS.DISTRICTS, JSON.stringify(INITIAL_DISTRICTS));
+    }
+
+    const savedPlaces = localStorage.getItem(STORAGE_KEYS.PLACES);
+    if (!savedPlaces || JSON.parse(savedPlaces).length < INITIAL_PLACES.length) {
+      localStorage.setItem(STORAGE_KEYS.PLACES, JSON.stringify(INITIAL_PLACES));
+    }
+
+    const savedHotels = localStorage.getItem(STORAGE_KEYS.HOTELS);
+    if (!savedHotels || JSON.parse(savedHotels).length < INITIAL_HOTELS.length) {
+      localStorage.setItem(STORAGE_KEYS.HOTELS, JSON.stringify(INITIAL_HOTELS));
+    }
+
+    const savedRestaurants = localStorage.getItem(STORAGE_KEYS.RESTAURANTS);
+    if (!savedRestaurants || JSON.parse(savedRestaurants).length < INITIAL_RESTAURANTS.length) {
+      localStorage.setItem(STORAGE_KEYS.RESTAURANTS, JSON.stringify(INITIAL_RESTAURANTS));
+    }
+
+    const savedTransports = localStorage.getItem(STORAGE_KEYS.TRANSPORTS);
+    if (!savedTransports || JSON.parse(savedTransports).length < INITIAL_TRANSPORTS.length) {
+      localStorage.setItem(STORAGE_KEYS.TRANSPORTS, JSON.stringify(INITIAL_TRANSPORTS));
+    }
+
+    if (!localStorage.getItem(STORAGE_KEYS.SHOPPING)) {
+      localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(INITIAL_SHOPPING));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.RIDES)) {
+      localStorage.setItem(STORAGE_KEYS.RIDES, JSON.stringify(INITIAL_RIDES));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.TRIPS)) {
+      localStorage.setItem(STORAGE_KEYS.TRIPS, JSON.stringify([SAMPLE_TRIP]));
+    }
+    if (!localStorage.getItem(STORAGE_KEYS.REVIEWS)) {
+      localStorage.setItem(STORAGE_KEYS.REVIEWS, JSON.stringify([]));
+    }
+  } catch (err) {
+    console.error('Error in initializeLocalStorage:', err);
   }
 }
 
