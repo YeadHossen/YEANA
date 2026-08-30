@@ -22,25 +22,37 @@ if (!fs.existsSync(dataDir)) {
 }
 
 const dbPath = path.join(dataDir, 'yeana.db');
-if (fs.existsSync(dbPath)) {
-  try {
-    fs.unlinkSync(dbPath);
-  } catch (e) { }
-}
-
 const db = new Database(dbPath);
 db.pragma('journal_mode = WAL');
-db.pragma('foreign_keys = ON');
+db.pragma('foreign_keys = OFF'); // Temporarily off for clean bulk reset
 
 // 1. Initialize schema
 const schemaPath = path.join(__dirname, 'schema.sql');
 const schema = fs.readFileSync(schemaPath, 'utf8');
 db.exec(schema);
-console.log('✅ SQLite Schema created from scratch.');
 
-// 2. Seed Profiles / Users
+// 2. Clean out old data
+db.exec(`
+  DELETE FROM favorites;
+  DELETE FROM reviews;
+  DELETE FROM trips;
+  DELETE FROM rides;
+  DELETE FROM shopping_places;
+  DELETE FROM transport_routes;
+  DELETE FROM restaurants;
+  DELETE FROM hotels;
+  DELETE FROM places;
+  DELETE FROM districts;
+  DELETE FROM profiles;
+`);
+console.log('✅ SQLite Schema initialized & cleared.');
+
+// Re-enable foreign keys
+db.pragma('foreign_keys = ON');
+
+// 3. Seed Profiles / Users
 const insertProfile = db.prepare(`
-  INSERT INTO profiles (id, full_name, email, phone, avatar_url, role, bio, preferred_language)
+  INSERT OR REPLACE INTO profiles (id, full_name, email, phone, avatar_url, role, bio, preferred_language)
   VALUES (@id, @full_name, @email, @phone, @avatar_url, @role, @bio, @preferred_language)
 `);
 
@@ -70,9 +82,9 @@ const profiles = [
 profiles.forEach(p => insertProfile.run(p));
 console.log(`✅ Seeded ${profiles.length} user profiles.`);
 
-// 3. Seed Districts
+// 4. Seed Districts (All 64 Zilas)
 const insertDistrict = db.prepare(`
-  INSERT INTO districts (id, division, name, name_bn, description, image_url, lat, lng, popular_season, place_count)
+  INSERT OR REPLACE INTO districts (id, division, name, name_bn, description, image_url, lat, lng, popular_season, place_count)
   VALUES (@id, @division, @name, @name_bn, @description, @image_url, @lat, @lng, @popular_season, @place_count)
 `);
 
@@ -90,11 +102,11 @@ INITIAL_DISTRICTS.forEach(d => {
     place_count: d.place_count || 0
   });
 });
-console.log(`✅ Seeded ${INITIAL_DISTRICTS.length} districts.`);
+console.log(`✅ Seeded all ${INITIAL_DISTRICTS.length} districts of Bangladesh.`);
 
-// 4. Seed Places
+// 5. Seed Places
 const insertPlace = db.prepare(`
-  INSERT INTO places (
+  INSERT OR REPLACE INTO places (
     id, district_id, district_name, division, name, name_bn, rating, reviews_count,
     short_description, full_description, location, lat, lng, entry_fee, opening_time,
     best_time, how_to_reach, image_url, gallery, category, is_featured, nearby_hotels, nearby_restaurants
@@ -134,9 +146,9 @@ INITIAL_PLACES.forEach(p => {
 });
 console.log(`✅ Seeded ${INITIAL_PLACES.length} tourist places.`);
 
-// 5. Seed Hotels
+// 6. Seed Hotels
 const insertHotel = db.prepare(`
-  INSERT INTO hotels (
+  INSERT OR REPLACE INTO hotels (
     id, district_id, district_name, name, name_bn, rating, reviews_count,
     price_per_night, price_formatted, location, address, contact_phone, contact_email,
     has_ac, has_wifi, has_parking, has_restaurant, has_room_service, has_security,
@@ -180,9 +192,9 @@ INITIAL_HOTELS.forEach(h => {
 });
 console.log(`✅ Seeded ${INITIAL_HOTELS.length} hotels & resorts.`);
 
-// 6. Seed Restaurants
+// 7. Seed Restaurants
 const insertRestaurant = db.prepare(`
-  INSERT INTO restaurants (
+  INSERT OR REPLACE INTO restaurants (
     id, district_id, district_name, name, name_bn, rating, reviews_count,
     cuisine, cuisine_bn, price_tier, location, address, phone, opening_hours,
     menu_highlights, image_url, is_featured
@@ -216,9 +228,9 @@ INITIAL_RESTAURANTS.forEach(r => {
 });
 console.log(`✅ Seeded ${INITIAL_RESTAURANTS.length} restaurants.`);
 
-// 7. Seed Transport Routes
+// 8. Seed Transport Routes
 const insertTransport = db.prepare(`
-  INSERT INTO transport_routes (
+  INSERT OR REPLACE INTO transport_routes (
     id, transport_type, company, from_district, to_district, departure_time, arrival_time,
     duration, price_min, price_max, boarding_points, schedule_days, contact_phone, is_active
   ) VALUES (
@@ -247,9 +259,9 @@ INITIAL_TRANSPORTS.forEach(t => {
 });
 console.log(`✅ Seeded ${INITIAL_TRANSPORTS.length} transport routes.`);
 
-// 8. Seed Shopping Places
+// 9. Seed Shopping Places
 const insertShopping = db.prepare(`
-  INSERT INTO shopping_places (
+  INSERT OR REPLACE INTO shopping_places (
     id, district_id, district_name, name, name_bn, category, location, address,
     famous_for, opening_hours, image_url
   ) VALUES (
@@ -275,9 +287,9 @@ INITIAL_SHOPPING.forEach(s => {
 });
 console.log(`✅ Seeded ${INITIAL_SHOPPING.length} shopping spots.`);
 
-// 9. Seed Rides
+// 10. Seed Rides
 const insertRide = db.prepare(`
-  INSERT INTO rides (
+  INSERT OR REPLACE INTO rides (
     id, district_id, district_name, vehicle_type, model, rental_type, price_per_hour, price_per_day,
     location, owner_name, contact_phone, availability_status, image_url
   ) VALUES (
@@ -305,10 +317,10 @@ INITIAL_RIDES.forEach(r => {
 });
 console.log(`✅ Seeded ${INITIAL_RIDES.length} local rides.`);
 
-// 10. Seed Sample Trip
+// 11. Seed Sample Trip
 if (SAMPLE_TRIP) {
   const insertTrip = db.prepare(`
-    INSERT INTO trips (
+    INSERT OR REPLACE INTO trips (
       id, user_id, title, destination, start_date, end_date, duration_days,
       budget, total_budget, places, hotels, notes, is_public
     ) VALUES (
