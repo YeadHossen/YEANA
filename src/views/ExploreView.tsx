@@ -20,6 +20,7 @@ import { PlaceCard } from '../components/common/PlaceCard';
 import { HotelCard } from '../components/common/HotelCard';
 import { RestaurantCard } from '../components/common/RestaurantCard';
 import { useLanguage } from '../context/LanguageContext';
+import { generateRoutesBetween, getLocationByNameOrId } from '../services/transportService';
 
 interface ExploreViewProps {
   onSelectPlace: (place: Place) => void;
@@ -119,13 +120,22 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
     ? rides.filter(rd => rd.district_id === selectedDistrict.id)
     : [];
 
-  const districtTransports = selectedDistrict
-    ? transports.filter(tr => 
-        tr.from_district.toLowerCase().includes(selectedDistrict.name.toLowerCase()) ||
-        tr.to_district.toLowerCase().includes(selectedDistrict.name.toLowerCase()) ||
-        selectedDistrict.name.toLowerCase().includes(tr.to_district.toLowerCase())
-      )
-    : [];
+  const districtTransports = React.useMemo(() => {
+    if (!selectedDistrict) return [];
+    const direct = transports.filter(tr => 
+      tr.from_district.toLowerCase().includes(selectedDistrict.name.toLowerCase()) ||
+      tr.to_district.toLowerCase().includes(selectedDistrict.name.toLowerCase()) ||
+      selectedDistrict.name.toLowerCase().includes(tr.to_district.toLowerCase())
+    );
+    if (direct.length > 0) return direct;
+
+    const fromLoc = getLocationByNameOrId('dhaka');
+    const toLoc = getLocationByNameOrId(selectedDistrict.id) || getLocationByNameOrId(selectedDistrict.name);
+    if (fromLoc && toLoc) {
+      return generateRoutesBetween(fromLoc, toLoc, transports).routes;
+    }
+    return direct;
+  }, [selectedDistrict, transports]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8 pb-16">

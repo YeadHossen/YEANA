@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <linearGradient id="yeanaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#047857"/>
+      <stop offset="50%" stop-color="#059669"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#ef4444"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <rect width="512" height="512" rx="128" fill="url(#yeanaGrad)"/>
+  
+  <!-- Mountain & Valley Paths -->
+  <path d="M120 380 L256 160 L392 380 Z" fill="#10b981" opacity="0.9"/>
+  <path d="M210 380 L310 210 L410 380 Z" fill="#34d399" opacity="0.75"/>
+  <path d="M120 380 L256 160 L290 380 Z" fill="#047857" opacity="0.3"/>
+  
+  <!-- Rising Sun -->
+  <circle cx="256" cy="180" r="50" fill="url(#sunGrad)"/>
+  
+  <!-- Modern Compass / Star -->
+  <path d="M256 260 L270 300 L310 314 L270 328 L256 368 L242 328 L202 314 L242 300 Z" fill="#ffffff"/>
+  
+  <!-- Text YEANA -->
+  <text x="256" y="445" font-family="'Plus Jakarta Sans', Inter, sans-serif" font-weight="900" font-size="52" fill="#ffffff" text-anchor="middle" letter-spacing="4">YEANA</text>
+</svg>

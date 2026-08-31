@@ -1,5 +1,22 @@
 import React, { useState, useEffect } from 'react';
-import { Search, X, MapPin, Compass, Hotel, Utensils, Bus, ShoppingBag, Car, ArrowRight } from 'lucide-react';
+import { 
+  Search, 
+  X, 
+  MapPin, 
+  Compass, 
+  Hotel, 
+  Utensils, 
+  Bus, 
+  ShoppingBag, 
+  Car, 
+  ArrowRight, 
+  Sparkles, 
+  ShieldCheck, 
+  Calendar,
+  Layers,
+  Heart,
+  UserCheck
+} from 'lucide-react';
 import { DataService } from '../../services/dataService';
 import { Place, Hotel as HotelType, Restaurant, TransportRoute, ShoppingPlace, Ride, District } from '../../types';
 import { useLanguage } from '../../context/LanguageContext';
@@ -52,16 +69,35 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   if (!isOpen) return null;
 
   const cleanQuery = query.toLowerCase().trim();
+  const isYeanaBrandSearch = cleanQuery === 'yeana' || 
+                            cleanQuery === 'yeana app' || 
+                            cleanQuery === 'yean' || 
+                            cleanQuery === 'iana' || 
+                            cleanQuery === 'app' || 
+                            cleanQuery === 'website' ||
+                            cleanQuery === 'about yeana';
 
+  // Filter Districts
+  const filteredDistricts = cleanQuery
+    ? districts.filter(d => 
+        d.name.toLowerCase().includes(cleanQuery) || 
+        d.name_bn.includes(cleanQuery) ||
+        d.division.toLowerCase().includes(cleanQuery)
+      )
+    : [];
+
+  // Filter Places
   const filteredPlaces = cleanQuery
     ? places.filter(p => 
         p.name.toLowerCase().includes(cleanQuery) || 
+        (p.name_bn && p.name_bn.includes(cleanQuery)) ||
         p.location.toLowerCase().includes(cleanQuery) ||
         p.short_description.toLowerCase().includes(cleanQuery) ||
         p.category.toLowerCase().includes(cleanQuery)
       )
     : places.slice(0, 3);
 
+  // Filter Hotels
   const filteredHotels = cleanQuery
     ? hotels.filter(h => 
         h.name.toLowerCase().includes(cleanQuery) || 
@@ -69,6 +105,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       )
     : hotels.slice(0, 2);
 
+  // Filter Restaurants
   const filteredRestaurants = cleanQuery
     ? restaurants.filter(r => 
         r.name.toLowerCase().includes(cleanQuery) || 
@@ -77,6 +114,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       )
     : restaurants.slice(0, 2);
 
+  // Filter Transports
   const filteredTransports = cleanQuery
     ? transports.filter(t => 
         t.from_district.toLowerCase().includes(cleanQuery) ||
@@ -85,7 +123,10 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
       )
     : [];
 
-  const totalResults = (cleanQuery ? filteredPlaces.length + filteredHotels.length + filteredRestaurants.length + filteredTransports.length : 0);
+  const totalResults = (cleanQuery 
+    ? (isYeanaBrandSearch ? 1 : 0) + filteredDistricts.length + filteredPlaces.length + filteredHotels.length + filteredRestaurants.length + filteredTransports.length 
+    : 0
+  );
 
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center pt-16 sm:pt-24 px-4 bg-slate-950/60 backdrop-blur-sm animate-in fade-in duration-200">
@@ -98,13 +139,13 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         
         {/* Search Input Header */}
         <div className="p-4 border-b border-slate-100 flex items-center gap-3 bg-slate-50/50">
-          <Search className="w-5 h-5 text-brand-600 shrink-0" />
+          <Search className="w-5 h-5 text-emerald-600 shrink-0" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search 'Sylhet', 'Jaflong', 'Cox's Bazar', 'Kacchi Biryani'..."
-            className="w-full bg-transparent border-none text-base sm:text-lg font-medium text-slate-800 placeholder-slate-400 focus:outline-none"
+            placeholder="Search 'YEANA', 'Sylhet', 'Cox's Bazar', 'Inter-district Transport'..."
+            className="w-full bg-transparent border-none text-base sm:text-lg font-bold text-slate-800 placeholder-slate-400 focus:outline-none"
             autoFocus
           />
           {query && (
@@ -117,7 +158,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           )}
           <button
             onClick={onClose}
-            className="p-2 rounded-xl text-slate-500 hover:bg-slate-200 text-xs font-bold"
+            className="px-2.5 py-1.5 rounded-xl bg-slate-100 text-slate-500 hover:bg-slate-200 text-xs font-bold"
           >
             Esc
           </button>
@@ -125,13 +166,13 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
 
         {/* Quick Suggestion Pills */}
         {!cleanQuery && (
-          <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center gap-2 overflow-x-auto text-xs">
+          <div className="px-5 py-3 bg-slate-50 border-b border-slate-100 flex items-center gap-2 overflow-x-auto text-xs scrollbar-none">
             <span className="text-slate-400 font-semibold shrink-0">Popular:</span>
-            {['Sylhet', 'Cox\'s Bazar', 'Sajek', 'Ratargul', 'Sreemangal', 'Biryani', 'Green Line'].map(pill => (
+            {['YEANA', 'Cox\'s Bazar', 'Sylhet', 'Sajek', 'Transport Hub', 'Kacchi Biryani', 'Green Line'].map(pill => (
               <button
                 key={pill}
                 onClick={() => setQuery(pill)}
-                className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 hover:border-brand-500 hover:text-brand-700 font-medium shrink-0 shadow-2xs transition-colors"
+                className="px-3 py-1 rounded-full bg-white border border-slate-200 text-slate-700 hover:border-emerald-500 hover:text-emerald-700 font-bold shrink-0 shadow-2xs transition-all"
               >
                 {pill}
               </button>
@@ -140,14 +181,101 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
         )}
 
         {/* Results Container */}
-        <div className="overflow-y-auto p-4 space-y-6 flex-1">
+        <div className="overflow-y-auto p-4 sm:p-5 space-y-6 flex-1">
           
+          {/* SPECIAL: YEANA BRAND & PLATFORM CARD (Shown on "YEANA" or brand queries) */}
+          {isYeanaBrandSearch && (
+            <div className="p-5 rounded-3xl bg-gradient-to-br from-emerald-900 via-teal-900 to-slate-900 text-white shadow-lg space-y-4">
+              <div className="flex items-start justify-between">
+                <div className="space-y-1">
+                  <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-extrabold uppercase tracking-wider border border-emerald-400/30">
+                    <Sparkles className="w-3 h-3" />
+                    <span>Official Application & Portal</span>
+                  </div>
+                  <h3 className="text-xl font-black tracking-tight">
+                    YEANA — Explore More. Enjoy Life.
+                  </h3>
+                  <p className="text-xs text-emerald-100/80 leading-relaxed max-w-xl">
+                    YEANA is Bangladesh's premier all-in-one travel, tourism, and lifestyle platform. Explore 64 districts, verify inter-district transport, book top hotels, savor traditional cuisine, and create unforgettable trip itineraries.
+                  </p>
+                </div>
+              </div>
+
+              {/* Quick Navigation Links */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 border-t border-emerald-800/60">
+                <button
+                  onClick={() => { onNavigateTab('explore'); onClose(); }}
+                  className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-2 transition-all"
+                >
+                  <Compass className="w-4 h-4 text-emerald-300" />
+                  <span>64 Districts</span>
+                </button>
+                <button
+                  onClick={() => { onNavigateTab('transport'); onClose(); }}
+                  className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-2 transition-all"
+                >
+                  <Bus className="w-4 h-4 text-emerald-300" />
+                  <span>Transport</span>
+                </button>
+                <button
+                  onClick={() => { onNavigateTab('hotels'); onClose(); }}
+                  className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-2 transition-all"
+                >
+                  <Hotel className="w-4 h-4 text-emerald-300" />
+                  <span>Hotels</span>
+                </button>
+                <button
+                  onClick={() => { onNavigateTab('trips'); onClose(); }}
+                  className="p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-2 transition-all"
+                >
+                  <Calendar className="w-4 h-4 text-emerald-300" />
+                  <span>Trip Planner</span>
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* Districts Results */}
+          {filteredDistricts.length > 0 && (
+            <div className="space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-extrabold uppercase tracking-wider text-emerald-800 flex items-center gap-1.5">
+                  <Layers className="w-3.5 h-3.5" /> Districts & Divisions ({filteredDistricts.length})
+                </span>
+                <button 
+                  onClick={() => { onNavigateTab('explore'); onClose(); }}
+                  className="text-xs font-semibold text-emerald-600 hover:underline"
+                >
+                  View all districts
+                </button>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                {filteredDistricts.map(d => (
+                  <div
+                    key={d.id}
+                    onClick={() => { onNavigateTab('explore'); onClose(); }}
+                    className="p-3 rounded-2xl bg-slate-50 hover:bg-emerald-50 border border-slate-100 hover:border-emerald-200 transition-all cursor-pointer flex items-center gap-3 group"
+                  >
+                    <img src={d.image_url} alt="" className="w-11 h-11 rounded-xl object-cover" />
+                    <div>
+                      <p className="text-sm font-bold text-slate-900 group-hover:text-emerald-700">
+                        {d.name} <span className="text-slate-400 font-normal text-xs">({d.name_bn})</span>
+                      </p>
+                      <p className="text-xs text-slate-500">{d.division} Division</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
           {/* Places Results */}
           {filteredPlaces.length > 0 && (
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-brand-700 flex items-center gap-1.5">
-                  <Compass className="w-3.5 h-3.5" /> Places ({filteredPlaces.length})
+                  <Compass className="w-3.5 h-3.5" /> Tourist Spots ({filteredPlaces.length})
                 </span>
                 <button 
                   onClick={() => { onNavigateTab('places'); onClose(); }}
@@ -187,7 +315,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-extrabold uppercase tracking-wider text-sky-700 flex items-center gap-1.5">
-                  <Hotel className="w-3.5 h-3.5" /> Hotels ({filteredHotels.length})
+                  <Hotel className="w-3.5 h-3.5" /> Hotels & Resorts ({filteredHotels.length})
                 </span>
                 <button 
                   onClick={() => { onNavigateTab('hotels'); onClose(); }}
@@ -288,15 +416,16 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
           {cleanQuery && totalResults === 0 && (
             <div className="text-center py-12 space-y-2">
               <p className="text-base font-bold text-slate-700">No matching destinations or services found</p>
-              <p className="text-xs text-slate-500">Try searching for districts like "Sylhet", "Cox's Bazar", "Sajek" or places like "Jaflong".</p>
+              <p className="text-xs text-slate-500">Try searching for "YEANA", "Sylhet", "Cox's Bazar", "Sajek", "Hotel", or "Transport".</p>
             </div>
           )}
 
         </div>
 
         {/* Footer */}
-        <div className="p-3 bg-slate-50 border-t border-slate-100 text-center text-xs text-slate-500">
-          Search covers all 8 Divisions, 64 Districts, Hotels, Food, Transport & Rentals in Bangladesh.
+        <div className="p-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500 px-5">
+          <span>YEANA — Travel & Lifestyle Bangladesh</span>
+          <span className="font-semibold text-emerald-700">64 Districts • 100+ Attractions</span>
         </div>
 
       </div>

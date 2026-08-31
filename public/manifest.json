@@ -1,0 +1,43 @@
+{
+  "name": "YEANA — Bangladesh Travel & Lifestyle",
+  "short_name": "YEANA",
+  "description": "Explore Bangladesh. Discover 64 districts, authentic tourist attractions, hotels, food, transport schedules, and plan dream trip itineraries with YEANA.",
+  "start_url": "/",
+  "id": "/",
+  "display": "standalone",
+  "background_color": "#047857",
+  "theme_color": "#047857",
+  "orientation": "portrait-primary",
+  "categories": ["travel", "lifestyle", "navigation", "utilities"],
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Inter-District Transport",
+      "short_name": "Transport",
+      "description": "Find bus, train, flight & launch schedules",
+      "url": "/#transport",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Explore 64 Districts",
+      "short_name": "Explore",
+      "description": "Browse Bangladesh tourist places by district",
+      "url": "/#explore",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    },
+    {
+      "name": "Trip & Budget Planner",
+      "short_name": "Trips",
+      "description": "Plan your custom travel itinerary",
+      "url": "/#trips",
+      "icons": [{ "src": "/icon.svg", "sizes": "96x96" }]
+    }
+  ]
+}
