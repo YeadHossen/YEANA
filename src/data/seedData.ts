@@ -763,12 +763,17 @@ export const INITIAL_PLACES: Place[] = INITIAL_DISTRICTS.map(district => {
   };
 });
 
-export const INITIAL_HOTELS: Hotel[] = INITIAL_DISTRICTS.map(district => {
+export const INITIAL_HOTELS: Hotel[] = INITIAL_DISTRICTS.map((district, index) => {
   const custom = DISTRICT_DATA_CATALOG[district.id];
   const name = custom ? custom.hotelName : `Hotel ${district.name} Regency & Resort`;
   const name_bn = custom ? custom.hotelNameBn : `হোটেল ${district.name_bn} রিজেন্সি`;
   const price = custom ? custom.hotelPrice : 2200 + ((district.name.length % 5) * 400);
-  const img = custom ? custom.hotelImg : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800';
+  const img = custom ? custom.hotelImg : 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&auto=format&fit=crop&q=85';
+
+  const roomPhoto1 = 'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=800&auto=format&fit=crop&q=80';
+  const roomPhoto2 = 'https://images.unsplash.com/photo-1590490360182-c33d57733427?w=800&auto=format&fit=crop&q=80';
+  const diningPhoto = 'https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&auto=format&fit=crop&q=80';
+  const viewPhoto = 'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=800&auto=format&fit=crop&q=80';
 
   return {
     id: `hotel-${district.id}`,
@@ -791,8 +796,11 @@ export const INITIAL_HOTELS: Hotel[] = INITIAL_DISTRICTS.map(district => {
     has_room_service: true,
     has_security: true,
     image_url: img,
-    gallery: [img, district.image_url],
-    room_types: ['Deluxe AC Room', 'Executive Suite'],
+    gallery: [img, roomPhoto1, roomPhoto2, diningPhoto, viewPhoto],
+    room_types: [
+      { name: 'Deluxe AC Room', name_bn: 'ডিলাক্স এসি রুম', price: price, bed: '1 King Bed', capacity: '2 Adults', is_ac: true, image_url: roomPhoto1 },
+      { name: 'Executive Suite', name_bn: 'এক্সিকিউটিভ স্যুট', price: Math.round(price * 1.5), bed: '1 King Bed + Lounge', capacity: '3 Guests', is_ac: true, image_url: roomPhoto2 }
+    ],
     check_in: '12:00 PM',
     check_out: '11:30 AM',
     is_featured: ['moulvibazar', 'coxs-bazar', 'rangamati', 'patuakhali', 'dhaka', 'sylhet', 'chattogram', 'khulna'].includes(district.id)

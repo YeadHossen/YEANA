@@ -12,10 +12,14 @@ import {
   Star, 
   Sparkles,
   Phone,
-  ArrowRight
+  ArrowRight,
+  Award,
+  Store,
+  ShieldCheck,
+  Tag
 } from 'lucide-react';
 import { DataService } from '../services/dataService';
-import { District, Place, Hotel, Restaurant, TransportRoute, ShoppingPlace, Ride, Division } from '../types';
+import { District, Place, Hotel, Restaurant, TransportRoute, ShoppingPlace, Ride, Division, LocalSpecialtyItem } from '../types';
 import { PlaceCard } from '../components/common/PlaceCard';
 import { HotelCard } from '../components/common/HotelCard';
 import { RestaurantCard } from '../components/common/RestaurantCard';
@@ -44,6 +48,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [transports, setTransports] = useState<TransportRoute[]>([]);
   const [shopping, setShopping] = useState<ShoppingPlace[]>([]);
+  const [specialties, setSpecialties] = useState<LocalSpecialtyItem[]>([]);
   const [rides, setRides] = useState<Ride[]>([]);
 
   const [districtSearch, setDistrictSearch] = useState<string>('');
@@ -53,13 +58,14 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
   useEffect(() => {
     async function loadData() {
-      const [d, p, h, r, tr, s, rd] = await Promise.all([
+      const [d, p, h, r, tr, s, spec, rd] = await Promise.all([
         DataService.getDistricts(),
         DataService.getPlaces(),
         DataService.getHotels(),
         DataService.getRestaurants(),
         DataService.getTransports(),
         DataService.getShopping(),
+        DataService.getExclusiveSpecialties(),
         DataService.getRides()
       ]);
       setDistricts(d);
@@ -68,6 +74,7 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
       setRestaurants(r);
       setTransports(tr);
       setShopping(s);
+      setSpecialties(spec);
       setRides(rd);
 
       if (initialDistrictId) {
@@ -114,6 +121,10 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
 
   const districtShopping = selectedDistrict
     ? shopping.filter(s => s.district_id === selectedDistrict.id)
+    : [];
+
+  const districtSpecialties = selectedDistrict
+    ? specialties.filter(spec => spec.district_id === selectedDistrict.id)
     : [];
 
   const districtRides = selectedDistrict
@@ -461,33 +472,107 @@ export const ExploreView: React.FC<ExploreViewProps> = ({
               </div>
             )}
 
-            {/* 5. SHOPPING TAB */}
+            {/* 5. SHOPPING & PLACE EXCLUSIVES TAB */}
             {activeDistrictTab === 'shopping' && (
-              <div className="space-y-4">
-                {districtShopping.length > 0 ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {districtShopping.map(shop => (
-                      <div key={shop.id} className="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-card p-5 space-y-3">
-                        <img src={shop.image_url} alt="" className="w-full h-40 object-cover rounded-xl" />
-                        <div>
-                          <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2 py-0.5 rounded">
-                            {shop.category}
-                          </span>
-                          <h4 className="text-base font-bold text-slate-900 mt-1">{shop.name}</h4>
-                          <p className="text-xs text-slate-500 mt-1">📍 {shop.location}</p>
+              <div className="space-y-8">
+                
+                {/* 5A. Place-Exclusive Specialties (Only Found in this District) */}
+                {districtSpecialties.length > 0 && (
+                  <div className="space-y-4">
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="w-5 h-5 text-amber-500" />
+                      <h4 className="text-lg font-black text-slate-900">
+                        {language === 'bn' 
+                          ? `${selectedDistrict.name_bn || selectedDistrict.name}-এর স্থানভিত্তিক অনন্য পণ্য ও খাবার (Must-Buy Exclusives)` 
+                          : `Must-Buy Specialties of ${selectedDistrict.name} (Only Found Here)`}
+                      </h4>
+                    </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {districtSpecialties.map(item => (
+                        <div key={item.id} className="bg-white rounded-3xl border border-purple-200/80 overflow-hidden shadow-card p-5 space-y-4 flex flex-col justify-between hover:border-purple-400 transition-all">
+                          <div className="space-y-3">
+                            <div className="relative aspect-[16/10] overflow-hidden rounded-2xl bg-slate-100">
+                              <img src={item.image_url} alt={item.name} className="w-full h-full object-cover" />
+                              <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+                                <span className="px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider bg-purple-900/90 text-white backdrop-blur-md">
+                                  {language === 'bn' && item.category_bn ? item.category_bn : item.category}
+                                </span>
+                                {item.is_gi_tagged && (
+                                  <span className="px-2 py-0.5 rounded-md text-[9px] font-black bg-amber-500 text-white flex items-center gap-1 shadow-xs">
+                                    <Award className="w-2.5 h-2.5" />
+                                    <span>GI Tagged</span>
+                                  </span>
+                                )}
+                              </div>
+                            </div>
+
+                            <div>
+                              <h5 className="text-base font-black text-slate-900">
+                                {language === 'bn' && item.name_bn ? item.name_bn : item.name}
+                              </h5>
+                              <p className="text-xs text-purple-900 font-bold mt-0.5">{item.price_range}</p>
+                            </div>
+
+                            <p className="text-xs text-slate-600 bg-purple-50/70 p-3 rounded-2xl border border-purple-100 leading-relaxed">
+                              <span className="font-extrabold text-purple-950 block mb-1">
+                                {language === 'bn' ? 'কেন এই স্থানের অনন্য:' : 'Why It Is Uniquely Found Here:'}
+                              </span>
+                              {language === 'bn' && item.origin_story_bn ? item.origin_story_bn : item.origin_story}
+                            </p>
+
+                            <div className="text-[11px] text-slate-700 space-y-1 pt-1">
+                              <p className="flex items-start gap-1">
+                                <Store className="w-3.5 h-3.5 text-purple-600 shrink-0 mt-0.5" />
+                                <span><strong>{language === 'bn' ? 'আসল পাওয়ার স্থান:' : 'Authentic Spot:'}</strong> {language === 'bn' && item.best_market_or_spot_bn ? item.best_market_or_spot_bn : item.best_market_or_spot}</span>
+                              </p>
+                              <p className="flex items-start gap-1 text-emerald-800">
+                                <ShieldCheck className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
+                                <span><strong>{language === 'bn' ? 'টিপস:' : 'Tip:'}</strong> {language === 'bn' && item.authenticity_tip_bn ? item.authenticity_tip_bn : item.authenticity_tip}</span>
+                              </p>
+                            </div>
+                          </div>
                         </div>
-                        <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl leading-relaxed">
-                          <span className="font-bold text-purple-900">Famous For:</span> {shop.famous_for}
-                        </p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-12 bg-white rounded-3xl border border-slate-200 space-y-2">
-                    <ShoppingBag className="w-8 h-8 text-slate-400 mx-auto" />
-                    <p className="text-sm font-bold text-slate-700">Explore local municipal bazaars and handicrafts</p>
+                      ))}
+                    </div>
                   </div>
                 )}
+
+                {/* 5B. Traditional District Bazaars & Crafts */}
+                <div className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Store className="w-5 h-5 text-purple-600" />
+                    <h4 className="text-lg font-black text-slate-900">
+                      {language === 'bn' ? `${selectedDistrict.name_bn || selectedDistrict.name}-এর ঐতিহ্যবাহী মার্কেট ও হাটবাজার` : `Artisan Bazaars & Markets in ${selectedDistrict.name}`}
+                    </h4>
+                  </div>
+
+                  {districtShopping.length > 0 ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                      {districtShopping.map(shop => (
+                        <div key={shop.id} className="bg-white rounded-3xl border border-slate-200 overflow-hidden shadow-card p-5 space-y-3">
+                          <img src={shop.image_url} alt="" className="w-full h-40 object-cover rounded-2xl" />
+                          <div>
+                            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-700 bg-purple-50 px-2.5 py-0.5 rounded-md">
+                              {shop.category}
+                            </span>
+                            <h4 className="text-base font-bold text-slate-900 mt-1">{shop.name}</h4>
+                            <p className="text-xs text-slate-500 mt-1">📍 {shop.location}</p>
+                          </div>
+                          <p className="text-xs text-slate-600 bg-slate-50 p-2.5 rounded-xl leading-relaxed">
+                            <span className="font-bold text-purple-900">Specialty:</span> {shop.famous_for}
+                          </p>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 bg-white rounded-3xl border border-slate-200 space-y-2">
+                      <ShoppingBag className="w-8 h-8 text-slate-400 mx-auto" />
+                      <p className="text-sm font-bold text-slate-700">Explore local municipal bazaars and handicrafts</p>
+                    </div>
+                  )}
+                </div>
+
               </div>
             )}
 

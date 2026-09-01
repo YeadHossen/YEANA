@@ -55,12 +55,41 @@ export interface Place {
   nearby_restaurants?: string[];
 }
 
+export type HotelStarRating = 2 | 3 | 4 | 5;
+export type PropertyCategory = 
+  | '5-Star Luxury' 
+  | '4-Star Premium' 
+  | '3-Star Comfort' 
+  | '2-Star Budget' 
+  | 'Luxury Resort & Spa'
+  | 'Resort & Spa' 
+  | 'Eco-Resort & Cottage' 
+  | 'Guest House / Dakbangla'
+  | 'Water Villa & Houseboat';
+
+export interface HotelRoomType {
+  name: string;
+  name_bn?: string;
+  price: number;
+  bed: string;
+  capacity: string;
+  is_ac: boolean;
+  image_url?: string;
+}
+
 export interface Hotel {
   id: string;
   district_id: string;
   district_name?: string;
+  upazila_id?: string;
+  upazila_name?: string;
+  upazila_name_bn?: string;
+  pouroshava_or_thana?: string;
+  division?: Division;
   name: string;
   name_bn: string;
+  star_category?: HotelStarRating;
+  property_category?: PropertyCategory;
   rating: number;
   reviews_count: number;
   price_per_night: number;
@@ -75,12 +104,20 @@ export interface Hotel {
   has_restaurant: boolean;
   has_room_service: boolean;
   has_security: boolean;
+  has_swimming_pool?: boolean;
+  has_gym?: boolean;
+  has_breakfast?: boolean;
+  has_hill_view?: boolean;
+  has_sea_view?: boolean;
+  has_lake_view?: boolean;
   image_url: string;
   gallery: string[];
-  room_types: string[];
+  room_types: string[] | HotelRoomType[];
   check_in: string;
   check_out: string;
   is_featured?: boolean;
+  description?: string;
+  nearby_attractions?: string[];
 }
 
 export interface Restaurant {
@@ -103,11 +140,22 @@ export interface Restaurant {
   is_featured?: boolean;
 }
 
-export type TransportType = 'Bus' | 'Train' | 'Flight' | 'Car' | 'Launch';
+export type TransportType = 'Bus' | 'Train' | 'Flight' | 'Car' | 'Launch' | 'Local';
+
+export type LocalVehicleCategory = 
+  | 'chander_gari'     // 4x4 Hill Safari Jeep (Sajek, Bandarban, Nilgiri)
+  | 'cng'              // 3-Wheeler Auto-Rickshaw (Intracity & Upazila)
+  | 'easy_bike'        // Electric Battery Auto / TomTom
+  | 'leguna'           // Human Hauler / Local Feeder Pickup
+  | 'boat_trawler'     // Tourist Engine Boat / Trawler / Speedboat (Haor / River)
+  | 'bike_ride'        // Local Motorcycle / Haor Trail Rider
+  | 'rickshaw';        // Traditional Heritage Rickshaw
 
 export interface TransportRoute {
   id: string;
   transport_type: TransportType;
+  local_category?: LocalVehicleCategory;
+  local_vehicle_name?: string;
   company: string;
   from_district: string;
   to_district: string;
@@ -116,7 +164,11 @@ export interface TransportRoute {
   duration: string;
   price_min: number;
   price_max: number;
+  reserve_price?: number;
+  is_reserve_available?: boolean;
+  capacity_seats?: number;
   boarding_points: string[];
+  dropping_points?: string[];
   schedule_days: string;
   contact_phone?: string;
   is_active: boolean;
@@ -135,6 +187,8 @@ export interface ShoppingPlace {
   opening_hours: string;
   image_url: string;
 }
+
+export type Shopping = ShoppingPlace;
 
 export interface Ride {
   id: string;
@@ -189,14 +243,43 @@ export interface Trip {
   created_at: string;
 }
 
-export type FavoriteType = 'place' | 'hotel' | 'restaurant' | 'shopping' | 'ride';
+export type SpecialtyCategory = 
+  | 'Dress & Handloom' 
+  | 'Food & Sweet' 
+  | 'Folk Craft & Souvenir' 
+  | 'Natural Produce';
+
+export interface LocalSpecialtyItem {
+  id: string;
+  district_id: string;
+  district_name: string;
+  division?: Division;
+  name: string;
+  name_bn: string;
+  category: SpecialtyCategory;
+  category_bn?: string;
+  is_gi_tagged?: boolean;
+  gi_tag_year?: string;
+  origin_story: string;
+  origin_story_bn?: string;
+  price_range: string;
+  best_market_or_spot: string;
+  best_market_or_spot_bn?: string;
+  authenticity_tip: string;
+  authenticity_tip_bn?: string;
+  image_url: string;
+  seasonality?: string;
+  tags: string[];
+}
+
+export type FavoriteType = 'place' | 'hotel' | 'restaurant' | 'shopping' | 'ride' | 'specialty';
 
 export interface FavoriteItem {
   id: string;
   user_id?: string;
   item_type: FavoriteType;
   item_id: string;
-  item_data: Place | Hotel | Restaurant | ShoppingPlace | Ride;
+  item_data: Place | Hotel | Restaurant | ShoppingPlace | Ride | LocalSpecialtyItem;
   created_at: string;
 }
 
@@ -231,3 +314,150 @@ export interface NotificationItem {
   date: string;
   read: boolean;
 }
+
+// Traveler Choices & Selection Payload
+export interface TravelerChoicePayload {
+  destination?: string;
+  district_name?: string;
+  selected_places?: { id: string; name: string; category?: string }[];
+  selected_hotel?: { id: string; name: string; room_type?: string; price_per_night?: number };
+  selected_ride?: { id: string; title: string; vehicle_type?: string; estimated_cost?: number };
+  selected_specialties?: { id: string; name: string; category?: string; price_range?: string }[];
+  travel_dates?: { start_date?: string; end_date?: string; duration_days?: number };
+  group_size?: number;
+  budget_range?: string;
+  special_notes?: string;
+}
+
+export type MessageSenderRole = 'traveler' | 'admin';
+
+export interface ChatMessage {
+  id: string;
+  inquiry_id: string;
+  sender_id: string;
+  sender_name: string;
+  sender_role: MessageSenderRole;
+  sender_avatar?: string;
+  message: string;
+  timestamp: string;
+  is_read: boolean;
+  attachment_type?: 'choices' | 'quote' | 'status_update' | 'general';
+  attachment_data?: TravelerChoicePayload;
+}
+
+export type InquiryCategory = 
+  | 'trip_planning' 
+  | 'hotel_booking' 
+  | 'ride_assistance' 
+  | 'specialty_order' 
+  | 'custom_package'
+  | 'general';
+
+export type InquiryStatus = 
+  | 'new' 
+  | 'in_progress' 
+  | 'confirmed' 
+  | 'resolved' 
+  | 'cancelled';
+
+export interface TravelerInquiry {
+  id: string;
+  traveler_id: string;
+  traveler_name: string;
+  traveler_email: string;
+  traveler_phone?: string;
+  traveler_avatar?: string;
+  subject: string;
+  category: InquiryCategory;
+  status: InquiryStatus;
+  created_at: string;
+  updated_at: string;
+  last_message: string;
+  unread_for_admin: number;
+  unread_for_traveler: number;
+  traveler_choices?: TravelerChoicePayload;
+  messages: ChatMessage[];
+  admin_notes?: string;
+}
+
+// ==========================================
+// KEEP NOTES & TRAVEL EXPENSES TYPES
+// ==========================================
+
+export type ExpenseCategory = 
+  | 'food' 
+  | 'transport' 
+  | 'hotel' 
+  | 'shopping' 
+  | 'activities' 
+  | 'ride' 
+  | 'emergency' 
+  | 'tips' 
+  | 'other';
+
+export type PaymentMethod = 
+  | 'cash' 
+  | 'bkash' 
+  | 'nagad' 
+  | 'card' 
+  | 'other';
+
+export interface TravelExpense {
+  id: string;
+  title: string;
+  amount: number;
+  category: ExpenseCategory;
+  date: string;
+  time?: string;
+  payment_method: PaymentMethod;
+  payer_name?: string;
+  split_count?: number;
+  location?: string;
+  notes?: string;
+  created_at: string;
+}
+
+export interface ChecklistItem {
+  id: string;
+  text: string;
+  completed: boolean;
+}
+
+export type NoteCategory = 
+  | 'general' 
+  | 'places' 
+  | 'food' 
+  | 'emergency' 
+  | 'tips' 
+  | 'packing' 
+  | 'diary';
+
+export type NoteColor = 
+  | 'emerald' 
+  | 'sky' 
+  | 'amber' 
+  | 'rose' 
+  | 'purple' 
+  | 'slate';
+
+export interface TravelNote {
+  id: string;
+  title: string;
+  content: string;
+  category: NoteCategory;
+  color: NoteColor;
+  is_pinned: boolean;
+  has_checklist: boolean;
+  checklist_items: ChecklistItem[];
+  location_tag?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface GroupSplitMember {
+  id: string;
+  name: string;
+  paid_amount: number;
+}
+
+

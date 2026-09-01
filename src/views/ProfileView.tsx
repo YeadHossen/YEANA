@@ -13,12 +13,14 @@ import {
   CheckCircle2, 
   Globe,
   Bell,
-  Settings
+  Settings,
+  Receipt
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTrip } from '../context/TripContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { useLanguage } from '../context/LanguageContext';
+import { useNotes } from '../context/NotesContext';
 
 interface ProfileViewProps {
   onNavigateTab: (tab: string) => void;
@@ -29,6 +31,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
   const { user, isAuthenticated, isAdmin, logout, updateProfile, loginDemoAdmin, loginDemoTraveler } = useAuth();
   const { trips } = useTrip();
   const { favorites } = useFavorites();
+  const { expenses, notes } = useNotes();
   const { language, setLanguage, t } = useLanguage();
 
   const [isEditing, setIsEditing] = useState(false);
@@ -185,44 +188,57 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
       </div>
 
       {/* Quick Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 sm:gap-4">
         
         <div 
           onClick={() => onNavigateTab('trips')}
-          className="p-5 rounded-3xl bg-white border border-slate-200 shadow-card cursor-pointer hover:border-brand-300 transition-colors"
+          className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-card cursor-pointer hover:border-brand-300 transition-colors"
         >
-          <div className="w-10 h-10 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mb-2">
-            <Calendar className="w-5 h-5" />
+          <div className="w-9 h-9 rounded-2xl bg-brand-50 text-brand-700 flex items-center justify-center mb-2">
+            <Calendar className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">{trips.length}</p>
-          <p className="text-xs text-slate-500 font-semibold">Planned Trips</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 font-mono">{trips.length}</p>
+          <p className="text-[11px] text-slate-500 font-semibold">Planned Trips</p>
+        </div>
+
+        <div 
+          onClick={() => onNavigateTab('notes')}
+          className="p-4 sm:p-5 rounded-3xl bg-emerald-50/60 border border-emerald-200/80 shadow-card cursor-pointer hover:border-emerald-400 transition-colors group"
+        >
+          <div className="w-9 h-9 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mb-2 group-hover:scale-105 transition-transform">
+            <Receipt className="w-4 h-4" />
+          </div>
+          <p className="text-xl sm:text-2xl font-black text-emerald-900 font-mono">
+            {expenses.length} / {notes.length}
+          </p>
+          <p className="text-[11px] text-emerald-700 font-bold">Keep Notes & Costs</p>
         </div>
 
         <div 
           onClick={() => onNavigateTab('favorites')}
-          className="p-5 rounded-3xl bg-white border border-slate-200 shadow-card cursor-pointer hover:border-rose-300 transition-colors"
+          className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-card cursor-pointer hover:border-rose-300 transition-colors"
         >
-          <div className="w-10 h-10 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2">
-            <Heart className="w-5 h-5" />
+          <div className="w-9 h-9 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center mb-2">
+            <Heart className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">{favorites.length}</p>
-          <p className="text-xs text-slate-500 font-semibold">Saved Bookmarks</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 font-mono">{favorites.length}</p>
+          <p className="text-[11px] text-slate-500 font-semibold">Saved Bookmarks</p>
         </div>
 
-        <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center mb-2">
-            <Globe className="w-5 h-5" />
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-card">
+          <div className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-700 flex items-center justify-center mb-2">
+            <Globe className="w-4 h-4" />
           </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">8</p>
-          <p className="text-xs text-slate-500 font-semibold">BD Divisions</p>
+          <p className="text-xl sm:text-2xl font-black text-slate-900 font-mono">8</p>
+          <p className="text-[11px] text-slate-500 font-semibold">BD Divisions</p>
         </div>
 
-        <div className="p-5 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-10 h-10 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2">
-            <ShieldCheck className="w-5 h-5" />
+        <div className="p-4 sm:p-5 rounded-3xl bg-white border border-slate-200 shadow-card col-span-2 sm:col-span-1">
+          <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2">
+            <ShieldCheck className="w-4 h-4" />
           </div>
-          <p className="text-sm font-black text-emerald-700 capitalize">{user?.role || 'Traveler'}</p>
-          <p className="text-xs text-slate-500 font-semibold">Account Status</p>
+          <p className="text-sm font-black text-emerald-700 capitalize truncate">{user?.role || 'Traveler'}</p>
+          <p className="text-[11px] text-slate-500 font-semibold">Account Status</p>
         </div>
 
       </div>

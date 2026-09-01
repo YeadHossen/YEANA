@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Compass, 
   Search, 
@@ -15,11 +15,14 @@ import {
   Hotel,
   Bus,
   ShoppingBag,
-  Car
+  Car,
+  MessageSquare,
+  Receipt
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useFavorites } from '../../context/FavoritesContext';
+import { useChat } from '../../context/ChatContext';
 
 interface NavbarProps {
   currentTab: string;
@@ -37,6 +40,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   const { language, toggleLanguage, t } = useLanguage();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
   const { favorites } = useFavorites();
+  const { unreadAdminCount, unreadTravelerCount, openTravelerChat } = useChat();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
@@ -50,10 +54,24 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'shopping', label: t('nav.shopping'), icon: ShoppingBag },
     { id: 'ride', label: t('nav.ride'), icon: Car },
     { id: 'trips', label: t('nav.trips'), icon: Calendar },
+    { id: 'notes', label: t('nav.notes'), icon: Receipt },
   ];
 
+  const [isOnline, setIsOnline] = useState<boolean>(() => typeof navigator !== 'undefined' ? navigator.onLine : true);
+
+  useEffect(() => {
+    const handleOnline = () => setIsOnline(true);
+    const handleOffline = () => setIsOnline(false);
+    window.addEventListener('online', handleOnline);
+    window.addEventListener('offline', handleOffline);
+    return () => {
+      window.removeEventListener('online', handleOnline);
+      window.removeEventListener('offline', handleOffline);
+    };
+  }, []);
+
   return (
-    <header className="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200/80 shadow-sm transition-all">
+    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-2xl border-b border-white/50 shadow-glass transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
@@ -62,15 +80,15 @@ export const Navbar: React.FC<NavbarProps> = ({
             onClick={() => { setCurrentTab('home'); }} 
             className="flex items-center gap-3 cursor-pointer group select-none"
           >
-            <div className="w-10 h-10 md:w-11 md:h-11 rounded-xl bg-gradient-to-br from-brand-600 to-brand-800 flex items-center justify-center text-white shadow-md shadow-brand-700/20 group-hover:scale-105 transition-transform">
+            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-tr from-emerald-600 via-teal-600 to-sky-600 flex items-center justify-center text-white shadow-lg shadow-emerald-600/25 group-hover:scale-105 group-hover:shadow-glow-emerald transition-all duration-300">
               <Compass className="w-6 h-6 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-1.5">
-                <span className="text-2xl font-extrabold tracking-tight text-slate-900 font-sans">
+                <span className="text-2xl font-black tracking-tight text-slate-900 font-heading">
                   YEANA
                 </span>
-                <span className="text-[10px] font-bold uppercase tracking-widest px-1.5 py-0.5 rounded bg-brand-100 text-brand-800 font-sans">
+                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg bg-emerald-100/80 text-emerald-800 border border-emerald-200/60 shadow-xs">
                   BD
                 </span>
               </div>
@@ -81,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 lg:gap-1.5">
+          <nav className="hidden xl:flex items-center gap-1 lg:gap-1.5 p-1 rounded-2xl bg-slate-100/70 border border-slate-200/60 backdrop-blur-md">
             {navLinks.map(link => {
               const Icon = link.icon;
               const isActive = currentTab === link.id;
@@ -89,13 +107,13 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={link.id}
                   onClick={() => setCurrentTab(link.id)}
-                  className={`px-3 py-2 rounded-lg text-sm font-medium transition-all flex items-center gap-1.5 ${
+                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
                     isActive 
-                      ? 'bg-brand-50 text-brand-700 font-semibold shadow-xs' 
-                      : 'text-slate-600 hover:text-brand-600 hover:bg-slate-50'
+                      ? 'bg-white text-emerald-700 font-black shadow-sm border border-emerald-100 scale-102' 
+                      : 'text-slate-600 hover:text-emerald-700 hover:bg-white/60'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-brand-600' : 'text-slate-400'}`} />
+                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
                   {link.label}
                 </button>
               );
@@ -105,23 +123,36 @@ export const Navbar: React.FC<NavbarProps> = ({
           {/* Right Action Icons & Auth */}
           <div className="flex items-center gap-2 sm:gap-3">
             
+            {/* Live Online / Cloud Status Indicator */}
+            <div 
+              className={`hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-bold border backdrop-blur-md transition-all ${
+                isOnline 
+                  ? 'bg-emerald-50/90 text-emerald-800 border-emerald-200/80 shadow-xs' 
+                  : 'bg-amber-50/90 text-amber-800 border-amber-200/80 shadow-xs'
+              }`}
+              title={isOnline ? 'Online: Cloud Synced with Live Platform' : 'Offline: Using cached local data'}
+            >
+              <span className={`w-2 h-2 rounded-full ${isOnline ? 'bg-emerald-500 animate-pulse' : 'bg-amber-500'}`} />
+              <span>{isOnline ? 'Live Online' : 'Offline'}</span>
+            </div>
+
             {/* Global Search Trigger */}
             <button
               onClick={onOpenSearch}
-              className="p-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-slate-900 transition-colors flex items-center gap-2 text-sm"
+              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100/90 hover:bg-white hover:border-emerald-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 transition-all flex items-center gap-2 text-sm shadow-xs"
               title="Search places, hotels, transport..."
             >
               <Search className="w-4 h-4 text-slate-500" />
-              <span className="hidden md:inline text-xs text-slate-500 pr-1">Search...</span>
+              <span className="hidden md:inline text-xs text-slate-500 font-medium pr-1">Search...</span>
             </button>
 
             {/* Language Switcher (EN / বাংলা) */}
             <button
               onClick={toggleLanguage}
-              className="px-2.5 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-xs font-semibold flex items-center gap-1 transition-colors"
+              className="px-3 py-2 rounded-xl bg-slate-100/90 hover:bg-white text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200/70 shadow-xs transition-all"
               title="Toggle Language"
             >
-              <Languages className="w-3.5 h-3.5 text-brand-600" />
+              <Languages className="w-3.5 h-3.5 text-emerald-600" />
               <span>{language === 'en' ? 'বাংলা' : 'English'}</span>
             </button>
 
@@ -141,11 +172,25 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
+            {/* Support Concierge Chat Button for Travelers */}
+            <button
+              onClick={() => openTravelerChat()}
+              className="p-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-brand-600 transition-colors relative"
+              title="Chat with YEANA Concierge / Tour Support"
+            >
+              <MessageSquare className="w-4 h-4" />
+              {unreadTravelerCount > 0 && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                  {unreadTravelerCount}
+                </span>
+              )}
+            </button>
+
             {/* Admin Badge/Link if Admin */}
             {isAdmin && (
               <button
                 onClick={() => setCurrentTab('admin')}
-                className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all ${
+                className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all relative ${
                   currentTab === 'admin' 
                     ? 'bg-amber-500 text-white shadow-sm' 
                     : 'bg-amber-100 text-amber-900 hover:bg-amber-200'
@@ -153,6 +198,11 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>Admin</span>
+                {unreadAdminCount > 0 && (
+                  <span className="px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-black rounded-full animate-pulse">
+                    {unreadAdminCount}
+                  </span>
+                )}
               </button>
             )}
 
@@ -198,6 +248,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                     >
                       <Calendar className="w-3.5 h-3.5" />
                       <span>{t('nav.trips')}</span>
+                    </button>
+
+                    <button
+                      onClick={() => { setCurrentTab('notes'); setUserDropdownOpen(false); }}
+                      className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2"
+                    >
+                      <Receipt className="w-3.5 h-3.5 text-emerald-600" />
+                      <span>{t('nav.notes')}</span>
                     </button>
 
                     {isAdmin && (

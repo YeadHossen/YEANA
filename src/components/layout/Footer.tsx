@@ -4,9 +4,10 @@ import { useLanguage } from '../../context/LanguageContext';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
+  onOpenPrivacy?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
+export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPrivacy }) => {
   const { t } = useLanguage();
 
   return (
@@ -82,7 +83,7 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
             </h4>
             <ul className="space-y-2 text-sm text-slate-400">
               <li><button onClick={() => onNavigate('trips')} className="hover:text-brand-400 transition-colors">Multi-Day Trip Itinerary</button></li>
-              <li><button onClick={() => onNavigate('trips')} className="hover:text-brand-400 transition-colors">Budget Estimator</button></li>
+              <li><button onClick={() => onNavigate('notes')} className="hover:text-emerald-400 text-emerald-300 font-semibold transition-colors">Keep Notes & Expenses (নোট ও খরচ)</button></li>
               <li><button onClick={() => onNavigate('favorites')} className="hover:text-brand-400 transition-colors">Saved Offline Guides</button></li>
               <li><button onClick={() => onNavigate('profile')} className="hover:text-brand-400 transition-colors">My Traveler Profile</button></li>
               <li><button onClick={() => onNavigate('admin')} className="hover:text-brand-400 transition-colors text-amber-400">Admin Portal</button></li>
@@ -99,8 +100,18 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate }) => {
               <Globe className="w-3.5 h-3.5 text-brand-500" />
               <span>Bangla & English</span>
             </span>
-            <span>Privacy Policy</span>
-            <span>Terms of Service</span>
+            <button 
+              onClick={onOpenPrivacy}
+              className="text-slate-400 hover:text-brand-400 transition-colors underline underline-offset-4"
+            >
+              Privacy Policy
+            </button>
+            <button 
+              onClick={onOpenPrivacy}
+              className="text-slate-400 hover:text-brand-400 transition-colors underline underline-offset-4"
+            >
+              Terms of Service
+            </button>
           </div>
         </div>
 

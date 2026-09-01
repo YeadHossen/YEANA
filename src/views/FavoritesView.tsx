@@ -28,7 +28,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
   const places = favorites.filter(f => f.item_type === 'place').map(f => f.item_data as Place);
   const hotels = favorites.filter(f => f.item_type === 'hotel').map(f => f.item_data as Hotel);
   const restaurants = favorites.filter(f => f.item_type === 'restaurant').map(f => f.item_data as Restaurant);
-  const others = favorites.filter(f => f.item_type === 'shopping' || f.item_type === 'ride');
+  const shoppingItems = favorites.filter(f => f.item_type === 'shopping' || f.item_type === 'specialty');
 
   const handleDownload = () => {
     downloadOfflinePackage();
@@ -96,6 +96,7 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
           { id: 'place', label: `Places (${places.length})`, icon: Compass },
           { id: 'hotel', label: `Hotels (${hotels.length})`, icon: HotelIcon },
           { id: 'restaurant', label: `Food (${restaurants.length})`, icon: Utensils },
+          { id: 'shopping', label: `Shopping & Crafts (${shoppingItems.length})`, icon: ShoppingBag },
         ].map(tab => (
           <button
             key={tab.id}
@@ -169,6 +170,51 @@ export const FavoritesView: React.FC<FavoritesViewProps> = ({
                     onSelect={onSelectRestaurant}
                   />
                 ))}
+              </div>
+            </div>
+          )}
+
+          {/* Shopping & Specialties Section */}
+          {(activeTab === 'all' || activeTab === 'shopping' || (activeTab as string) === 'specialty') && shoppingItems.length > 0 && (
+            <div className="space-y-4">
+              <h3 className="text-lg font-bold text-slate-900 font-sans flex items-center gap-2">
+                <ShoppingBag className="w-5 h-5 text-purple-600" />
+                <span>Saved Shopping & Local Specialties ({shoppingItems.length})</span>
+              </h3>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                {shoppingItems.map(item => {
+                  const data = item.item_data as any;
+                  return (
+                    <div key={item.id} className="bg-white rounded-3xl border border-slate-200 shadow-card p-5 space-y-3">
+                      {data.image_url && (
+                        <img src={data.image_url} alt="" className="w-full h-40 object-cover rounded-2xl" />
+                      )}
+                      <div>
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="text-[10px] font-extrabold uppercase px-2.5 py-0.5 rounded-md bg-purple-100 text-purple-800">
+                            {data.category || 'Specialty'}
+                          </span>
+                          {data.is_gi_tagged && (
+                            <span className="text-[10px] font-black px-2 py-0.5 rounded-full bg-amber-500 text-white">
+                              ★ GI Tagged
+                            </span>
+                          )}
+                        </div>
+                        <h4 className="text-base font-bold text-slate-900 mt-2">{data.name}</h4>
+                        <p className="text-xs text-slate-500 mt-0.5">📍 {data.district_name || data.location || 'Bangladesh'}</p>
+                      </div>
+                      <p className="text-xs text-slate-600 bg-purple-50/50 p-3 rounded-2xl border border-purple-100 leading-relaxed">
+                        {data.origin_story || data.famous_for || 'Authentic local treasure of Bangladesh.'}
+                      </p>
+                      {data.price_range && (
+                        <div className="text-xs font-bold text-slate-700 flex justify-between items-center pt-2 border-t border-slate-100">
+                          <span>Price Range:</span>
+                          <span className="text-purple-700 font-black">{data.price_range}</span>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
             </div>
           )}

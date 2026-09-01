@@ -21,8 +21,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
   ];
 
   return (
-    <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t border-slate-200/80 px-2 py-1.5 shadow-lg safe-area-bottom">
-      <div className="flex items-center justify-around">
+    <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-2 pt-1 safe-area-bottom pointer-events-none">
+      <div className="max-w-md mx-auto bg-white/85 backdrop-blur-2xl border border-white/60 shadow-2xl rounded-2xl px-2 py-1.5 flex items-center justify-around pointer-events-auto shadow-slate-900/10">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = currentTab === tab.id;
@@ -32,19 +32,22 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
               onClick={() => setCurrentTab(tab.id)}
               className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all relative ${
                 isActive 
-                  ? 'text-brand-700 font-bold scale-105' 
-                  : 'text-slate-500 hover:text-slate-800'
+                  ? 'text-emerald-700 font-black scale-105' 
+                  : 'text-slate-500 hover:text-slate-900'
               }`}
             >
+              {isActive && (
+                <span className="absolute inset-0 bg-emerald-50/90 rounded-xl -z-10 border border-emerald-100/80 shadow-xs" />
+              )}
               <div className="relative">
-                <Icon className={`w-5 h-5 ${isActive ? 'text-brand-700 stroke-[2.5]' : 'stroke-[1.75]'}`} />
+                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? 'text-emerald-700 stroke-[2.5] -translate-y-0.5' : 'stroke-[1.75]'}`} />
                 {tab.badge !== undefined && tab.badge > 0 && (
-                  <span className="absolute -top-1 -right-2 w-3.5 h-3.5 bg-rose-500 text-white text-[9px] font-extrabold rounded-full flex items-center justify-center">
+                  <span className="absolute -top-1 -right-2.5 min-w-4 h-4 px-1 bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[9px] font-black rounded-full flex items-center justify-center shadow-xs">
                     {tab.badge}
                   </span>
                 )}
               </div>
-              <span className="text-[10px] mt-0.5 tracking-tight font-medium">
+              <span className={`text-[10px] mt-0.5 tracking-tight font-sans ${isActive ? 'font-black text-emerald-800' : 'font-medium text-slate-500'}`}>
                 {tab.label}
               </span>
             </button>

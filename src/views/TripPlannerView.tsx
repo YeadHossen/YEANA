@@ -14,12 +14,14 @@ import {
   ChevronRight,
   Layers,
   ArrowRight,
-  HelpCircle
+  HelpCircle,
+  MessageSquare
 } from 'lucide-react';
 import { useTrip } from '../context/TripContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useFavorites } from '../context/FavoritesContext';
-import { Place, District, TripBudget } from '../types';
+import { useChat } from '../context/ChatContext';
+import { Place, District, TripBudget, TravelerChoicePayload } from '../types';
 import { DataService } from '../services/dataService';
 
 interface TripPlannerViewProps {
@@ -30,6 +32,7 @@ export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace 
   const { t, language } = useLanguage();
   const { trips, activeTrip, setActiveTrip, createTrip, addCustomStopToTrip, removeTripPlace, updateTripBudget, deleteTrip } = useTrip();
   const { downloadOfflinePackage, isOfflineReady } = useFavorites();
+  const { openTravelerChat } = useChat();
   
   const [districts, setDistricts] = useState<District[]>([]);
   const [places, setPlaces] = useState<Place[]>([]);
@@ -283,6 +286,33 @@ export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace 
             </div>
 
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 z-10">
+              <button
+                onClick={() => {
+                  const choices: TravelerChoicePayload = {
+                    destination: activeTrip.destination,
+                    district_name: activeTrip.destination,
+                    selected_places: activeTrip.places.map((p, idx) => ({
+                      id: p.place_id || p.id || `place-stop-${idx}`,
+                      name: p.place?.name || p.custom_title || `Day ${p.day_number} Attraction`,
+                      category: p.place?.category || 'Sightseeing'
+                    })),
+                    travel_dates: {
+                      start_date: activeTrip.start_date,
+                      end_date: activeTrip.end_date,
+                      duration_days: activeTrip.duration_days
+                    },
+                    budget_range: activeTrip.total_budget ? `৳${activeTrip.total_budget.toLocaleString()}` : undefined,
+                    special_notes: activeTrip.notes
+                  };
+                  openTravelerChat(choices, `Assistance for ${activeTrip.title}`, 'trip_planning');
+                }}
+                className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-brand-500 to-emerald-500 hover:from-brand-400 hover:to-emerald-400 text-white text-xs font-black shadow-lg transition-all flex items-center justify-center gap-1.5"
+                title="Send your choices to Admin for guide booking & verification"
+              >
+                <MessageSquare className="w-4 h-4" />
+                <span>Send Plan to Admin / Concierge</span>
+              </button>
+
               <button
                 onClick={handleOfflineDownload}
                 className="px-4 py-2.5 rounded-xl bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-bold shadow-md transition-all flex items-center justify-center gap-1.5"

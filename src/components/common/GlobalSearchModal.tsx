@@ -101,9 +101,14 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
   const filteredHotels = cleanQuery
     ? hotels.filter(h => 
         h.name.toLowerCase().includes(cleanQuery) || 
+        (h.name_bn && h.name_bn.includes(cleanQuery)) ||
+        (h.upazila_name && h.upazila_name.toLowerCase().includes(cleanQuery)) ||
+        (h.upazila_name_bn && h.upazila_name_bn.includes(cleanQuery)) ||
+        (h.district_name && h.district_name.toLowerCase().includes(cleanQuery)) ||
+        (h.property_category && h.property_category.toLowerCase().includes(cleanQuery)) ||
         h.location.toLowerCase().includes(cleanQuery)
-      )
-    : hotels.slice(0, 2);
+      ).slice(0, 6)
+    : hotels.slice(0, 3);
 
   // Filter Restaurants
   const filteredRestaurants = cleanQuery

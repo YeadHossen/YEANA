@@ -20,6 +20,7 @@ const translations: Record<string, { en: string; bn: string }> = {
   'nav.shopping': { en: 'Shopping', bn: 'কেনাকাটা' },
   'nav.ride': { en: 'Ride', bn: 'গাড়ি/বাইক ভাড়া' },
   'nav.trips': { en: 'Trip Planner', bn: 'ভ্রমণ পরিকল্পনা' },
+  'nav.notes': { en: 'KEEP NOTES', bn: 'নোট ও খরচ' },
   'nav.favorites': { en: 'Favorites', bn: 'প্রিয় তালিকা' },
   'nav.profile': { en: 'Profile', bn: 'প্রোফাইল' },
   'nav.admin': { en: 'Admin Portal', bn: 'অ্যাডমিন প্যানেল' },
@@ -106,7 +107,43 @@ const translations: Record<string, { en: string; bn: string }> = {
   'admin.total_places': { en: 'Tourist Places', bn: 'দর্শনীয় স্থান' },
   'admin.total_hotels': { en: 'Hotels & Resorts', bn: 'হোটেল ও রিসোর্ট' },
   'admin.total_food': { en: 'Food Spots', bn: 'খাবারের দোকান' },
-  'admin.total_trips': { en: 'Trips Planned', bn: 'পরিকল্পিত ট্রিপ' }
+  'admin.total_trips': { en: 'Trips Planned', bn: 'পরিকল্পিত ট্রিপ' },
+
+  // Shopping & Place Exclusives
+  'shop.tagline': { en: 'Only Found Here & Local Crafts', bn: 'স্থানভিত্তিক বিশেষ পণ্য ও হস্তশিল্প' },
+  'shop.title': { en: 'Authentic Regional Delicacies, Handlooms & Crafts', bn: 'স্থানভিত্তিক অনন্য পোশাক, ঐতিহ্যবাহী খাবার ও কারুশিল্প' },
+  'shop.subtitle': { en: 'Discover unique specialties, iconic traditional dresses, famous regional sweets, and GI-certified heritage treasures found only in their native districts.', bn: 'বাংলাদেশের প্রতিটি জেলার স্বকীয় ঐতিহ্যবাহী পোশাক, বিখ্যাত মিষ্টান্ন, অনন্য খাবার ও জিআই সনদপ্রাপ্ত দুর্লভ পণ্যের আসল সংগ্রহ।' },
+  'shop.tab_exclusives': { en: 'Place-Exclusive Specialties', bn: 'স্থানভিত্তিক অনন্য পণ্য ও খাবার' },
+  'shop.tab_bazaars': { en: 'Traditional Bazaars & Markets', bn: 'ঐতিহ্যবাহী মার্কেট ও হাটবাজার' },
+  'shop.all_categories': { en: 'All Specialties', bn: 'সকল অনন্য পণ্য' },
+  'shop.dress_handloom': { en: 'Traditional Dresses & Handloom', bn: 'পোশাক ও তাঁতশিল্প' },
+  'shop.food_sweet': { en: 'Iconic Regional Foods & Sweets', bn: 'ঐতিহ্যবাহী খাবার ও মিষ্টি' },
+  'shop.folk_craft': { en: 'Folk Crafts & Souvenirs', bn: 'হস্তশিল্প ও স্যুভনির' },
+  'shop.natural_produce': { en: 'Natural Honey, Tea & Produce', bn: 'প্রাকৃতিক মধু, চা ও ফলমূল' },
+  'shop.gi_tagged': { en: 'GI Certified Heritage', bn: 'জিআই স্বীকৃতিপ্রাপ্ত' },
+  'shop.search_placeholder': { en: 'Search specialties (e.g. Jamdani, Chomchom, Silk, Doi, Honey)...', bn: 'পণ্য খুঁজুন (যেমন: জামদানি, চমচম, সিল্ক, দই, মধু, খাঁদি)...' },
+  'shop.why_exclusive': { en: 'Why It Is Uniquely Found Here:', bn: 'কেন এই স্থানের অনন্য ঐতিহ্য:' },
+  'shop.price_estimate': { en: 'Estimated Price Range:', bn: 'আনুমানিক মূল্য সীমা:' },
+  'shop.authentic_spot': { en: 'Where to Buy Authentic Original:', bn: 'আসল পণ্য পাওয়ার নির্ভরযোগ্য স্থান:' },
+  'shop.authenticity_guide': { en: 'Authenticity & Buyer Tip:', bn: 'আসল চেনার উপায় ও পরামর্শ:' },
+  'shop.view_guide': { en: 'Authenticity Details', bn: 'বিস্তারিত গাইড' },
+
+  // Keep Notes & Expenses
+  'notes.title': { en: 'Traveler Notes & Cost Keeper', bn: 'ভ্রমণ নোট ও খরচের হিসাব' },
+  'notes.subtitle': { en: 'Log your trip expenses in BDT (৳), calculate group splits, track budgets, and save important travel checklists & diary notes with offline auto-sync.', bn: 'আপনার সমস্ত ভ্রমণ খরচের হিসাব (৳), বন্ধুদের মাঝে খরচের ভাগ, বাজেট ট্র্যাকিং এবং প্রয়োজনীয় ভ্রমণ নোট ও চেকলিস্ট এক জায়গায় সংরক্ষণ করুন।' },
+  'notes.tab_expenses': { en: 'Costs & Expenses', bn: 'খরচের হিসাব' },
+  'notes.tab_notes': { en: 'Travel Notes & Diary', bn: 'ভ্রমণ নোট ও ডায়েরি' },
+  'notes.tab_split': { en: 'Group Splitter', bn: 'গ্রুপ খরচের ভাগ' },
+  'notes.tab_checklists': { en: 'Packing & Checklists', bn: 'প্যাকিং ও চেকলিস্ট' },
+  'notes.add_expense': { en: 'Add New Expense', bn: 'নতুন খরচ যুক্ত করুন' },
+  'notes.add_note': { en: 'Create New Note', bn: 'নতুন নোট লিখুন' },
+  'notes.budget_target': { en: 'Target Budget Goal', bn: 'মোট ভ্রমণ বাজেট' },
+  'notes.total_spent': { en: 'Total Spent', bn: 'মোট খরচ হয়েছে' },
+  'notes.balance_left': { en: 'Remaining Balance', bn: 'অবশিষ্ট টাকা' },
+  'notes.export_whatsapp': { en: 'Share to WhatsApp', bn: 'হোয়াটসঅ্যাপে পাঠান' },
+  'notes.load_sample': { en: 'Load Sample Tour', bn: 'নমুনা ট্যুর লোড করুন' },
+  'notes.empty_expenses': { en: 'No expenses logged yet. Start recording your journey costs!', bn: 'এখনও কোনো খরচ যুক্ত করা হয়নি। আপনার ভ্রমণের খরচের হিসাব রাখুন!' },
+  'notes.empty_notes': { en: 'No notes created yet. Keep your emergency hotlines, packing lists, and memories here.', bn: 'এখনও কোনো নোট নেই। জরুরি নম্বর, প্যাকিং লিস্ট ও সুন্দর স্মৃতিগুলো লিখে রাখুন।' }
 };
 
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);

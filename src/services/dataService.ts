@@ -8,7 +8,13 @@ import {
   ShoppingPlace, 
   Ride, 
   Review,
-  Trip
+  Trip,
+  LocalSpecialtyItem,
+  TravelerInquiry,
+  ChatMessage,
+  InquiryCategory,
+  InquiryStatus,
+  TravelerChoicePayload
 } from '../types';
 import { 
   INITIAL_DISTRICTS, 
@@ -20,6 +26,9 @@ import {
   INITIAL_RIDES, 
   SAMPLE_TRIP 
 } from '../data/seedData';
+import { EXCLUSIVE_SPECIALTIES } from '../data/exclusiveSpecialtiesData';
+import { INITIAL_INQUIRIES } from '../data/seedInquiriesData';
+import { getAllAccommodations } from './hotelService';
 
 // LocalStorage Keys for persistent offline/mock mode
 const STORAGE_KEYS = {
@@ -29,9 +38,11 @@ const STORAGE_KEYS = {
   RESTAURANTS: 'yeana_restaurants',
   TRANSPORTS: 'yeana_transports',
   SHOPPING: 'yeana_shopping',
+  SPECIALTIES: 'yeana_specialties',
   RIDES: 'yeana_rides',
   TRIPS: 'yeana_trips',
-  REVIEWS: 'yeana_reviews'
+  REVIEWS: 'yeana_reviews',
+  INQUIRIES: 'yeana_inquiries'
 };
 
 // Initialize LocalStorage with seed data and auto-upgrade if new districts/places added
@@ -65,6 +76,16 @@ function initializeLocalStorage() {
     const savedShopping = localStorage.getItem(STORAGE_KEYS.SHOPPING);
     if (!savedShopping || JSON.parse(savedShopping).length < INITIAL_SHOPPING.length) {
       localStorage.setItem(STORAGE_KEYS.SHOPPING, JSON.stringify(INITIAL_SHOPPING));
+    }
+
+    const savedSpecialties = localStorage.getItem(STORAGE_KEYS.SPECIALTIES);
+    if (!savedSpecialties || JSON.parse(savedSpecialties).length < EXCLUSIVE_SPECIALTIES.length) {
+      localStorage.setItem(STORAGE_KEYS.SPECIALTIES, JSON.stringify(EXCLUSIVE_SPECIALTIES));
+    }
+
+    const savedInquiries = localStorage.getItem(STORAGE_KEYS.INQUIRIES);
+    if (!savedInquiries || JSON.parse(savedInquiries).length < INITIAL_INQUIRIES.length) {
+      localStorage.setItem(STORAGE_KEYS.INQUIRIES, JSON.stringify(INITIAL_INQUIRIES));
     }
 
     const savedRides = localStorage.getItem(STORAGE_KEYS.RIDES);
@@ -212,10 +233,15 @@ export const DataService = {
       const { data, error } = await supabase.from('hotels').select('*');
       if (!error && data && data.length > 0) return data as Hotel[];
     }
-    return getLocal<Hotel>(STORAGE_KEYS.HOTELS, INITIAL_HOTELS);
+    const allAccommodations = getAllAccommodations();
+    return allAccommodations.length > 0 ? allAccommodations : getLocal<Hotel>(STORAGE_KEYS.HOTELS, INITIAL_HOTELS);
   },
 
   async getHotelById(id: string): Promise<Hotel | null> {
+    const allAccommodations = getAllAccommodations();
+    const foundInAll = allAccommodations.find(h => h.id === id);
+    if (foundInAll) return foundInAll;
+
     const apiHotel = await fetchApi<Hotel>(`/api/hotels/${id}`);
     if (apiHotel) return apiHotel;
 
@@ -331,7 +357,7 @@ export const DataService = {
     return true;
   },
 
-  // Shopping
+  // Shopping & Place Exclusives
   async getShopping(): Promise<ShoppingPlace[]> {
     const apiData = await fetchApi<ShoppingPlace[]>('/api/shopping');
     if (apiData && apiData.length > 0) {
@@ -344,6 +370,25 @@ export const DataService = {
       if (!error && data && data.length > 0) return data as ShoppingPlace[];
     }
     return getLocal<ShoppingPlace>(STORAGE_KEYS.SHOPPING, INITIAL_SHOPPING);
+  },
+
+  async getExclusiveSpecialties(districtId?: string, category?: string): Promise<LocalSpecialtyItem[]> {
+    const apiData = await fetchApi<LocalSpecialtyItem[]>('/api/specialties');
+    let list: LocalSpecialtyItem[];
+    if (apiData && apiData.length > 0) {
+      setLocal(STORAGE_KEYS.SPECIALTIES, apiData);
+      list = apiData;
+    } else {
+      list = getLocal<LocalSpecialtyItem>(STORAGE_KEYS.SPECIALTIES, EXCLUSIVE_SPECIALTIES);
+    }
+
+    if (districtId && districtId !== 'All') {
+      list = list.filter(item => item.district_id === districtId);
+    }
+    if (category && category !== 'All') {
+      list = list.filter(item => item.category === category);
+    }
+    return list;
   },
 
   // Rides
@@ -448,7 +493,211 @@ export const DataService = {
       totalRides: rides.length,
       totalTrips: trips.length,
       totalReviews: reviews.length,
+      totalInquiries: (await this.getInquiries()).length,
+      unreadInquiries: (await this.getUnreadInquiryCount('admin')),
       totalUsers: 2540
     };
+  },
+
+  // ============================================================================
+  // Traveler Inquiries & Admin Messaging System
+  // ============================================================================
+
+  async getInquiries(category?: string, status?: string): Promise<TravelerInquiry[]> {
+    const apiData = await fetchApi<TravelerInquiry[]>('/api/inquiries');
+    let list: TravelerInquiry[];
+    if (apiData && apiData.length > 0) {
+      setLocal(STORAGE_KEYS.INQUIRIES, apiData);
+      list = apiData;
+    } else {
+      list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    }
+
+    if (category && category !== 'all') {
+      list = list.filter(item => item.category === category);
+    }
+    if (status && status !== 'all') {
+      list = list.filter(item => item.status === status);
+    }
+
+    // Sort by updated_at descending
+    return list.sort((a, b) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime());
+  },
+
+  async getInquiryById(id: string): Promise<TravelerInquiry | null> {
+    const apiData = await fetchApi<TravelerInquiry>(`/api/inquiries/${id}`);
+    if (apiData) return apiData;
+
+    const list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    return list.find(item => item.id === id) || null;
+  },
+
+  async createInquiry(data: {
+    traveler_id: string;
+    traveler_name: string;
+    traveler_email: string;
+    traveler_phone?: string;
+    traveler_avatar?: string;
+    subject: string;
+    category: InquiryCategory;
+    initial_message: string;
+    traveler_choices?: TravelerChoicePayload;
+  }): Promise<TravelerInquiry> {
+    const now = new Date().toISOString();
+    const newInquiryId = `inq-${Date.now()}`;
+    const initialMsg: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      inquiry_id: newInquiryId,
+      sender_id: data.traveler_id,
+      sender_name: data.traveler_name,
+      sender_role: 'traveler',
+      sender_avatar: data.traveler_avatar,
+      message: data.initial_message,
+      timestamp: now,
+      is_read: false,
+      attachment_type: data.traveler_choices ? 'choices' : 'general',
+      attachment_data: data.traveler_choices
+    };
+
+    const newInquiry: TravelerInquiry = {
+      id: newInquiryId,
+      traveler_id: data.traveler_id,
+      traveler_name: data.traveler_name,
+      traveler_email: data.traveler_email,
+      traveler_phone: data.traveler_phone || '+880 1700-000000',
+      traveler_avatar: data.traveler_avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150',
+      subject: data.subject,
+      category: data.category,
+      status: 'new',
+      created_at: now,
+      updated_at: now,
+      last_message: data.initial_message,
+      unread_for_admin: 1,
+      unread_for_traveler: 0,
+      traveler_choices: data.traveler_choices,
+      messages: [initialMsg]
+    };
+
+    // Try posting to API
+    await fetchApi<TravelerInquiry>('/api/inquiries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newInquiry)
+    });
+
+    const list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    list.unshift(newInquiry);
+    setLocal(STORAGE_KEYS.INQUIRIES, list);
+
+    // Trigger custom event for real-time reactivity
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('yeana:inquiries_updated', { detail: newInquiry }));
+    }
+
+    return newInquiry;
+  },
+
+  async sendMessage(
+    inquiryId: string,
+    messageText: string,
+    senderRole: 'traveler' | 'admin',
+    senderName: string,
+    senderId: string,
+    senderAvatar?: string,
+    attachmentType?: 'choices' | 'quote' | 'status_update' | 'general',
+    attachmentData?: TravelerChoicePayload
+  ): Promise<ChatMessage> {
+    const list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    const index = list.findIndex(i => i.id === inquiryId);
+    const now = new Date().toISOString();
+
+    const newMsg: ChatMessage = {
+      id: `msg-${Date.now()}`,
+      inquiry_id: inquiryId,
+      sender_id: senderId,
+      sender_name: senderName,
+      sender_role: senderRole,
+      sender_avatar: senderAvatar,
+      message: messageText,
+      timestamp: now,
+      is_read: false,
+      attachment_type: attachmentType || 'general',
+      attachment_data: attachmentData
+    };
+
+    if (index >= 0) {
+      const inquiry = list[index];
+      inquiry.messages.push(newMsg);
+      inquiry.last_message = (senderRole === 'admin' ? 'Admin: ' : '') + messageText;
+      inquiry.updated_at = now;
+      if (senderRole === 'traveler') {
+        inquiry.unread_for_admin += 1;
+      } else {
+        inquiry.unread_for_traveler += 1;
+        if (inquiry.status === 'new') {
+          inquiry.status = 'in_progress';
+        }
+      }
+      if (attachmentData) {
+        inquiry.traveler_choices = { ...inquiry.traveler_choices, ...attachmentData };
+      }
+      list[index] = inquiry;
+      setLocal(STORAGE_KEYS.INQUIRIES, list);
+
+      // Trigger custom event for reactivity
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('yeana:inquiries_updated', { detail: inquiry }));
+      }
+    }
+
+    return newMsg;
+  },
+
+  async updateInquiryStatus(inquiryId: string, status: InquiryStatus, adminNotes?: string): Promise<boolean> {
+    const list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    const index = list.findIndex(i => i.id === inquiryId);
+    if (index >= 0) {
+      list[index].status = status;
+      if (adminNotes !== undefined) {
+        list[index].admin_notes = adminNotes;
+      }
+      list[index].updated_at = new Date().toISOString();
+      setLocal(STORAGE_KEYS.INQUIRIES, list);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('yeana:inquiries_updated', { detail: list[index] }));
+      }
+      return true;
+    }
+    return false;
+  },
+
+  async markInquiryRead(inquiryId: string, forRole: 'admin' | 'traveler'): Promise<void> {
+    const list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    const index = list.findIndex(i => i.id === inquiryId);
+    if (index >= 0) {
+      if (forRole === 'admin') {
+        list[index].unread_for_admin = 0;
+      } else {
+        list[index].unread_for_traveler = 0;
+      }
+      list[index].messages.forEach(m => {
+        if (forRole === 'admin' && m.sender_role === 'traveler') m.is_read = true;
+        if (forRole === 'traveler' && m.sender_role === 'admin') m.is_read = true;
+      });
+      setLocal(STORAGE_KEYS.INQUIRIES, list);
+
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('yeana:inquiries_updated', { detail: list[index] }));
+      }
+    }
+  },
+
+  async getUnreadInquiryCount(forRole: 'admin' | 'traveler'): Promise<number> {
+    const list = getLocal<TravelerInquiry>(STORAGE_KEYS.INQUIRIES, INITIAL_INQUIRIES);
+    return list.reduce((total, inq) => {
+      return total + (forRole === 'admin' ? inq.unread_for_admin : inq.unread_for_traveler);
+    }, 0);
   }
 };
+

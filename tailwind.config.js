@@ -28,13 +28,18 @@ export default {
         }
       },
       fontFamily: {
-        sans: ['Inter', 'Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        outfit: ['Outfit', 'Plus Jakarta Sans', 'sans-serif'],
         bengali: ['Hind Siliguri', 'Noto Sans Bengali', 'sans-serif'],
       },
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(15, 118, 110, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
         'card': '0 10px 30px -5px rgba(0, 0, 0, 0.05), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
         'elevated': '0 20px 40px -10px rgba(15, 118, 110, 0.15)',
+        'glass': '0 8px 32px 0 rgba(15, 23, 42, 0.08)',
+        'glass-hover': '0 16px 40px 0 rgba(13, 148, 136, 0.18)',
+        'glow-emerald': '0 0 25px -5px rgba(16, 185, 129, 0.4)',
+        'glow-sky': '0 0 25px -5px rgba(14, 165, 233, 0.4)',
       },
     },
   },
