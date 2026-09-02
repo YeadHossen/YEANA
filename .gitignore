@@ -33,3 +33,6 @@ dist-ssr
 # SQLite Database WAL files (optional: keep .db or ignore)
 server/data/*.db-wal
 server/data/*.db-shm
+
+.vercel
+.env*

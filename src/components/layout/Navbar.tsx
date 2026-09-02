@@ -153,17 +153,17 @@ export const Navbar: React.FC<NavbarProps> = ({
             {/* Language Switcher (EN / বাংলা) */}
             <button
               onClick={toggleLanguage}
-              className="px-3 py-2 rounded-xl bg-slate-100/90 hover:bg-white text-slate-700 text-xs font-bold flex items-center gap-1.5 border border-slate-200/70 shadow-xs transition-all"
+              className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-100/90 hover:bg-white text-slate-700 text-xs font-bold flex items-center gap-1 sm:gap-1.5 border border-slate-200/70 shadow-xs transition-all"
               title="Toggle Language"
             >
               <Languages className="w-3.5 h-3.5 text-emerald-600" />
               <span>{language === 'en' ? 'বাংলা' : 'English'}</span>
             </button>
 
-            {/* Favorites Button */}
+            {/* Favorites Button (Desktop/Tablet - on mobile accessible via BottomNav) */}
             <button
               onClick={() => setCurrentTab('favorites')}
-              className={`p-2.5 rounded-xl transition-colors relative ${
+              className={`hidden sm:flex p-2.5 rounded-xl transition-colors relative ${
                 currentTab === 'favorites' ? 'bg-rose-50 text-rose-600' : 'bg-slate-100/80 text-slate-600 hover:text-rose-600'
               }`}
               title="Favorites & Saved Items"
@@ -176,10 +176,10 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Support Concierge Chat Button for Travelers */}
+            {/* Support Concierge Chat Button for Travelers (Desktop/Tablet) */}
             <button
               onClick={() => openTravelerChat()}
-              className="p-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-brand-600 transition-colors relative"
+              className="hidden md:flex p-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-brand-600 transition-colors relative"
               title="Chat with YEANA Concierge / Tour Support"
             >
               <MessageSquare className="w-4 h-4" />

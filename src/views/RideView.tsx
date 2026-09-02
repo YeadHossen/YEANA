@@ -285,10 +285,10 @@ export const RideView: React.FC = () => {
               </div>
             </div>
 
-            <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-3">
+            <div className="pt-2 border-t border-slate-100 flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
               <a
                 href={`tel:${selectedRideModal.contact_phone}`}
-                className="px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center gap-1.5 transition-all"
+                className="w-full sm:w-auto px-4 py-3 rounded-2xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-bold flex items-center justify-center gap-1.5 transition-all"
               >
                 <Phone className="w-4 h-4 text-rose-600" />
                 <span>Call Host ({selectedRideModal.contact_phone})</span>
@@ -299,7 +299,7 @@ export const RideView: React.FC = () => {
                   setBookingConfirmedRide(selectedRideModal);
                   setSelectedRideModal(null);
                 }}
-                className="flex-1 px-5 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition-all shadow-elevated active:scale-95"
+                className="w-full sm:flex-1 px-5 py-3 rounded-2xl bg-rose-600 hover:bg-rose-700 text-white text-xs font-black transition-all shadow-elevated active:scale-95 text-center"
               >
                 Confirm Reservation ⏎
               </button>
@@ -310,11 +310,11 @@ export const RideView: React.FC = () => {
 
       {/* Confirmation Toast */}
       {bookingConfirmedRide && (
-        <div className="fixed bottom-6 right-6 z-50 p-5 rounded-3xl bg-slate-900 text-white shadow-2xl border border-slate-700 flex items-center gap-4 animate-in slide-in-from-bottom-5">
+        <div className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 p-4 sm:p-5 rounded-3xl bg-slate-900 text-white shadow-2xl border border-slate-700 flex items-center gap-3 sm:gap-4 max-w-sm animate-in slide-in-from-bottom-5">
           <ShieldCheck className="w-6 h-6 text-emerald-400 shrink-0" />
           <div className="space-y-0.5">
-            <h4 className="font-extrabold text-sm text-emerald-400">Reservation Request Sent!</h4>
-            <p className="text-xs text-slate-300">Host {bookingConfirmedRide.owner_name} will call you shortly to confirm pickup.</p>
+            <h4 className="font-extrabold text-xs sm:text-sm text-emerald-400">Reservation Request Sent!</h4>
+            <p className="text-[11px] sm:text-xs text-slate-300">Host {bookingConfirmedRide.owner_name} will call you shortly to confirm pickup.</p>
           </div>
           <button
             onClick={() => setBookingConfirmedRide(null)}

@@ -1159,7 +1159,7 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
                     </div>
 
                     {/* Total Price Summary */}
-                    <div className="flex items-center justify-between p-4 rounded-2xl bg-slate-800/80 border border-slate-700 flex-wrap gap-2">
+                    <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between p-4 rounded-2xl bg-slate-800/80 border border-slate-700 gap-3">
                       <div>
                         <p className="text-[11px] text-slate-400 font-bold">Total Reservation Amount ({numberOfNights} Nights × {roomCount} Room)</p>
                         <p className="text-2xl font-mono font-black text-emerald-400">
@@ -1169,9 +1169,9 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
 
                       <button
                         type="submit"
-                        className="px-6 py-3 rounded-2xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black text-xs sm:text-sm flex items-center gap-2 shadow-lg shadow-emerald-500/20 transition-all"
+                        className="w-full sm:w-auto px-6 py-3.5 rounded-2xl bg-emerald-500 hover:bg-emerald-600 active:scale-95 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 transition-all text-center"
                       >
-                        <CheckCircle2 className="w-4 h-4" />
+                        <CheckCircle2 className="w-4 h-4 shrink-0" />
                         <span>Confirm & Generate Hotel Voucher</span>
                       </button>
                     </div>

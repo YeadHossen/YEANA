@@ -67,7 +67,7 @@ export const FoodView: React.FC<FoodViewProps> = ({ onSelectRestaurant }) => {
           <Utensils className="w-4 h-4 text-amber-600" />
           <span>Taste of Bangladesh</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-black text-slate-900 font-sans">
+        <h1 className="text-2xl sm:text-4xl font-black text-slate-900 font-sans">
           Iconic Cuisine, Restaurants & Cafés
         </h1>
         <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">

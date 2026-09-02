@@ -125,7 +125,7 @@ export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace 
             <Calendar className="w-4 h-4 text-brand-600" />
             <span>Itinerary & Budget Creator</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-black text-slate-900 font-sans">
+          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 font-sans">
             Personalized Trip Planner
           </h1>
           <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">

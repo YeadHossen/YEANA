@@ -178,14 +178,14 @@ export const PlaceDetailView: React.FC<PlaceDetailViewProps> = ({
           )}
 
           {/* Action Floating Bar for Mobile/Desktop */}
-          <div className="p-4 rounded-2xl bg-brand-50/80 border border-brand-200/80 flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-brand-50/80 border border-brand-200/80 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
             <div>
               <p className="text-xs font-extrabold text-brand-950">Add {place.name} to Trip Plan</p>
               <p className="text-[11px] text-brand-700">Organize Day 1, 2 or 3 itinerary with budget estimator</p>
             </div>
             <button
               onClick={() => onAddToTrip(place)}
-              className="px-4 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-700/20 transition-all flex items-center gap-1.5 active:scale-95"
+              className="w-full sm:w-auto px-4 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold shadow-md shadow-brand-700/20 transition-all flex items-center justify-center gap-1.5 active:scale-95 text-center"
             >
               <CalendarPlus className="w-4 h-4" />
               <span>{t('common.add_to_trip')}</span>

@@ -297,14 +297,14 @@ const AppContent: React.FC = () => {
 
       {/* Global Toast Notification */}
       {toastMessage && (
-        <div className="fixed bottom-20 sm:bottom-6 right-4 sm:right-6 z-50 p-4 rounded-2xl bg-slate-900 text-white shadow-2xl border border-slate-700 flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-200">
+        <div className="fixed bottom-24 sm:bottom-6 right-4 sm:right-6 z-50 p-4 rounded-2xl bg-slate-900 text-white shadow-2xl border border-slate-700 flex items-center gap-3 animate-in slide-in-from-bottom-5 duration-200">
           <CheckCircle2 className="w-5 h-5 text-teal-400 shrink-0" />
           <span className="text-xs sm:text-sm font-semibold">{toastMessage}</span>
         </div>
       )}
 
       {/* Main View Area */}
-      <main className="flex-1 pt-6 sm:pt-8">
+      <main className="flex-1 pt-4 sm:pt-6 md:pt-8 pb-24 xl:pb-12">
         
         {/* If a place is selected, show PlaceDetailView regardless of tab */}
         {selectedPlace ? (
