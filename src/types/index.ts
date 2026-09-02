@@ -75,6 +75,10 @@ export interface HotelRoomType {
   capacity: string;
   is_ac: boolean;
   image_url?: string;
+  total_rooms?: number;
+  available_rooms?: number;
+  booked_rooms?: number;
+  amenities?: string[];
 }
 
 export interface Hotel {
@@ -459,5 +463,101 @@ export interface GroupSplitMember {
   name: string;
   paid_amount: number;
 }
+
+// ==========================================
+// TRANSPORT & HOTEL BOOKING SYSTEM TYPES
+// ==========================================
+
+export type BookingStatus = 'confirmed' | 'checked_in' | 'boarded' | 'completed' | 'cancelled';
+
+export interface TransportBooking {
+  id: string;
+  route_id: string;
+  route?: TransportRoute;
+  company: string;
+  transport_type: TransportType;
+  from_district: string;
+  to_district: string;
+  departure_time: string;
+  travel_date: string;
+  selected_seats: string[];
+  seat_count: number;
+  is_full_reserve: boolean;
+  passenger_name: string;
+  passenger_phone: string;
+  passenger_email: string;
+  passenger_gender: 'Male' | 'Female' | 'Other';
+  boarding_point: string;
+  dropping_point: string;
+  total_fare: number;
+  status: BookingStatus;
+  booked_at: string;
+}
+
+export interface HotelBooking {
+  id: string;
+  hotel_id: string;
+  hotel_name: string;
+  hotel_image?: string;
+  district_name: string;
+  room_type: string;
+  room_count: number;
+  guest_count: number;
+  check_in_date: string;
+  check_out_date: string;
+  nights: number;
+  guest_name: string;
+  guest_phone: string;
+  guest_email: string;
+  total_cost: number;
+  status: BookingStatus;
+  special_requests?: string;
+  booked_at: string;
+}
+
+export interface SeatInventoryItem {
+  id: string;
+  route_id: string;
+  travel_date: string;
+  seat_id: string;
+  status: 'available' | 'booked' | 'blocked' | 'female_reserved';
+  booking_id?: string;
+  passenger_name?: string;
+  passenger_phone?: string;
+  blocked_reason?: string;
+  updated_at?: string;
+}
+
+export interface RoomInventoryItem {
+  id: string;
+  hotel_id: string;
+  room_type: string;
+  total_rooms: number;
+  available_rooms: number;
+  booked_rooms: number;
+  blocked_rooms: number;
+  price_per_night: number;
+  updated_at?: string;
+}
+
+export interface CompanyPortalStats {
+  transport: {
+    totalBookings: number;
+    seatsSold: number;
+    revenue: number;
+    totalRoutes: number;
+  };
+  hotel: {
+    totalBookings: number;
+    roomsBooked: number;
+    revenue: number;
+    totalProperties: number;
+  };
+  summary: {
+    totalRevenue: number;
+    totalCompanies: number;
+  };
+}
+
 
 

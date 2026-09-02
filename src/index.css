@@ -86,21 +86,63 @@
 
 /* Radiant Text Gradients */
 .text-gradient-emerald {
-  background: linear-gradient(135deg, #059669 0%, #0d9488 40%, #0284c7 100%);
+  background: linear-gradient(135deg, #006A4E 0%, #059669 45%, #0ea5e9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #ea580c 100%);
+  background: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #e11d48 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-crimson {
+  background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-ocean {
-  background: linear-gradient(135deg, #0284c7 0%, #0d9488 50%, #4f46e5 100%);
+  background: linear-gradient(135deg, #0284c7 0%, #059669 50%, #6366f1 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* Cultural Badges */
+.badge-heritage-green {
+  background: linear-gradient(135deg, rgba(0, 106, 78, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
+  color: #065f46;
+  border: 1px solid rgba(5, 150, 105, 0.3);
+}
+
+.badge-sunset-red {
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.12) 0%, rgba(244, 63, 94, 0.08) 100%);
+  color: #9f1239;
+  border: 1px solid rgba(225, 29, 72, 0.3);
+}
+
+.badge-mustard-gold {
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%);
+  color: #78350f;
+  border: 1px solid rgba(245, 158, 11, 0.35);
+}
+
+.badge-haor-blue {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(14, 165, 233, 0.08) 100%);
+  color: #0369a1;
+  border: 1px solid rgba(2, 132, 199, 0.3);
+}
+
+/* Bangladeshi Alpona / Mesh Ambient Background */
+.bg-bangla-mesh {
+  background-color: #fafbfc;
+  background-image: 
+    radial-gradient(at 0% 0%, rgba(0, 106, 78, 0.07) 0px, transparent 50%),
+    radial-gradient(at 100% 0%, rgba(225, 29, 72, 0.05) 0px, transparent 45%),
+    radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
+    radial-gradient(at 100% 100%, rgba(2, 132, 199, 0.06) 0px, transparent 50%);
+  background-attachment: fixed;
 }
 
 /* Floating Animations */
@@ -115,6 +157,19 @@
 
 .animate-float {
   animation: floatGentle 4s ease-in-out infinite;
+}
+
+@keyframes pulseGlow {
+  0%, 100% {
+    box-shadow: 0 0 15px -3px rgba(5, 150, 105, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 30px 2px rgba(5, 150, 105, 0.7);
+  }
+}
+
+.animate-glow-pulse {
+  animation: pulseGlow 3s ease-in-out infinite;
 }
 
 /* Custom Sleek Scrollbars */

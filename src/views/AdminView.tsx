@@ -23,12 +23,14 @@ import {
   Car,
   AlertCircle,
   Clock,
-  ChevronRight
+  ChevronRight,
+  Building2
 } from 'lucide-react';
 import { DataService } from '../services/dataService';
 import { Place, Hotel, Restaurant, TransportRoute, District, TravelerInquiry, InquiryCategory, InquiryStatus } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
+import { CompanyPortalSection } from '../components/admin/CompanyPortalSection';
 
 export const AdminView: React.FC = () => {
   const { isAdmin, loginDemoAdmin } = useAuth();
@@ -55,7 +57,7 @@ export const AdminView: React.FC = () => {
     unreadInquiries: 0
   });
 
-  const [activeTab, setActiveTab] = useState<'inquiries' | 'places' | 'hotels' | 'restaurants' | 'transports'>('inquiries');
+  const [activeTab, setActiveTab] = useState<'portal' | 'inquiries' | 'places' | 'hotels' | 'restaurants' | 'transports'>('portal');
   const [places, setPlaces] = useState<Place[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
@@ -473,6 +475,7 @@ export const AdminView: React.FC = () => {
       {/* Navigation Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
         {[
+          { id: 'portal', label: '🏢 Company E-Portal (কোম্পানি ই-পোর্টাল)', icon: Building2 },
           { id: 'inquiries', label: `Traveler Inquiries & Choices (${inquiries.length})`, icon: MessageSquare, badge: unreadAdminCount },
           { id: 'places', label: `Manage Places (${places.length})`, icon: Compass },
           { id: 'hotels', label: `Manage Hotels (${hotels.length})`, icon: HotelIcon },
@@ -502,6 +505,20 @@ export const AdminView: React.FC = () => {
           );
         })}
       </div>
+
+      {/* ========================================================================= */}
+      {/* 0. COMPANY E-PORTAL (REAL-TIME SEAT & ROOM INVENTORY & MANIFEST)          */}
+      {/* ========================================================================= */}
+      {activeTab === 'portal' && (
+        <CompanyPortalSection
+          transports={transports}
+          hotels={hotels}
+          onNotify={(msg) => {
+            setSuccessToast(msg);
+            setTimeout(() => setSuccessToast(''), 3000);
+          }}
+        />
+      )}
 
       {/* ========================================================================= */}
       {/* 1. TRAVELER INQUIRIES & CHOICES PORTAL (MASTER-DETAIL VIEW) */}

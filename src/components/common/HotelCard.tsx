@@ -159,6 +159,14 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
                 <Mountain className="w-3 h-3 text-teal-600" /> {hotel.has_sea_view ? 'Sea View' : 'Hill View'}
               </span>
             )}
+            {/* Live Room Availability Badge */}
+            <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-[10px] font-extrabold border border-emerald-200 shadow-2xs font-bengali">
+              <Sparkles className="w-3 h-3 text-emerald-600" /> লাইভ রুম ফাঁকা আছে
+            </span>
+            {/* bKash / Pay At Hotel Badge */}
+            <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-pink-50 text-pink-700 text-[10px] font-bold border border-pink-200">
+              💳 bKash / নগদ
+            </span>
           </div>
         </div>
 

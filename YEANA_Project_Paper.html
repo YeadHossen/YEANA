@@ -704,17 +704,56 @@ CREATE TABLE exclusive_specialties (
 </ol>
 
 <!-- ========================================== -->
-<!-- SECTION 6: MODEL CONTEXT PROTOCOL (MCP) -->
+<!-- SECTION 6: KEEP NOTES & TRAVEL EXPENSES ENGINE -->
 <!-- ========================================== -->
 <div class="page-break"></div>
 
-<h2>6. Model Context Protocol (MCP) AI Server Integration</h2>
+<h2>6. KEEP NOTES: Travel Expense Tracking, Group Split & Travel Diary Engine</h2>
+
+<p>
+  A critical challenge encountered by travelers across Bangladesh is managing complex shared travel costs (e.g., hill safari jeep charters, boat hire, cottage deposits, food bills) and maintaining emergency contact lists, packing checklists, and itinerary notes in offline environments. YEANA incorporates a dedicated <strong>KEEP NOTES</strong> subsystem (<code>KeepNotesView.tsx</code>, <code>NotesContext.tsx</code>) providing four integrated functional modules:
+</p>
+
+<div class="arch-grid">
+  <div class="arch-box">
+    <h5>1. Categorized Expense & Cost Tracker</h5>
+    <p>Logs trip expenditures across 9 distinct categories (Food & Dining, Transport & Fares, Hotels & Stay, Shopping & Crafts, Sightseeing & Tickets, Local Rides & Jeeps, Emergency & Medical, Tips & Guides, Miscellaneous) with payment method tagging (Cash, bKash, Nagad, Card) in BDT (৳).</p>
+  </div>
+  <div class="arch-box">
+    <h5>2. Real-Time Budget Health & Analytics</h5>
+    <p>Dynamic visual progress indicator showing Target Budget Goal, Total Spent, Remaining Balance, and multi-tier color warning alerts (Green &lt; 75%, Amber 75–90%, Red &gt; 90%).</p>
+  </div>
+  <div class="arch-box">
+    <h5>3. Group Tour Cost Splitter (কে কত পাবে)</h5>
+    <p>Calculates equal per-person shares across group travel companions and computes precise mathematical settlement debts (e.g. who needs to pay whom to settle balances).</p>
+  </div>
+  <div class="arch-box">
+    <h5>4. Digital Diary & Interactive Checklists</h5>
+    <p>Rich pinned notes, color-coded pastel cards, embedded interactive packing checklists with live progress counters, and 1-click WhatsApp text export formatted for travel group chats.</p>
+  </div>
+</div>
+
+<h3>6.1 Group Expense Settlement Mathematical Formulation</h3>
+<p>
+  For a travel group consisting of $N$ companions where companion $i$ has contributed an aggregate expenditure $C_i$, the total tour spend $S$, per-person target share $E$, and net balance $B_i$ are formulated as:
+</p>
+<pre><code>S = ∑ C_i (for i=1 to N),      E = S / N,      B_i = C_i - E</code></pre>
+<p>
+  where $B_i &gt; 0$ indicates a credit surplus (companion will receive a refund) and $B_i &lt; 0$ represents a deficit liability (companion must pay $|B_i|$ to settle the group ledger).
+</p>
+
+<hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16pt 0;">
+
+<!-- ========================================== -->
+<!-- SECTION 7: MODEL CONTEXT PROTOCOL (MCP) -->
+<!-- ========================================== -->
+<h2>7. Model Context Protocol (MCP) AI Server Integration</h2>
 
 <p>
   YEANA embeds a standards-compliant <strong>Model Context Protocol (MCP)</strong> server (<code>server/mcp-server.js</code>), bridging generative AI agents (Google Gemini, Anthropic Claude) directly with the SQLite travel database without requiring brittle prompt engineering or web scraping.
 </p>
 
-<h3>6.1 Exposed Tool Interface Specification</h3>
+<h3>7.1 Exposed Tool Interface Specification</h3>
 
 <table>
   <thead>
@@ -759,17 +798,40 @@ CREATE TABLE exclusive_specialties (
   </tbody>
 </table>
 
-<h3>6.2 Smart AI Multi-Day Itinerary Planner</h3>
+<h3>7.2 Smart AI Multi-Day Itinerary Planner</h3>
 <p>
   In <code>src/views/TripPlannerView.tsx</code>, the application combines client-side spatial algorithms with AI knowledge. Users specify: (1) Destination District; (2) Duration (1 to 7 Days); (3) Travel Style (Family, Adventure, Budget, Luxury); and (4) Companion Count. The algorithm constructs an optimized day-by-day sequence minimizing inter-spot travel time, calculating accommodation costs, meal budgets, and entry fees with an itemized budget summary.
 </p>
 
+<h3>7.3 Bidirectional Traveler-Admin Messaging & Choices Notification Engine</h3>
+<p>
+  To bridge the gap between automated algorithmic trip generation and human concierge operations, YEANA integrates a real-time <strong>Traveler Choices & Messaging Hub</strong> (<code>src/components/chat/TravelerConciergeModal.tsx</code>, <code>src/views/AdminView.tsx</code>, <code>src/context/ChatContext.tsx</code>):
+</p>
+<div class="arch-grid">
+  <div class="arch-box">
+    <h5>Traveler Choice Serialization</h5>
+    <p>Captures traveler-selected itineraries, hotels, 4x4 Chander Gari/boat rides, and GI-tagged specialties into structured JSON payloads (<code>TravelerChoicePayload</code>).</p>
+  </div>
+  <div class="arch-box">
+    <h5>Admin Selection Inspector</h5>
+    <p>Provides platform operators with instant visual breakdowns of traveler selections, total estimated budget, group size, and custom operational notes.</p>
+  </div>
+  <div class="arch-box">
+    <h5>Live Notification & Badge Sync</h5>
+    <p>Custom reactive event bus (<code>yeana:inquiries_updated</code>) synchronizing unread badges across floating widgets, navigation bars, and admin dashboards.</p>
+  </div>
+  <div class="arch-box">
+    <h5>Instant Action Response Protocols</h5>
+    <p>One-click pre-configured response templates for assigning local guides, confirming room allocations, sourcing authentic goods, and issuing quotations.</p>
+  </div>
+</div>
+
 <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16pt 0;">
 
 <!-- ========================================== -->
-<!-- SECTION 7: UI/UX GLASSMORPHISM DESIGN -->
+<!-- SECTION 8: UI/UX GLASSMORPHISM DESIGN -->
 <!-- ========================================== -->
-<h2>7. UI/UX Design System: Ultra-Modern Luxury Glassmorphism</h2>
+<h2>8. UI/UX Design System: Ultra-Modern Luxury Glassmorphism</h2>
 
 <p>
   YEANA incorporates a bespoke <strong>Ultra-Modern Luxury Glassmorphism</strong> design system formulated in <code>src/index.css</code> and Tailwind configuration.
@@ -795,17 +857,17 @@ CREATE TABLE exclusive_specialties (
 </div>
 
 <!-- ========================================== -->
-<!-- SECTION 8: ANDROID BUILD & PLAY STORE -->
+<!-- SECTION 9: ANDROID BUILD & PLAY STORE -->
 <!-- ========================================== -->
 <div class="page-break"></div>
 
-<h2>8. Native Android Compilation & Google Play Store Pipeline</h2>
+<h2>9. Native Android Compilation & Google Play Store Pipeline</h2>
 
 <p>
   YEANA is fully configured and compiled into native release packages adhering to Google Play Console requirements (Target SDK 34, Android 14+).
 </p>
 
-<h3>8.1 Cryptographic Signing Configuration</h3>
+<h3>9.1 Cryptographic Signing Configuration</h3>
 <p>
   A production 2048-bit RSA release keystore (<code>yeana-release-key.jks</code>) was generated using Java Keytool. Gradle release signing was implemented in <code>android/app/build.gradle</code>:
 </p>
@@ -829,7 +891,7 @@ buildTypes {
     }
 }</code></pre>
 
-<h3>8.2 Compiled Release Artifact Benchmarks</h3>
+<h3>9.2 Compiled Release Artifact Benchmarks</h3>
 
 <table>
   <thead>
@@ -859,11 +921,11 @@ buildTypes {
 <hr style="border: 0; border-top: 1px solid #e2e8f0; margin: 16pt 0;">
 
 <!-- ========================================== -->
-<!-- SECTION 9: PERFORMANCE EVALUATION -->
+<!-- SECTION 10: PERFORMANCE EVALUATION -->
 <!-- ========================================== -->
-<h2>9. Performance Evaluation & Empirical Verification</h2>
+<h2>10. Performance Evaluation & Empirical Verification</h2>
 
-<h3>9.1 Core Web Vitals & Mobile Performance Metrics</h3>
+<h3>10.1 Core Web Vitals & Mobile Performance Metrics</h3>
 <ul>
   <li><strong>First Contentful Paint (FCP):</strong> <strong>0.38s</strong> (Offline IndexedDB / Memory Cache) / <strong>0.75s</strong> (Cold Cloud Sync).</li>
   <li><strong>Largest Contentful Paint (LCP):</strong> <strong>1.05s</strong> (Hero images pre-loaded with optimized WebP compression).</li>
@@ -872,7 +934,7 @@ buildTypes {
   <li><strong>Offline Memory Footprint:</strong> <strong>&lt; 42 MB</strong> RAM consumption during intensive map rendering and gallery browsing.</li>
 </ul>
 
-<h3>9.2 Security, Privacy & Compliance Validation</h3>
+<h3>10.2 Security, Privacy & Compliance Validation</h3>
 <p>
   YEANA complies with Google Play's User Data Policy and Data Safety disclosures:
 </p>
@@ -883,17 +945,17 @@ buildTypes {
 </ul>
 
 <!-- ========================================== -->
-<!-- SECTION 10: CONCLUSION & REFERENCES -->
+<!-- SECTION 11: CONCLUSION & REFERENCES -->
 <!-- ========================================== -->
 <div class="page-break"></div>
 
-<h2>10. Conclusion & Future Roadmap</h2>
+<h2>11. Conclusion & Future Roadmap</h2>
 
 <p>
   <strong>YEANA</strong> represents an end-to-end, resilient, and aesthetically captivating smart tourism engineering platform tailored specifically to the geographical and infrastructural realities of Bangladesh. By overcoming rural cellular deadzones through an offline-first architecture, cataloging exhaustive verified datasets across all 64 districts, providing authentic multi-angle hotel galleries, integrating MCP AI agent tooling, and compiling into signed Android Play Store release bundles, YEANA sets a new engineering benchmark for regional travel technology.
 </p>
 
-<h3>10.1 Future Development Milestones</h3>
+<h3>11.1 Future Development Milestones</h3>
 <ol>
   <li><strong>Augmented Reality (AR) Landmark Reconstruction:</strong> On-device WebXR/AR overlays rendering historical architectural reconstructions of Mahasthangarh, Paharpur Vihara, and Lalbagh Fort.</li>
   <li><strong>Direct Digital Escrow Payments:</strong> Seamless integration with bKash, Nagad, and Upay APIs for in-app instant ticket and hotel room booking.</li>

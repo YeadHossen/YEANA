@@ -41,7 +41,7 @@ import {
   Globe,
   Sparkle
 } from 'lucide-react';
-import { Hotel, District, HotelStarRating, PropertyCategory, HotelRoomType } from '../types';
+import { Hotel, District, HotelStarRating, PropertyCategory, HotelRoomType, RoomInventoryItem, HotelBooking } from '../types';
 import { HotelCard } from '../components/common/HotelCard';
 import { useLanguage } from '../context/LanguageContext';
 import { useTrip } from '../context/TripContext';
@@ -92,6 +92,7 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
 
   // Active Hotel Modal State
   const [activeHotel, setActiveHotel] = useState<Hotel | null>(null);
+  const [roomInventory, setRoomInventory] = useState<RoomInventoryItem[]>([]);
   const [selectedRoomIndex, setSelectedRoomIndex] = useState<number>(0);
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState<number>(0);
   const [photoCategoryFilter, setPhotoCategoryFilter] = useState<'all' | 'rooms' | 'suites' | 'pool' | 'dining' | 'exterior'>('all');
@@ -112,6 +113,9 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
   const [guestCount, setGuestCount] = useState<number>(2);
   const [guestName, setGuestName] = useState<string>('');
   const [guestPhone, setGuestPhone] = useState<string>('');
+  const [guestEmail, setGuestEmail] = useState<string>('');
+  const [specialRequests, setSpecialRequests] = useState<string>('');
+  const [confirmedBooking, setConfirmedBooking] = useState<HotelBooking | null>(null);
   const [confirmedBookingId, setConfirmedBookingId] = useState<string | null>(null);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
@@ -119,6 +123,17 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
     setToastMessage(msg);
     setTimeout(() => setToastMessage(null), 3500);
   };
+
+  // Load live room inventory whenever active hotel changes
+  useEffect(() => {
+    if (activeHotel) {
+      DataService.getHotelRoomAvailability(activeHotel.id).then(inv => {
+        setRoomInventory(inv);
+      });
+    } else {
+      setRoomInventory([]);
+    }
+  }, [activeHotel]);
 
   // Sync external selected hotel if passed from parent
   useEffect(() => {
@@ -284,18 +299,55 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
     if (externalOnCloseModal) externalOnCloseModal();
   };
 
-  const handleConfirmReservation = (e: React.FormEvent) => {
+  const handleConfirmReservation = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!guestName || !guestPhone) {
       showToast('Please enter guest name and phone number.');
       return;
     }
 
+    if (!activeHotel) return;
+
+    // Check available rooms for this room type
+    const invItem = roomInventory.find(r => r.room_type === currentRoom.name);
+    if (invItem && invItem.available_rooms < roomCount) {
+      showToast(`⚠️ Only ${invItem.available_rooms} rooms available for ${currentRoom.name}. Please select fewer rooms.`);
+      return;
+    }
+
     const pnr = `HTL-${Math.random().toString(36).substring(2, 7).toUpperCase()}-${Math.floor(100 + Math.random() * 900)}`;
+    
+    const newBooking: Partial<HotelBooking> = {
+      id: pnr,
+      hotel_id: activeHotel.id,
+      hotel_name: activeHotel.name,
+      hotel_image: activeHotel.image_url,
+      district_name: activeHotel.district_name || activeHotel.location,
+      room_type: currentRoom.name,
+      room_count: roomCount,
+      guest_count: guestCount,
+      check_in_date: checkInDate,
+      check_out_date: checkOutDate,
+      nights: numberOfNights,
+      guest_name: guestName.trim(),
+      guest_phone: guestPhone.trim(),
+      guest_email: guestEmail.trim() || 'traveler@yeana.bd',
+      total_cost: totalBookingCost,
+      status: 'confirmed',
+      special_requests: specialRequests.trim()
+    };
+
+    const saved = await DataService.createHotelBooking(newBooking);
+    setConfirmedBooking(saved);
     setConfirmedBookingId(pnr);
+    
+    // Refresh room inventory
+    const updatedInv = await DataService.getHotelRoomAvailability(activeHotel.id);
+    setRoomInventory(updatedInv);
+
     showToast(`🎉 Hotel Voucher Confirmed! Booking ID: ${pnr}`);
 
-    if (activeTrip && activeHotel) {
+    if (activeTrip) {
       addCustomStopToTrip(
         activeTrip.id,
         `Stay at ${activeHotel.name} (${currentRoom.name})`,
@@ -906,13 +958,20 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
                     const rBed = typeof room === 'string' ? '1 King Bed' : room.bed;
                     const rCap = typeof room === 'string' ? '2 Adults' : room.capacity;
                     const rImg = typeof room === 'object' && room.image_url ? room.image_url : (hotelPhotos[index + 1]?.url || activeHotel.image_url);
+                    const rInv = roomInventory.find(item => item.room_type === rName);
+                    const rAvailableCount = rInv ? rInv.available_rooms : 8;
+                    const isSoldOut = rAvailableCount <= 0;
 
                     return (
                       <div
                         key={index}
-                        onClick={() => setSelectedRoomIndex(index)}
+                        onClick={() => {
+                          if (!isSoldOut) setSelectedRoomIndex(index);
+                        }}
                         className={`p-3.5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between space-y-3 ${
-                          isSelected 
+                          isSoldOut 
+                            ? 'opacity-60 bg-slate-100 border-slate-200 cursor-not-allowed'
+                            : isSelected 
                             ? 'bg-sky-50/80 border-sky-500 shadow-md ring-2 ring-sky-500/20' 
                             : 'bg-slate-50 border-slate-200 hover:border-sky-300'
                         }`}
@@ -944,8 +1003,32 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
                               </div>
                             </div>
                             {rNameBn && <p className="text-xs text-slate-500 font-bold">{rNameBn}</p>}
-                            <p className="text-[11px] text-slate-600 mt-1 font-medium">🛏️ {rBed}</p>
-                            <p className="text-[11px] text-slate-500">👥 {rCap}</p>
+                            <p className="text-[11px] text-slate-600 mt-1 font-medium">🛏️ {rBed} • 👥 {rCap}</p>
+                            
+                            {/* Live Availability Tag */}
+                            {(() => {
+                              const inv = roomInventory.find(item => item.room_type === rName);
+                              const availableCount = inv ? inv.available_rooms : 8;
+                              const isSold = availableCount <= 0;
+                              return (
+                                <div className="flex items-center gap-1.5 flex-wrap mt-1.5">
+                                  <span className={`text-[10px] font-extrabold px-2 py-0.5 rounded-md border ${
+                                    isSold 
+                                      ? 'bg-rose-100 text-rose-800 border-rose-200' 
+                                      : availableCount <= 2 
+                                      ? 'bg-amber-100 text-amber-900 border-amber-300 animate-pulse' 
+                                      : 'bg-emerald-100 text-emerald-900 border-emerald-200'
+                                  }`}>
+                                    {isSold ? '🔴 Sold Out' : availableCount <= 2 ? `⚠️ Only ${availableCount} Left!` : `🟢 ${availableCount} Rooms Available`}
+                                  </span>
+                                  {inv?.total_rooms && (
+                                    <span className="text-[10px] text-slate-400 font-medium">
+                                      ({inv.total_rooms} cap)
+                                    </span>
+                                  )}
+                                </div>
+                              );
+                            })()}
                           </div>
                         </div>
 
@@ -1027,7 +1110,7 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
                 {/* Lead Guest Contact */}
                 {!confirmedBookingId && (
                   <form onSubmit={handleConfirmReservation} className="space-y-4 pt-2 border-t border-slate-800">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                       <div>
                         <label className="block text-[11px] font-bold text-slate-300 mb-1">Lead Guest Name (নাম)</label>
                         <input
@@ -1041,7 +1124,7 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
                       </div>
 
                       <div>
-                        <label className="block text-[11px] font-bold text-slate-300 mb-1">Contact Phone (মোবাইল নম্বর)</label>
+                        <label className="block text-[11px] font-bold text-slate-300 mb-1">Contact Phone (মোবাইল)</label>
                         <input
                           type="tel"
                           value={guestPhone}
@@ -1051,6 +1134,28 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
                           required
                         />
                       </div>
+
+                      <div>
+                        <label className="block text-[11px] font-bold text-slate-300 mb-1">Email (ঐচ্ছিক ইমেইল)</label>
+                        <input
+                          type="email"
+                          value={guestEmail}
+                          onChange={(e) => setGuestEmail(e.target.value)}
+                          placeholder="traveler@yeana.bd"
+                          className="w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-bold text-xs focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
+                    <div>
+                      <label className="block text-[11px] font-bold text-slate-300 mb-1">Special Requests & Notes (বিশেষ অনুরোধ)</label>
+                      <input
+                        type="text"
+                        value={specialRequests}
+                        onChange={(e) => setSpecialRequests(e.target.value)}
+                        placeholder="e.g. High floor, quiet room, late check-in at 7 PM"
+                        className="w-full p-2.5 rounded-xl bg-slate-800 border border-slate-700 text-white font-medium text-xs focus:outline-none"
+                      />
                     </div>
 
                     {/* Total Price Summary */}
@@ -1075,44 +1180,77 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
 
                 {/* Confirmed E-Voucher Pass */}
                 {confirmedBookingId && (
-                  <div className="p-5 rounded-2xl bg-gradient-to-r from-emerald-950 to-slate-900 border border-emerald-500/50 space-y-4 animate-in fade-in">
-                    <div className="flex items-center justify-between flex-wrap gap-2">
-                      <div className="flex items-center gap-2">
-                        <CheckCircle2 className="w-6 h-6 text-emerald-400" />
+                  <div className="p-6 rounded-3xl bg-gradient-to-br from-emerald-950 via-slate-900 to-sky-950 border-2 border-emerald-500/60 shadow-2xl space-y-5 animate-in zoom-in-95 duration-200">
+                    <div className="flex items-center justify-between flex-wrap gap-3 border-b border-emerald-500/30 pb-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+                          <CheckCircle2 className="w-7 h-7" />
+                        </div>
                         <div>
-                          <h5 className="font-black text-base text-white">Hotel Reservation Confirmed!</h5>
-                          <p className="text-xs text-emerald-300 font-mono">PNR / Voucher ID: {confirmedBookingId}</p>
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-500 text-slate-950 text-[10px] font-black uppercase">
+                              Official Voucher
+                            </span>
+                            <span className="text-[11px] text-emerald-300 font-bold">Verified Reservation</span>
+                          </div>
+                          <h5 className="font-black text-lg text-white font-heading">{activeHotel.name}</h5>
+                          <p className="text-xs text-slate-300 font-mono">PNR / Voucher Code: <strong className="text-emerald-400 font-black">{confirmedBookingId}</strong></p>
                         </div>
                       </div>
 
                       <div className="flex items-center gap-2">
+                        <button
+                          onClick={() => window.print()}
+                          className="px-3 py-2 rounded-xl bg-white/10 hover:bg-white/20 text-white text-xs font-bold flex items-center gap-1.5 border border-white/20 transition-all"
+                        >
+                          <Download className="w-4 h-4 text-sky-400" />
+                          <span>Print Voucher</span>
+                        </button>
                         <a
                           href={`tel:${activeHotel.contact_phone}`}
-                          className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-bold flex items-center gap-1.5 border border-slate-700"
+                          className="px-3.5 py-2 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-slate-950 text-xs font-black flex items-center gap-1.5 shadow-md transition-all"
                         >
-                          <Phone className="w-3.5 h-3.5 text-emerald-400" />
+                          <Phone className="w-4 h-4" />
                           <span>Call Front Desk</span>
                         </a>
                       </div>
                     </div>
 
-                    <div className="p-4 rounded-xl bg-slate-900/90 border border-slate-800 grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs bg-slate-900/90 p-4 rounded-2xl border border-slate-800">
                       <div>
-                        <span className="text-slate-400 block text-[10px]">Lead Guest</span>
-                        <strong className="text-white font-bold">{guestName}</strong>
+                        <span className="text-slate-400 block text-[10px] font-semibold">Lead Guest</span>
+                        <strong className="text-white font-black text-sm">{guestName}</strong>
+                        <span className="text-[11px] text-slate-400 block">{guestPhone}</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block text-[10px]">Room Type</span>
-                        <strong className="text-white font-bold">{currentRoom.name}</strong>
+                        <span className="text-slate-400 block text-[10px] font-semibold">Room & Quantity</span>
+                        <strong className="text-white font-black text-sm">{currentRoom.name}</strong>
+                        <span className="text-[11px] text-emerald-300 block">{roomCount} Room ({guestCount} Guests)</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block text-[10px]">Stay Duration</span>
-                        <strong className="text-white font-bold">{checkInDate} to {checkOutDate}</strong>
+                        <span className="text-slate-400 block text-[10px] font-semibold">Stay Duration</span>
+                        <strong className="text-white font-black text-sm">{checkInDate}</strong>
+                        <span className="text-[11px] text-slate-300 block">to {checkOutDate} ({numberOfNights} Nights)</span>
                       </div>
                       <div>
-                        <span className="text-slate-400 block text-[10px]">Total Paid/Pay-at-hotel</span>
-                        <strong className="text-emerald-400 font-mono font-bold">৳{totalBookingCost.toLocaleString()}</strong>
+                        <span className="text-slate-400 block text-[10px] font-semibold">Total Price</span>
+                        <strong className="text-2xl text-emerald-400 font-mono font-black block">৳{totalBookingCost.toLocaleString()}</strong>
+                        <span className="text-[10px] text-emerald-300/80 font-bold">Payable at Check-in</span>
                       </div>
+                    </div>
+
+                    {/* QR Code & Mobile Check-in Tag */}
+                    <div className="flex items-center justify-between p-3.5 rounded-2xl bg-white/5 border border-white/10 flex-wrap gap-2 text-xs">
+                      <div className="flex items-center gap-2">
+                        <QrCode className="w-8 h-8 text-emerald-400" />
+                        <div>
+                          <p className="text-white font-bold">Fast Digital QR Check-in</p>
+                          <p className="text-[11px] text-slate-400">Show this QR / Voucher code to front desk upon arrival for instant key handover.</p>
+                        </div>
+                      </div>
+                      <span className="text-emerald-400 font-mono font-bold text-xs bg-emerald-950/80 px-3 py-1 rounded-xl border border-emerald-500/40">
+                        {confirmedBookingId}
+                      </span>
                     </div>
                   </div>
                 )}

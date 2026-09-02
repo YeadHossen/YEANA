@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   X,
   Check,
@@ -28,8 +28,9 @@ import {
   Compass,
   Bike
 } from 'lucide-react';
-import { TransportRoute, TransportType } from '../../types';
+import { TransportRoute, TransportType, SeatInventoryItem } from '../../types';
 import { useTrip } from '../../context/TripContext';
+import { DataService } from '../../services/dataService';
 
 interface SeatSelectionModalProps {
   route: TransportRoute;
@@ -61,7 +62,7 @@ interface SeatInfo {
   row: number;
   col: number;
   type: 'regular' | 'sleeper_lower' | 'sleeper_upper' | 'window' | 'aisle' | 'cabin' | 'vip' | 'front' | 'rear' | 'bench';
-  status: 'available' | 'booked' | 'female_reserved';
+  status: 'available' | 'booked' | 'female_reserved' | 'blocked';
   price: number;
 }
 
@@ -76,6 +77,15 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
 
   // Booking Step: 1 = Seat Map & Passenger Info, 2 = Confirmed Digital E-Ticket
   const [step, setStep] = useState<'selection' | 'ticket'>('selection');
+
+  // Real-time seat inventory from DataService
+  const [realInventory, setRealInventory] = useState<SeatInventoryItem[]>([]);
+
+  useEffect(() => {
+    DataService.getTransportSeatAvailability(route.id, travelDate).then(inv => {
+      setRealInventory(inv);
+    });
+  }, [route.id, travelDate]);
 
   // Reserve Mode for Local Vehicles and Cars (Reserve Whole Vehicle vs Shared Seats)
   const isReserveSupported = route.transport_type === 'Local' || route.transport_type === 'Car' || !!route.reserve_price;
@@ -328,8 +338,18 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
       });
     }
 
-    return seats;
-  }, [route, pricePerSeat]);
+    // Apply live overrides from real inventory
+    return seats.map(s => {
+      const match = realInventory.find(inv => inv.seat_id === s.id);
+      if (match) {
+        return {
+          ...s,
+          status: match.status
+        };
+      }
+      return s;
+    });
+  }, [route, pricePerSeat, realInventory]);
 
   // Auto-initialize default selected seats matching desired count if none selected
   React.useEffect(() => {
@@ -360,7 +380,7 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
 
   // Handle clicking on an individual seat
   const handleSeatClick = (seat: SeatInfo) => {
-    if (seat.status === 'booked') return;
+    if (seat.status === 'booked' || seat.status === 'blocked') return;
     if (isFullReserve) return; // In full reserve mode, all are selected
 
     if (selectedSeatIds.includes(seat.id)) {
@@ -407,7 +427,7 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
   }, [selectedSeatIds, seatLayout, pricePerSeat, isFullReserve, route.reserve_price]);
 
   // Confirm booking & generate E-Ticket
-  const handleConfirmReservation = (e: React.FormEvent) => {
+  const handleConfirmReservation = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (selectedSeatIds.length === 0) {
@@ -435,13 +455,37 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
       isFullReserve,
       passengerName: passengerName.trim(),
       passengerPhone: passengerPhone.trim(),
-      passengerEmail: passengerEmail.trim() || 'traveler@yeana.com',
+      passengerEmail: passengerEmail.trim() || 'traveler@yeana.bd',
       passengerGender,
       boardingPoint: selectedBoarding,
       droppingPoint: selectedDropping,
       totalFare,
       bookedAt: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
     };
+
+    // Persist to shared DataService
+    await DataService.createTransportBooking({
+      id: bookingId,
+      route_id: route.id,
+      route,
+      company: route.company,
+      transport_type: route.transport_type,
+      from_district: route.from_district,
+      to_district: route.to_district,
+      departure_time: route.departure_time,
+      travel_date: travelDate,
+      selected_seats: selectedSeatIds,
+      seat_count: selectedSeatIds.length,
+      is_full_reserve: isFullReserve,
+      passenger_name: passengerName.trim(),
+      passenger_phone: passengerPhone.trim(),
+      passenger_email: passengerEmail.trim() || 'traveler@yeana.bd',
+      passenger_gender: passengerGender,
+      boarding_point: selectedBoarding,
+      dropping_point: selectedDropping,
+      total_fare: totalFare,
+      status: 'confirmed'
+    });
 
     setConfirmedBooking(booking);
     setStep('ticket');
@@ -629,22 +673,34 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
                   </span>
                 </div>
 
-                {/* Seat Map Legend */}
-                <div className="flex items-center gap-4 text-xs font-bold text-slate-600 flex-wrap bg-slate-50 p-3 rounded-2xl border border-slate-100">
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded-md bg-emerald-600 border border-emerald-700 flex items-center justify-center text-[10px] text-white">
-                      ✓
+                {/* Seat Map Legend & Live Stats */}
+                <div className="flex items-center justify-between gap-3 text-xs font-bold text-slate-600 flex-wrap bg-slate-50 p-3 rounded-2xl border border-slate-200">
+                  <div className="flex items-center gap-3 flex-wrap">
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 rounded-md bg-emerald-600 border border-emerald-700 flex items-center justify-center text-[10px] text-white">
+                        ✓
+                      </div>
+                      <span>Selected ({selectedSeatIds.length})</span>
                     </div>
-                    <span>Selected</span>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 rounded-md bg-white border-2 border-slate-300" />
+                      <span className="text-emerald-700 font-black">Available ({seatLayout.filter(s => s.status === 'available').length})</span>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <div className="w-4 h-4 rounded-md bg-slate-300 border border-slate-400 opacity-60" />
+                      <span>Booked ({seatLayout.filter(s => s.status === 'booked').length})</span>
+                    </div>
+                    {seatLayout.some(s => s.status === 'blocked') && (
+                      <div className="flex items-center gap-1.5">
+                        <div className="w-4 h-4 rounded-md bg-amber-500 border border-amber-600" />
+                        <span className="text-amber-800 font-bold">VIP/Blocked ({seatLayout.filter(s => s.status === 'blocked').length})</span>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded-md bg-white border-2 border-slate-300" />
-                    <span>Available</span>
-                  </div>
-                  <div className="flex items-center gap-1.5">
-                    <div className="w-4 h-4 rounded-md bg-slate-300 border border-slate-400 opacity-60" />
-                    <span>Booked</span>
-                  </div>
+
+                  <span className="px-2.5 py-1 rounded-xl bg-slate-200 text-slate-800 text-[11px] font-black">
+                    Total {seatLayout.length} Seats
+                  </span>
                 </div>
 
                 {/* Vehicle Cabin Container */}
