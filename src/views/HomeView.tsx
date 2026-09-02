@@ -232,157 +232,159 @@ export const HomeView: React.FC<HomeViewProps> = ({
   ];
 
   return (
-    <div className="space-y-16 pb-20 bg-bangla-mesh">
+    <div className="space-y-12 sm:space-y-16 pb-20 bg-bangla-mesh w-full max-w-full overflow-x-hidden">
 
       {/* ========================================================================= */}
       {/* 1. HERO SECTION: ALL-IN-ONE BANGLADESHI TRAVEL HUB                       */}
       {/* ========================================================================= */}
-      <section className="relative rounded-3xl sm:rounded-4xl overflow-hidden bg-slate-950 text-white min-h-[560px] sm:min-h-[620px] flex flex-col justify-center px-5 sm:px-12 py-12 sm:py-20 shadow-2xl border border-white/10">
+      <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full">
+        <div className="relative rounded-3xl sm:rounded-4xl overflow-hidden bg-slate-950 text-white min-h-[500px] sm:min-h-[600px] flex flex-col justify-center px-4 sm:px-12 py-10 sm:py-20 shadow-2xl border border-white/10 w-full">
 
-        {/* Ambient Nature Background */}
-        <div className="absolute inset-0 z-0">
-          <img
-            src="https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=1600&auto=format&fit=crop&q=85"
-            alt="Explore Beautiful Bangladesh"
-            className="w-full h-full object-cover object-center opacity-40 scale-105 transition-transform duration-1000"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/35" />
-          <div className="absolute -top-32 -left-32 w-96 h-96 bg-shyamol-600/25 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-surjo-600/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-shorisha-500/15 rounded-full blur-3xl pointer-events-none" />
-        </div>
-
-        {/* Hero Content */}
-        <div className="relative z-10 max-w-4xl space-y-6 mx-auto text-center">
-
-          {/* Dynamic Time Greeting & Seasonal Chip */}
-          <div className="inline-flex items-center gap-2.5 px-4 py-1.5 rounded-full bg-slate-900/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold backdrop-blur-xl shadow-lg animate-float">
-            <span className="text-base">{greeting.icon}</span>
-            <span className="font-bold text-white">{greeting.text}!</span>
-            <span className="text-slate-400">•</span>
-            <span className="text-emerald-400 font-medium">{greeting.tag}</span>
+          {/* Ambient Nature Background */}
+          <div className="absolute inset-0 z-0">
+            <img
+              src="https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=1600&auto=format&fit=crop&q=85"
+              alt="Explore Beautiful Bangladesh"
+              className="w-full h-full object-cover object-center opacity-40 scale-105 transition-transform duration-1000"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/35" />
+            <div className="absolute -top-32 -left-32 w-96 h-96 bg-shyamol-600/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-surjo-600/20 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-shorisha-500/15 rounded-full blur-3xl pointer-events-none" />
           </div>
 
-          <h1 className="text-3xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight font-heading">
-            {language === 'bn' ? 'চলুন ঘুরে আসি ' : 'Explore Beautiful '}
-            <br className="hidden sm:block" />
-            <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-shorisha-400 to-surjo-400 drop-shadow-sm">
-              {language === 'bn' ? 'রূপসী বাংলাদেশ' : 'Bangladesh'}
-            </span>
-          </h1>
+          {/* Hero Content */}
+          <div className="relative z-10 max-w-4xl space-y-6 mx-auto text-center w-full">
 
-          <p className="text-xs sm:text-base text-slate-200 max-w-2xl mx-auto leading-relaxed font-medium">
-            {language === 'bn' 
-              ? '৬৪ জেলার দর্শনীয় স্থান, সেরা হোটেল, ঐতিহ্যবাহী খাবার, বাস-ট্রেন-লঞ্চ টিকিট এবং নির্ভরযোগ্য স্মার্ট ট্রিপ প্ল্যানার।'
-              : 'Discover 64 districts, scenic destinations, top hotels, iconic regional foods, live bus & train tickets, and smart itinerary planners.'
-            }
-          </p>
-
-          {/* All-in-One Multi-Service Search Hub */}
-          <div className="max-w-2xl mx-auto space-y-3 pt-2">
-            
-            {/* Quick Service Tab Selectors */}
-            <div className="flex items-center justify-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-slate-900/80 border border-white/15 backdrop-blur-xl">
-              {[
-                { id: 'destinations', label: language === 'bn' ? '📍 দর্শনীয় স্থান' : '📍 Destinations' },
-                { id: 'hotels', label: language === 'bn' ? '🏨 হোটেল ও রিসোর্ট' : '🏨 Hotels & Stays' },
-                { id: 'transport', label: language === 'bn' ? '🚌 বাস ও ট্রেন সিট' : '🚌 Transit Seats' },
-                { id: 'food', label: language === 'bn' ? '🍛 বিখ্যাত খাবার' : '🍛 Famous Food' },
-                { id: 'shopping', label: language === 'bn' ? '🛍️ তাঁত ও পোশাক' : '🛍️ Native Crafts' },
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  type="button"
-                  onClick={() => setActiveSearchTab(tab.id as any)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                    activeSearchTab === tab.id
-                      ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
-                      : 'text-slate-300 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  {tab.label}
-                </button>
-              ))}
+            {/* Dynamic Time Greeting & Seasonal Chip */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold backdrop-blur-xl shadow-lg animate-float max-w-full">
+              <span className="text-base">{greeting.icon}</span>
+              <span className="font-bold text-white">{greeting.text}!</span>
+              <span className="text-slate-400">•</span>
+              <span className="text-emerald-400 font-medium truncate">{greeting.tag}</span>
             </div>
 
-            {/* Smart Search Form */}
-            <form
-              onSubmit={handleHeroSearch}
-              className="p-2 sm:p-2.5 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-2xl border border-white/60 flex flex-col sm:flex-row items-center gap-2 shadow-emerald-950/20"
-            >
-              <div className="flex items-center gap-2.5 px-4 py-2.5 flex-1 w-full">
-                <MapPin className="w-5 h-5 text-emerald-700 shrink-0" />
-                <input
-                  type="text"
-                  value={searchInput}
-                  onChange={(e) => setSearchInput(e.target.value)}
-                  placeholder={
-                    activeSearchTab === 'destinations' ? (language === 'bn' ? 'কোথায় ভ্রমণ করতে চান? (যেমন: সাজেক, জাফলং, কক্সবাজার...)' : 'Where do you want to go? (e.g. Sajek, Sylhet, Cox\'s Bazar...)') :
-                    activeSearchTab === 'hotels' ? (language === 'bn' ? 'হোটেল বা রিসোর্ট খুঁজুন (যেমন: গ্র্যান্ড সুলতান, সায়মন...)' : 'Search hotels & eco-resorts (e.g. Grand Sultan, Sayeman...)') :
-                    activeSearchTab === 'transport' ? (language === 'bn' ? 'বাস বা ট্রেনের রুট খুঁজুন (যেমন: ঢাকা ➔ কক্সবাজার...)' : 'Search bus & train routes (e.g. Dhaka to Cox\'s Bazar...)') :
-                    activeSearchTab === 'food' ? (language === 'bn' ? 'ঐতিহ্যবাহী খাবার খুঁজুন (যেমন: বগুড়ার দই, মেজবানি...)' : 'Search iconic food (e.g. Bogura Doi, Mezbani Beef...)') :
-                    (language === 'bn' ? 'ঐতিহ্যবাহী পোশাক খুঁজুন (যেমন: জামদানি শাড়ি, খাদি কাপড়...)' : 'Search traditional attire & crafts (e.g. Jamdani, Khadi...)')
-                  }
-                  className="w-full text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-bold focus:outline-none bg-transparent"
-                />
+            <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight font-heading">
+              {language === 'bn' ? 'চলুন ঘুরে আসি ' : 'Explore Beautiful '}
+              <br className="hidden sm:block" />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-shorisha-400 to-surjo-400 drop-shadow-sm">
+                {language === 'bn' ? 'রূপসী বাংলাদেশ' : 'Bangladesh'}
+              </span>
+            </h1>
+
+            <p className="text-xs sm:text-base text-slate-200 max-w-2xl mx-auto leading-relaxed font-medium">
+              {language === 'bn' 
+                ? '৬৪ জেলার দর্শনীয় স্থান, সেরা হোটেল, ঐতিহ্যবাহী খাবার, বাস-ট্রেন-লঞ্চ টিকিট এবং নির্ভরযোগ্য স্মার্ট ট্রিপ প্ল্যানার।'
+                : 'Discover 64 districts, scenic destinations, top hotels, iconic regional foods, live bus & train tickets, and smart itinerary planners.'
+              }
+            </p>
+
+            {/* All-in-One Multi-Service Search Hub */}
+            <div className="max-w-2xl mx-auto space-y-3 pt-2 w-full">
+              
+              {/* Quick Service Tab Selectors */}
+              <div className="flex items-center justify-start sm:justify-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-slate-900/80 border border-white/15 backdrop-blur-xl w-full max-w-full scrollbar-none">
+                {[
+                  { id: 'destinations', label: language === 'bn' ? '📍 দর্শনীয় স্থান' : '📍 Destinations' },
+                  { id: 'hotels', label: language === 'bn' ? '🏨 হোটেল ও রিসোর্ট' : '🏨 Hotels & Stays' },
+                  { id: 'transport', label: language === 'bn' ? '🚌 বাস ও ট্রেন সিট' : '🚌 Transit Seats' },
+                  { id: 'food', label: language === 'bn' ? '🍛 বিখ্যাত খাবার' : '🍛 Famous Food' },
+                  { id: 'shopping', label: language === 'bn' ? '🛍️ তাঁত ও পোশাক' : '🛍️ Native Crafts' },
+                ].map(tab => (
+                  <button
+                    key={tab.id}
+                    type="button"
+                    onClick={() => setActiveSearchTab(tab.id as any)}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
+                      activeSearchTab === tab.id
+                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                        : 'text-slate-300 hover:text-white hover:bg-white/10'
+                    }`}
+                  >
+                    {tab.label}
+                  </button>
+                ))}
               </div>
 
-              <button
-                type="submit"
-                className="w-full sm:w-auto px-7 py-3.5 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-700/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 hover:shadow-glow-emerald"
+              {/* Smart Search Form */}
+              <form
+                onSubmit={handleHeroSearch}
+                className="p-1.5 sm:p-2.5 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-2xl border border-white/60 flex flex-col sm:flex-row items-center gap-2 shadow-emerald-950/20 w-full max-w-full"
               >
-                <Search className="w-4 h-4" />
-                <span>{language === 'bn' ? 'সন্ধান করুন' : 'Search'}</span>
-              </button>
-            </form>
+                <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 flex-1 w-full min-w-0">
+                  <MapPin className="w-5 h-5 text-emerald-700 shrink-0" />
+                  <input
+                    type="text"
+                    value={searchInput}
+                    onChange={(e) => setSearchInput(e.target.value)}
+                    placeholder={
+                      activeSearchTab === 'destinations' ? (language === 'bn' ? 'কোথায় ভ্রমণ করতে চান? (যেমন: সাজেক, কক্সবাজার...)' : 'Where do you want to go? (e.g. Sajek, Cox\'s Bazar...)') :
+                      activeSearchTab === 'hotels' ? (language === 'bn' ? 'হোটেল বা রিসোর্ট খুঁজুন...' : 'Search hotels & eco-resorts...') :
+                      activeSearchTab === 'transport' ? (language === 'bn' ? 'বাস বা ট্রেনের রুট খুঁজুন...' : 'Search bus & train routes...') :
+                      activeSearchTab === 'food' ? (language === 'bn' ? 'ঐতিহ্যবাহী খাবার খুঁজুন...' : 'Search iconic food...') :
+                      (language === 'bn' ? 'ঐতিহ্যবাহী পোশাক খুঁজুন...' : 'Search traditional attire...')
+                    }
+                    className="w-full text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-bold focus:outline-none bg-transparent min-w-0"
+                  />
+                </div>
 
-            {/* Trending Destination Pills */}
-            <div className="flex flex-wrap items-center justify-center gap-2 pt-1 text-xs">
-              <span className="text-shorisha-300 font-bold">{language === 'bn' ? 'জনপ্রিয় গন্তব্য:' : 'Popular:'}</span>
-              {[
-                { name: language === 'bn' ? 'কক্সবাজার' : "Cox's Bazar", query: "Cox's Bazar", icon: '🌊' },
-                { name: language === 'bn' ? 'সাজেক ভ্যালি' : 'Sajek Valley', query: 'Sajek', icon: '☁️' },
-                { name: language === 'bn' ? 'সুন্দরবন' : 'Sundarbans', query: 'Sundarbans', icon: '🌿' },
-                { name: language === 'bn' ? 'শ্রীমঙ্গল' : 'Sreemangal', query: 'Sreemangal', icon: '☕' },
-                { name: language === 'bn' ? 'টাঙ্গুয়ার হাওড়' : 'Tanguar Haor', query: 'Tahirpur', icon: '⛵' },
-                { name: language === 'bn' ? 'কুয়াকাটা' : 'Kuakata', query: 'Kuakata', icon: '🌅' },
-                { name: language === 'bn' ? 'বান্দরবান' : 'Bandarban', query: 'Bandarban', icon: '🏞️' },
-              ].map(item => (
                 <button
-                  key={item.query}
-                  onClick={() => onNavigateTab('places', { search: item.query })}
-                  className="px-3 py-1 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-white font-bold border border-white/20 transition-all backdrop-blur-md shadow-xs flex items-center gap-1"
+                  type="submit"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-700/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 hover:shadow-glow-emerald text-center"
                 >
-                  <span>{item.icon}</span>
-                  <span>{item.name}</span>
+                  <Search className="w-4 h-4" />
+                  <span>{language === 'bn' ? 'সন্ধান করুন' : 'Search'}</span>
                 </button>
-              ))}
+              </form>
+
+              {/* Trending Destination Pills */}
+              <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-1 text-xs max-w-full">
+                <span className="text-shorisha-300 font-bold">{language === 'bn' ? 'জনপ্রিয়:' : 'Popular:'}</span>
+                {[
+                  { name: language === 'bn' ? 'কক্সবাজার' : "Cox's Bazar", query: "Cox's Bazar", icon: '🌊' },
+                  { name: language === 'bn' ? 'সাজেক' : 'Sajek', query: 'Sajek', icon: '☁️' },
+                  { name: language === 'bn' ? 'সুন্দরবন' : 'Sundarbans', query: 'Sundarbans', icon: '🌿' },
+                  { name: language === 'bn' ? 'শ্রীমঙ্গল' : 'Sreemangal', query: 'Sreemangal', icon: '☕' },
+                  { name: language === 'bn' ? 'টাঙ্গুয়ার হাওড়' : 'Tanguar Haor', query: 'Tahirpur', icon: '⛵' },
+                  { name: language === 'bn' ? 'কুয়াকাটা' : 'Kuakata', query: 'Kuakata', icon: '🌅' },
+                  { name: language === 'bn' ? 'বান্দরবান' : 'Bandarban', query: 'Bandarban', icon: '🏞️' },
+                ].map(item => (
+                  <button
+                    key={item.query}
+                    onClick={() => onNavigateTab('places', { search: item.query })}
+                    className="px-2.5 sm:px-3 py-1 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-white font-bold border border-white/20 transition-all backdrop-blur-md shadow-xs flex items-center gap-1 text-[11px] sm:text-xs"
+                  >
+                    <span>{item.icon}</span>
+                    <span>{item.name}</span>
+                  </button>
+                ))}
+              </div>
+
             </div>
 
-          </div>
+            {/* Real-time Metric Badges */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 max-w-2xl mx-auto text-white w-full">
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="text-xl font-black text-emerald-400 font-heading block">64</span>
+                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'সমগ্র বাংলাদেশ কাভারেজ' : 'Districts Covered'}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="text-xl font-black text-sky-400 font-heading block">2,500+</span>
+                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'প্রাকৃতিক ও ঐতিহ্য স্থান' : 'Scenic Spots'}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="text-xl font-black text-shorisha-400 font-heading block">1,000+</span>
+                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'লাইভ রুম রিজার্ভেশন' : 'Verified Hotels'}</span>
+              </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+                <span className="text-xl font-black text-surjo-400 font-heading block">Live</span>
+                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'বাস, ট্রেন ও লঞ্চ সিট' : 'Bus & Train Seats'}</span>
+              </div>
+            </div>
 
-          {/* Real-time Metric Badges */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 max-w-2xl mx-auto text-white">
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <span className="text-xl font-black text-emerald-400 font-heading block">64</span>
-              <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'সমগ্র বাংলাদেশ কাভারেজ' : 'Districts Covered'}</span>
-            </div>
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <span className="text-xl font-black text-sky-400 font-heading block">2,500+</span>
-              <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'প্রাকৃতিক ও ঐতিহ্য স্থান' : 'Scenic Spots'}</span>
-            </div>
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <span className="text-xl font-black text-shorisha-400 font-heading block">1,000+</span>
-              <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'লাইভ রুম রিজার্ভেশন' : 'Verified Hotels'}</span>
-            </div>
-            <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-              <span className="text-xl font-black text-surjo-400 font-heading block">Live</span>
-              <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'বাস, ট্রেন ও লঞ্চ সিট' : 'Bus & Train Seats'}</span>
-            </div>
           </div>
 
         </div>
-
       </section>
 
       {/* ========================================================================= */}

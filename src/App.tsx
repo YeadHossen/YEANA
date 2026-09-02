@@ -261,7 +261,7 @@ const AppContent: React.FC = () => {
     : currentTab !== 'home' ? 'Home' : null;
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden w-full max-w-full">
       
       {/* Top Navigation */}
       <Navbar
