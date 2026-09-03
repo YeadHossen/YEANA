@@ -21,13 +21,15 @@ import { useTrip } from '../context/TripContext';
 import { useFavorites } from '../context/FavoritesContext';
 import { useLanguage } from '../context/LanguageContext';
 import { useNotes } from '../context/NotesContext';
+import { BrandLogo } from '../components/common/BrandLogo';
 
 interface ProfileViewProps {
   onNavigateTab: (tab: string) => void;
   onOpenAuth: () => void;
+  onOpenPrivacy?: () => void;
 }
 
-export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenAuth }) => {
+export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenAuth, onOpenPrivacy }) => {
   const { user, isAuthenticated, isAdmin, logout, updateProfile, loginDemoAdmin, loginDemoTraveler } = useAuth();
   const { trips } = useTrip();
   const { favorites } = useFavorites();
@@ -54,14 +56,12 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
 
   if (!isAuthenticated) {
     return (
-      <div className="max-w-md mx-auto my-16 p-8 bg-white rounded-3xl border border-slate-200 shadow-card text-center space-y-6">
-        <div className="w-16 h-16 rounded-2xl bg-brand-100 text-brand-700 flex items-center justify-center mx-auto">
-          <User className="w-8 h-8" />
-        </div>
+      <div className="max-w-md mx-auto my-16 p-8 bg-white/95 backdrop-blur-xl rounded-3xl border border-slate-200/80 shadow-2xl text-center space-y-6">
+        <BrandLogo size="lg" showText={false} className="justify-center" />
         <div className="space-y-2">
           <h2 className="text-2xl font-black text-slate-900 font-sans">Sign in to YEANA</h2>
           <p className="text-xs text-slate-500">
-            Access your personalized multi-day trip itineraries, saved destinations, and reviews.
+            Access your personalized multi-day trip itineraries, saved destinations, and verified bookings.
           </p>
         </div>
         <button
@@ -315,6 +315,27 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
               </button>
             </div>
           )}
+
+          {/* Bangladesh Privacy Policy & Legal Terms */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div>
+              <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                <span>{language === 'bn' ? 'বাংলাদেশ প্রাইভেসি পলিসি ও নীতিমালা' : 'Bangladesh Privacy Policy & Legal'}</span>
+              </p>
+              <p className="text-slate-400 text-xs">
+                {language === 'bn' 
+                  ? 'আইসিটি আইন ও সাইবার নিরাপত্তা আইন ২০২৩ সম্পর্কিত তথ্যাবলি' 
+                  : 'ICT Act 2006, Cyber Security Act 2023 & data rights'}
+              </p>
+            </div>
+            <button
+              onClick={onOpenPrivacy}
+              className="px-3.5 py-1.5 rounded-xl border border-emerald-300 text-emerald-700 bg-emerald-50/80 hover:bg-emerald-100 font-bold text-xs transition-all shadow-2xs"
+            >
+              {language === 'bn' ? 'পলিসি দেখুন' : 'View Policy'}
+            </button>
+          </div>
 
           {/* Logout */}
           <div className="flex items-center justify-between pt-4">

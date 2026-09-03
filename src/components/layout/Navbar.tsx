@@ -18,12 +18,14 @@ import {
   Car,
   MessageSquare,
   Receipt,
-  Building2
+  Building2,
+  ShieldAlert
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { useChat } from '../../context/ChatContext';
+import { BrandLogo } from '../common/BrandLogo';
 
 interface NavbarProps {
   currentTab: string;
@@ -46,16 +48,17 @@ export const Navbar: React.FC<NavbarProps> = ({
   const [userDropdownOpen, setUserDropdownOpen] = useState(false);
 
   const navLinks = [
-    { id: 'home', label: t('nav.home'), icon: Compass },
-    { id: 'explore', label: t('nav.explore'), icon: MapPin },
-    { id: 'places', label: t('nav.places'), icon: Compass },
-    { id: 'hotels', label: t('nav.hotels'), icon: Hotel },
-    { id: 'food', label: t('nav.food'), icon: Utensils },
-    { id: 'transport', label: t('nav.transport'), icon: Bus },
-    { id: 'shopping', label: t('nav.shopping'), icon: ShoppingBag },
-    { id: 'ride', label: t('nav.ride'), icon: Car },
-    { id: 'trips', label: t('nav.trips'), icon: Calendar },
-    { id: 'notes', label: t('nav.notes'), icon: Receipt },
+    { id: 'home', label: t('nav.home'), icon: Compass, color: 'text-emerald-600', active: 'bg-emerald-50/90 text-emerald-800 border-emerald-200/90 shadow-emerald-950/5', dot: 'bg-emerald-500' },
+    { id: 'explore', label: t('nav.explore'), icon: MapPin, color: 'text-teal-600', active: 'bg-teal-50/90 text-teal-800 border-teal-200/90 shadow-teal-950/5', dot: 'bg-teal-500' },
+    { id: 'places', label: t('nav.places'), icon: Compass, color: 'text-emerald-700', active: 'bg-emerald-50/90 text-emerald-900 border-emerald-200/90 shadow-emerald-950/5', dot: 'bg-emerald-500' },
+    { id: 'hotels', label: t('nav.hotels'), icon: Hotel, color: 'text-indigo-600', active: 'bg-indigo-50/90 text-indigo-900 border-indigo-200/90 shadow-indigo-950/5', dot: 'bg-indigo-500' },
+    { id: 'food', label: t('nav.food'), icon: Utensils, color: 'text-amber-600', active: 'bg-amber-50/90 text-amber-950 border-amber-200/90 shadow-amber-950/5', dot: 'bg-amber-500' },
+    { id: 'transport', label: t('nav.transport'), icon: Bus, color: 'text-sky-600', active: 'bg-sky-50/90 text-sky-900 border-sky-200/90 shadow-sky-950/5', dot: 'bg-sky-500' },
+    { id: 'shopping', label: t('nav.shopping'), icon: ShoppingBag, color: 'text-purple-600', active: 'bg-purple-50/90 text-purple-900 border-purple-200/90 shadow-purple-950/5', dot: 'bg-purple-500' },
+    { id: 'ride', label: t('nav.ride'), icon: Car, color: 'text-rose-600', active: 'bg-rose-50/90 text-rose-900 border-rose-200/90 shadow-rose-950/5', dot: 'bg-rose-500' },
+    { id: 'trips', label: t('nav.trips'), icon: Calendar, color: 'text-orange-600', active: 'bg-orange-50/90 text-orange-950 border-orange-200/90 shadow-orange-950/5', dot: 'bg-orange-500' },
+    { id: 'notes', label: t('nav.notes'), icon: Receipt, color: 'text-teal-700', active: 'bg-teal-50/90 text-teal-900 border-teal-200/90 shadow-teal-950/5', dot: 'bg-teal-500' },
+    { id: 'emergency', label: t('nav.emergency'), icon: ShieldAlert, color: 'text-rose-600', active: 'bg-rose-50/90 text-rose-900 border-rose-200/90 shadow-rose-950/5', dot: 'bg-rose-500' },
   ];
 
   const [isOnline, setIsOnline] = useState<boolean>(() => typeof navigator !== 'undefined' ? navigator.onLine : true);
@@ -72,38 +75,20 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 backdrop-blur-2xl border-b border-white/50 shadow-glass transition-all">
+    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-2xl border-b border-white/60 shadow-glass transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
           {/* Logo & Tagline */}
           <div 
             onClick={() => { setCurrentTab('home'); }} 
-            className="flex items-center gap-3 cursor-pointer group select-none"
+            className="cursor-pointer group select-none"
           >
-            <div className="w-10 h-10 md:w-11 md:h-11 rounded-2xl bg-gradient-to-tr from-emerald-800 via-emerald-600 to-teal-600 flex items-center justify-center text-white shadow-lg shadow-emerald-800/30 group-hover:scale-105 group-hover:shadow-glow-emerald transition-all duration-300 relative">
-              <Compass className="w-6 h-6 animate-pulse" />
-              <span className="absolute -top-1 -right-1 w-3.5 h-3.5 rounded-full bg-surjo-600 border-2 border-white" title="Bangladesh Pride" />
-            </div>
-            <div>
-              <div className="flex items-center gap-1.5">
-                <span className="text-2xl font-black tracking-tight text-slate-900 font-heading">
-                  YEANA
-                </span>
-                <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-lg bg-emerald-900 text-emerald-100 border border-emerald-700 shadow-xs">
-                  🇧🇩 BD
-                </span>
-              </div>
-              <p className="text-[11px] text-slate-500 font-medium hidden sm:flex items-center gap-1">
-                <span className="text-emerald-800 font-bold">রূপসী বাংলাদেশ</span>
-                <span>•</span>
-                <span>Explore More</span>
-              </p>
-            </div>
+            <BrandLogo size="md" />
           </div>
 
           {/* Desktop Navigation Links */}
-          <nav className="hidden xl:flex items-center gap-1 lg:gap-1.5 p-1 rounded-2xl bg-slate-100/70 border border-slate-200/60 backdrop-blur-md">
+          <nav className="hidden xl:flex items-center gap-1 p-1 rounded-2xl bg-slate-100/80 border border-slate-200/70 backdrop-blur-md">
             {navLinks.map(link => {
               const Icon = link.icon;
               const isActive = currentTab === link.id;
@@ -111,14 +96,14 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={link.id}
                   onClick={() => setCurrentTab(link.id)}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
                     isActive 
-                      ? 'bg-white text-emerald-700 font-black shadow-sm border border-emerald-100 scale-102' 
-                      : 'text-slate-600 hover:text-emerald-700 hover:bg-white/60'
+                      ? `${link.active} font-black shadow-xs scale-102` 
+                      : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/80'
                   }`}
                 >
-                  <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-emerald-600' : 'text-slate-400'}`} />
-                  {link.label}
+                  <Icon className={`w-3.5 h-3.5 transition-colors ${isActive ? link.color : 'text-slate-400'}`} />
+                  <span>{link.label}</span>
                 </button>
               );
             })}
@@ -324,7 +309,7 @@ export const Navbar: React.FC<NavbarProps> = ({
       {/* Mobile Dropdown Navigation Menu */}
       {mobileMenuOpen && (
         <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-6 space-y-1 shadow-lg">
-          <div className="grid grid-cols-2 gap-1.5 pt-2">
+          <div className="grid grid-cols-2 gap-2 pt-2">
             {navLinks.map(link => {
               const Icon = link.icon;
               const isActive = currentTab === link.id;
@@ -335,12 +320,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                     setCurrentTab(link.id);
                     setMobileMenuOpen(false);
                   }}
-                  className={`p-2.5 rounded-xl text-xs font-medium flex items-center gap-2 ${
-                    isActive ? 'bg-brand-600 text-white font-bold' : 'bg-slate-50 text-slate-700 hover:bg-slate-100'
+                  className={`p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all ${
+                    isActive 
+                      ? `${link.active} shadow-xs font-black` 
+                      : 'bg-slate-50/90 text-slate-700 border-slate-200/70 hover:bg-white hover:border-slate-300'
                   }`}
                 >
-                  <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-brand-600'}`} />
-                  <span>{link.label}</span>
+                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${isActive ? 'bg-white shadow-xs' : 'bg-slate-100'}`}>
+                    <Icon className={`w-3.5 h-3.5 ${link.color}`} />
+                  </div>
+                  <span className="truncate">{link.label}</span>
                 </button>
               );
             })}

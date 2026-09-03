@@ -1,30 +1,150 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="100%" height="100%">
   <defs>
-    <linearGradient id="yeanaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#047857"/>
-      <stop offset="50%" stop-color="#059669"/>
+    <!-- Background Gradient: Deep Emerald to Haor Teal -->
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#022c22"/>
+      <stop offset="50%" stop-color="#064e3b"/>
       <stop offset="100%" stop-color="#0f766e"/>
     </linearGradient>
-    <linearGradient id="sunGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#f59e0b"/>
-      <stop offset="100%" stop-color="#ef4444"/>
+
+    <!-- Gold Accent Gradient: Compass & Plane -->
+    <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fef08a"/>
+      <stop offset="40%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
     </linearGradient>
+
+    <!-- Sun Gradient -->
+    <linearGradient id="sunGrad" x1="0%" y1="100%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#ea580c"/>
+      <stop offset="50%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#fde047"/>
+    </linearGradient>
+
+    <!-- River Water Gradient -->
+    <linearGradient id="riverGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#38bdf8"/>
+      <stop offset="60%" stop-color="#0284c7"/>
+      <stop offset="100%" stop-color="#0369a1"/>
+    </linearGradient>
+
+    <!-- Hills Gradients -->
+    <linearGradient id="hillBack" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#047857"/>
+    </linearGradient>
+    <linearGradient id="hillFront" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#34d399"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    
+    <!-- Outer Shield Glow -->
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="8" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
   </defs>
+
+  <!-- App Rounded Icon Container -->
+  <rect width="512" height="512" rx="128" fill="url(#bgGrad)"/>
   
-  <!-- Background Circle -->
-  <rect width="512" height="512" rx="128" fill="url(#yeanaGrad)"/>
-  
-  <!-- Mountain & Valley Paths -->
-  <path d="M120 380 L256 160 L392 380 Z" fill="#10b981" opacity="0.9"/>
-  <path d="M210 380 L310 210 L410 380 Z" fill="#34d399" opacity="0.75"/>
-  <path d="M120 380 L256 160 L290 380 Z" fill="#047857" opacity="0.3"/>
-  
-  <!-- Rising Sun -->
-  <circle cx="256" cy="180" r="50" fill="url(#sunGrad)"/>
-  
-  <!-- Modern Compass / Star -->
-  <path d="M256 260 L270 300 L310 314 L270 328 L256 368 L242 328 L202 314 L242 300 Z" fill="#ffffff"/>
-  
-  <!-- Text YEANA -->
-  <text x="256" y="445" font-family="'Plus Jakarta Sans', Inter, sans-serif" font-weight="900" font-size="52" fill="#ffffff" text-anchor="middle" letter-spacing="4">YEANA</text>
+  <!-- Subtle Inner Border -->
+  <rect x="12" y="12" width="488" height="488" rx="116" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="3"/>
+
+  <!-- Compass Starburst Top -->
+  <g transform="translate(256, 140)">
+    <!-- 8-point compass star -->
+    <polygon points="0,-85 18,-25 78,-25 28,10 46,68 0,35 -46,68 -28,10 -78,-25 -18,-25" fill="url(#goldGrad)" opacity="0.95"/>
+    <polygon points="0,-85 12,-20 0,-10 -12,-20" fill="#fef08a"/>
+    <circle cx="0" cy="0" r="14" fill="#022c22"/>
+    <circle cx="0" cy="0" r="8" fill="url(#goldGrad)"/>
+  </g>
+
+  <!-- Crest Shield Frame for Landscapes -->
+  <g id="crest">
+    <!-- Clip path for the landscape inside crest -->
+    <clipPath id="crestClip">
+      <path d="M 146 220 
+               Q 146 360 256 420 
+               Q 366 360 366 220 
+               Z"/>
+    </clipPath>
+
+    <!-- Shield background inside clip -->
+    <g clip-path="url(#crestClip)">
+      <rect x="140" y="180" width="232" height="250" fill="#064e3b"/>
+
+      <!-- Rising Golden Sun -->
+      <circle cx="285" cy="275" r="38" fill="url(#sunGrad)" filter="url(#glow)"/>
+      <!-- Sun Rays -->
+      <g stroke="url(#sunGrad)" stroke-width="3.5" stroke-linecap="round" opacity="0.8">
+        <line x1="285" y1="225" x2="285" y2="215"/>
+        <line x1="320" y1="239" x2="327" y2="232"/>
+        <line x1="335" y1="275" x2="345" y2="275"/>
+        <line x1="250" y1="239" x2="243" y2="232"/>
+        <line x1="235" y1="275" x2="225" y2="275"/>
+      </g>
+
+      <!-- Rolling Green Hills (Tea Gardens & Sajek) -->
+      <!-- Back Hill -->
+      <path d="M 140 330 Q 220 280 320 320 Q 355 335 375 350 L 375 430 L 140 430 Z" fill="url(#hillBack)"/>
+      <!-- Contours on back hill -->
+      <path d="M 155 340 Q 230 295 330 335" stroke="#047857" stroke-width="3" fill="none" opacity="0.6"/>
+      
+      <!-- Front Hill -->
+      <path d="M 140 375 Q 230 320 375 350 L 375 430 L 140 430 Z" fill="url(#hillFront)"/>
+      <!-- Contours on front hill -->
+      <path d="M 145 390 Q 220 345 320 365" stroke="#047857" stroke-width="3.5" fill="none" opacity="0.6"/>
+
+      <!-- Winding River / Haor Waterway -->
+      <path d="M 285 315 
+               Q 275 335 250 350 
+               Q 220 370 245 400 
+               Q 255 415 256 425 
+               L 282 425 
+               Q 285 410 270 395 
+               Q 245 375 275 350 
+               Q 295 335 292 315 Z" 
+            fill="url(#riverGrad)"/>
+    </g>
+
+    <!-- Golden Crest Border -->
+    <path d="M 146 220 
+             Q 146 360 256 420 
+             Q 366 360 366 220 
+             Z" 
+          fill="none" 
+          stroke="url(#goldGrad)" 
+          stroke-width="7" 
+          stroke-linejoin="round"/>
+  </g>
+
+  <!-- Soaring Airplane / Travel Trajectory Silhouette (Golden & Sleek) -->
+  <g transform="translate(4, -8)">
+    <path d="M 155 255 
+             L 210 235 
+             L 215 195 
+             L 238 200 
+             L 242 225 
+             L 345 190 
+             Q 372 180 378 195 
+             Q 378 208 355 218 
+             L 260 262 
+             L 265 295 
+             L 245 298 
+             L 230 273 
+             L 175 292 
+             Q 150 300 145 290 
+             Q 142 275 155 255 Z" 
+          fill="url(#goldGrad)" 
+          filter="url(#glow)"/>
+    <!-- Sleek inner wing highlight -->
+    <path d="M 245 228 L 340 196 Q 355 191 356 198 Q 356 205 342 211 L 255 250 Z" fill="#ffffff" opacity="0.5"/>
+  </g>
+
+  <!-- Subtle Star Sparkles -->
+  <circle cx="130" cy="160" r="3" fill="#fef08a" opacity="0.8"/>
+  <circle cx="395" cy="140" r="4" fill="#fef08a" opacity="0.9"/>
+  <circle cx="410" cy="270" r="2.5" fill="#fef08a" opacity="0.6"/>
+  <circle cx="105" cy="290" r="2.5" fill="#fef08a" opacity="0.6"/>
 </svg>

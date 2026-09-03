@@ -26,7 +26,12 @@ import {
   AlertCircle,
   HelpCircle,
   Compass,
-  Bike
+  Bike,
+  CreditCard,
+  Wallet,
+  Lock,
+  ArrowLeft,
+  Loader2
 } from 'lucide-react';
 import { TransportRoute, TransportType, SeatInventoryItem } from '../../types';
 import { useTrip } from '../../context/TripContext';
@@ -53,6 +58,8 @@ export interface ConfirmedBooking {
   boardingPoint: string;
   droppingPoint: string;
   totalFare: number;
+  paymentMethod: 'card' | 'bkash' | 'rocket' | 'nogod';
+  transactionId: string;
   bookedAt: string;
 }
 
@@ -75,8 +82,28 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
 }) => {
   const { activeTrip, addCustomStopToTrip, updateTripBudget } = useTrip();
 
-  // Booking Step: 1 = Seat Map & Passenger Info, 2 = Confirmed Digital E-Ticket
-  const [step, setStep] = useState<'selection' | 'ticket'>('selection');
+  // Booking Step: 1 = Seat Map & Passenger Info, 2 = Modern Checkout Payment, 3 = Confirmed Digital E-Ticket
+  const [step, setStep] = useState<'selection' | 'payment' | 'ticket'>('selection');
+  const [paymentMethod, setPaymentMethod] = useState<'bkash' | 'nogod' | 'rocket' | 'card'>('bkash');
+  const [isProcessingPayment, setIsProcessingPayment] = useState<boolean>(false);
+  const [processingStatus, setProcessingStatus] = useState<string>('');
+
+  // Payment form states
+  const [cardNumber, setCardNumber] = useState<string>('4321 •••• •••• 9812');
+  const [cardHolder, setCardHolder] = useState<string>('');
+  const [cardExpiry, setCardExpiry] = useState<string>('12/28');
+  const [cardCvv, setCardCvv] = useState<string>('842');
+
+  const [bkashNumber, setBkashNumber] = useState<string>('');
+  const [bkashOtp, setBkashOtp] = useState<string>('582914');
+  const [bkashPin, setBkashPin] = useState<string>('•••••');
+
+  const [nagadNumber, setNagadNumber] = useState<string>('');
+  const [nagadOtp, setNagadOtp] = useState<string>('716293');
+  const [nagadPin, setNagadPin] = useState<string>('••••');
+
+  const [rocketNumber, setRocketNumber] = useState<string>('');
+  const [rocketPin, setRocketPin] = useState<string>('••••');
 
   // Real-time seat inventory from DataService
   const [realInventory, setRealInventory] = useState<SeatInventoryItem[]>([]);
@@ -426,8 +453,8 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
     }, 0);
   }, [selectedSeatIds, seatLayout, pricePerSeat, isFullReserve, route.reserve_price]);
 
-  // Confirm booking & generate E-Ticket
-  const handleConfirmReservation = async (e: React.FormEvent) => {
+  // Stage 1: Validate seat selection & proceed to modern payment gateway
+  const handleProceedToPayment = (e: React.FormEvent) => {
     e.preventDefault();
 
     if (selectedSeatIds.length === 0) {
@@ -445,6 +472,27 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
       return;
     }
 
+    setFormError(null);
+    if (!bkashNumber) setBkashNumber(passengerPhone.trim());
+    if (!nagadNumber) setNagadNumber(passengerPhone.trim());
+    if (!rocketNumber) setRocketNumber(passengerPhone.trim() + '8');
+    if (!cardHolder) setCardHolder(passengerName.trim());
+
+    setStep('payment');
+  };
+
+  // Stage 2: Process payment with chosen Bangladeshi gateway (Card, bKash, Rocket, Nagad)
+  const handleExecutePayment = async () => {
+    setIsProcessingPayment(true);
+    setProcessingStatus(`Connecting to ${paymentMethod.toUpperCase()} Secure Payment Gateway...`);
+    
+    await new Promise(r => setTimeout(r, 600));
+    setProcessingStatus(`Authorizing ৳${totalFare} BDT with Bangladesh Bank Payment Systems...`);
+    
+    await new Promise(r => setTimeout(r, 700));
+
+    const prefix = paymentMethod === 'bkash' ? 'BK' : paymentMethod === 'nogod' ? 'NG' : paymentMethod === 'rocket' ? 'RK' : 'CD';
+    const txnId = `TXN-${prefix}-${Math.floor(100000 + Math.random() * 900000)}`;
     const bookingId = `YN-${route.transport_type.substring(0, 2).toUpperCase()}-${Math.floor(100000 + Math.random() * 900000)}`;
 
     const booking: ConfirmedBooking = {
@@ -460,6 +508,8 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
       boardingPoint: selectedBoarding,
       droppingPoint: selectedDropping,
       totalFare,
+      paymentMethod,
+      transactionId: txnId,
       bookedAt: new Date().toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' })
     };
 
@@ -484,10 +534,13 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
       boarding_point: selectedBoarding,
       dropping_point: selectedDropping,
       total_fare: totalFare,
+      payment_method: paymentMethod,
+      transaction_id: txnId,
       status: 'confirmed'
     });
 
     setConfirmedBooking(booking);
+    setIsProcessingPayment(false);
     setStep('ticket');
 
     // Auto-update active trip planner budget & add stop if active trip exists
@@ -497,7 +550,7 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
         `${route.transport_type === 'Local' ? (route.local_vehicle_name || 'Local Transport') : route.transport_type}: ${route.company} (${isFullReserve ? 'Full Reserve' : `${selectedSeatIds.length} Seats`})`,
         1,
         route.departure_time.split('/')[0],
-        `Boarding: ${selectedBoarding} ➔ Dropping: ${selectedDropping}. Fare: ৳${totalFare} BDT. Booking ID: ${bookingId}`
+        `Boarding: ${selectedBoarding} ➔ Dropping: ${selectedDropping}. Fare: ৳${totalFare} BDT. Paid via: ${paymentMethod.toUpperCase()} (TXN: ${txnId})`
       );
       updateTripBudget(activeTrip.id, {
         ...activeTrip.budget,
@@ -521,7 +574,8 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
       `Seats: ${confirmedBooking.selectedSeats.join(', ')} (${confirmedBooking.selectedSeats.length} Seats)\n` +
       `Lead Passenger: ${confirmedBooking.passengerName} (${confirmedBooking.passengerPhone})\n` +
       `Boarding Stand: ${confirmedBooking.boardingPoint}\n` +
-      `Total Fare: ৳${confirmedBooking.totalFare} BDT (VERIFIED / CONFIRMED)\n` +
+      `Payment: PAID VIA ${confirmedBooking.paymentMethod.toUpperCase()} (TXN: ${confirmedBooking.transactionId})\n` +
+      `Total Fare: ৳${confirmedBooking.totalFare} BDT (VERIFIED / PAID)\n` +
       `Stand Hotline: ${confirmedBooking.route.contact_phone || 'Local Drivers Union'}`;
 
     navigator.clipboard.writeText(text);
@@ -578,6 +632,36 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
           >
             <X className="w-5 h-5" />
           </button>
+        </div>
+
+        {/* 3-Step Modern Booking Indicator */}
+        <div className="bg-slate-50 border-b border-slate-200 px-4 sm:px-6 py-2.5 flex items-center justify-center gap-2 overflow-x-auto text-xs font-bold scrollbar-none">
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-nowrap">
+            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all whitespace-nowrap ${
+              step === 'selection' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}>
+              <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-black">1</span>
+              <span>Seats & Passengers</span>
+            </span>
+
+            <ArrowRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+
+            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all whitespace-nowrap ${
+              step === 'payment' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-600 hover:text-slate-900'
+            }`}>
+              <span className="w-4 h-4 rounded-full bg-white/20 flex items-center justify-center text-[10px] font-black">2</span>
+              <span>Payment (Card / bKash / Rocket / Nagad)</span>
+            </span>
+
+            <ArrowRight className="w-3.5 h-3.5 text-slate-300 shrink-0" />
+
+            <span className={`flex items-center gap-1.5 px-3 py-1 rounded-full transition-all whitespace-nowrap ${
+              step === 'ticket' ? 'bg-emerald-600 text-white shadow-xs' : 'text-slate-400'
+            }`}>
+              <span className="w-4 h-4 rounded-full bg-slate-200 text-slate-600 flex items-center justify-center text-[10px] font-black">3</span>
+              <span>Digital Pass</span>
+            </span>
+          </div>
         </div>
 
         {/* ========================================================================= */}
@@ -871,7 +955,7 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
               {/* RIGHT: PASSENGER DETAILS & BOARDING INFORMATION FORM (5 cols) */}
               <div className="lg:col-span-5 space-y-6">
                 
-                <form onSubmit={handleConfirmReservation} className="space-y-5">
+                <form onSubmit={handleProceedToPayment} className="space-y-5">
                   <div className="border-b border-slate-100 pb-3">
                     <h3 className="text-sm font-black text-slate-900 flex items-center gap-2">
                       <ShieldCheck className="w-4 h-4 text-emerald-600" />
@@ -1014,13 +1098,13 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
                     type="submit"
                     className="w-full py-4 rounded-2xl bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-sm font-extrabold flex items-center justify-center gap-2 shadow-elevated transition-all"
                   >
-                    <span>Confirm & Generate Digital Transit Pass</span>
+                    <span>Proceed to Payment (Card, bKash, Rocket, Nagad)</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
 
                   <p className="text-[11px] text-slate-400 text-center flex items-center justify-center gap-1">
                     <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>Instant confirmation with SMS & QR Transit Code</span>
+                    <span>Instant payment gateway with official transaction ID & e-ticket</span>
                   </p>
 
                 </form>
@@ -1033,7 +1117,551 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 2: CONFIRMED DIGITAL E-TICKET BOARDING PASS                          */}
+        {/* STEP 2: MODERN CHECKOUT & BANGLADESHI PAYMENT GATEWAYS                    */}
+        {/* (Card, bKash, Rocket, Nagad)                                             */}
+        {/* ========================================================================= */}
+        {step === 'payment' && (
+          <div className="p-5 sm:p-8 space-y-6 flex-1 bg-slate-50/60">
+            {/* Top Navigation & Amount bar */}
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <button
+                type="button"
+                onClick={() => setStep('selection')}
+                className="px-4 py-2.5 rounded-2xl bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 text-xs font-bold flex items-center gap-2 transition-all shadow-2xs"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                <span>Back to Seat Selection</span>
+              </button>
+
+              <div className="flex items-center gap-2 bg-emerald-50 px-4 py-2 rounded-2xl border border-emerald-200">
+                <span className="text-xs font-bold text-emerald-800">Total Payable:</span>
+                <span className="text-base font-black text-emerald-900 font-mono">৳{totalFare} BDT</span>
+              </div>
+            </div>
+
+            {/* Grid Layout: Booking Summary (Left) + Payment Methods (Right) */}
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+              
+              {/* Left Column: Order Review */}
+              <div className="lg:col-span-4 space-y-4">
+                <div className="bg-white rounded-3xl p-5 border border-slate-200 shadow-card space-y-4">
+                  <div className="border-b border-slate-100 pb-3">
+                    <span className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400">Order Summary</span>
+                    <h3 className="text-sm font-black text-slate-900">{route.company}</h3>
+                    <p className="text-xs text-slate-500">{route.local_vehicle_name || route.transport_type}</p>
+                  </div>
+
+                  <div className="space-y-2.5 text-xs">
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Route:</span>
+                      <span className="font-bold text-slate-900">{route.from_district} ➔ {route.to_district}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Journey Date:</span>
+                      <span className="font-bold text-slate-900">{travelDate}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Departure Time:</span>
+                      <span className="font-bold text-slate-900">{route.departure_time.split('/')[0]}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Seats / Capacity:</span>
+                      <span className="font-bold text-emerald-700">
+                        {isFullReserve ? 'Full Vehicle Reserve' : `${selectedSeatIds.join(', ')} (${selectedSeatIds.length} Seats)`}
+                      </span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Lead Passenger:</span>
+                      <span className="font-bold text-slate-900">{passengerName}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Mobile:</span>
+                      <span className="font-mono text-slate-900">{passengerPhone}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-600">
+                      <span className="font-medium">Boarding Stand:</span>
+                      <span className="font-bold text-slate-800 text-right truncate max-w-[140px]">{selectedBoarding}</span>
+                    </div>
+                  </div>
+
+                  <div className="border-t border-slate-100 pt-3 space-y-1.5 text-xs">
+                    <div className="flex justify-between text-slate-500">
+                      <span>Seat Fare</span>
+                      <span className="font-mono font-bold text-slate-800">৳{totalFare}</span>
+                    </div>
+                    <div className="flex justify-between text-slate-500">
+                      <span>YEANA Booking Fee</span>
+                      <span className="text-emerald-600 font-bold">FREE (৳0)</span>
+                    </div>
+                    <div className="flex justify-between text-slate-500">
+                      <span>Union Safety & Insurance</span>
+                      <span className="text-emerald-600 font-bold">Included</span>
+                    </div>
+                    <div className="border-t border-slate-200 pt-2 flex justify-between items-center">
+                      <span className="text-xs font-black text-slate-900">Total Payable</span>
+                      <span className="text-lg font-black text-emerald-700 font-mono">৳{totalFare} BDT</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2 text-xs">
+                  <div className="flex items-center gap-2 text-emerald-400 font-bold">
+                    <ShieldCheck className="w-4 h-4" />
+                    <span>Bangladesh Bank PSD Regulated</span>
+                  </div>
+                  <p className="text-[11px] text-slate-300 leading-normal">
+                    Payments are protected by 256-bit TLS encryption in compliance with Bangladesh Bank Payment Systems Department (PSD) rules. We never store PIN or CVV.
+                  </p>
+                </div>
+              </div>
+
+              {/* Right Column: Bangladeshi Payment Gateway Options */}
+              <div className="lg:col-span-8 space-y-4">
+                
+                {/* Method Tabs */}
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                  {/* bKash */}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('bkash')}
+                    className={`p-3.5 rounded-2xl border transition-all text-left flex flex-col justify-between h-24 ${
+                      paymentMethod === 'bkash'
+                        ? 'bg-[#E2136E] text-white border-[#C20F5D] shadow-lg shadow-[#E2136E]/20 scale-[1.02]'
+                        : 'bg-white hover:bg-pink-50/50 border-slate-200 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                        paymentMethod === 'bkash' ? 'bg-white/20 text-white' : 'bg-pink-100 text-[#E2136E]'
+                      }`}>
+                        MFS
+                      </span>
+                      {paymentMethod === 'bkash' && <CheckCircle2 className="w-4 h-4 text-white" />}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black tracking-tight">bKash</h4>
+                      <p className={`text-[10px] font-bold ${paymentMethod === 'bkash' ? 'text-pink-100' : 'text-slate-500'}`}>
+                        বিকাশ পেমেন্ট
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Nagad */}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('nogod')}
+                    className={`p-3.5 rounded-2xl border transition-all text-left flex flex-col justify-between h-24 ${
+                      paymentMethod === 'nogod'
+                        ? 'bg-[#F7941D] text-white border-[#DE8114] shadow-lg shadow-[#F7941D]/20 scale-[1.02]'
+                        : 'bg-white hover:bg-orange-50/50 border-slate-200 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                        paymentMethod === 'nogod' ? 'bg-white/20 text-white' : 'bg-orange-100 text-[#F7941D]'
+                      }`}>
+                        Post MFS
+                      </span>
+                      {paymentMethod === 'nogod' && <CheckCircle2 className="w-4 h-4 text-white" />}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black tracking-tight">Nagad</h4>
+                      <p className={`text-[10px] font-bold ${paymentMethod === 'nogod' ? 'text-orange-100' : 'text-slate-500'}`}>
+                        নগদ পেমেন্ট
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Rocket */}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('rocket')}
+                    className={`p-3.5 rounded-2xl border transition-all text-left flex flex-col justify-between h-24 ${
+                      paymentMethod === 'rocket'
+                        ? 'bg-[#8C3494] text-white border-[#722579] shadow-lg shadow-[#8C3494]/20 scale-[1.02]'
+                        : 'bg-white hover:bg-purple-50/50 border-slate-200 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                        paymentMethod === 'rocket' ? 'bg-white/20 text-white' : 'bg-purple-100 text-[#8C3494]'
+                      }`}>
+                        DBBL
+                      </span>
+                      {paymentMethod === 'rocket' && <CheckCircle2 className="w-4 h-4 text-white" />}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black tracking-tight">Rocket</h4>
+                      <p className={`text-[10px] font-bold ${paymentMethod === 'rocket' ? 'text-purple-100' : 'text-slate-500'}`}>
+                        রকেট (ডাচ-বাংলা)
+                      </p>
+                    </div>
+                  </button>
+
+                  {/* Debit / Credit Card */}
+                  <button
+                    type="button"
+                    onClick={() => setPaymentMethod('card')}
+                    className={`p-3.5 rounded-2xl border transition-all text-left flex flex-col justify-between h-24 ${
+                      paymentMethod === 'card'
+                        ? 'bg-slate-900 text-white border-slate-950 shadow-lg shadow-slate-900/20 scale-[1.02]'
+                        : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-800'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between">
+                      <span className={`text-[10px] font-black uppercase px-2 py-0.5 rounded ${
+                        paymentMethod === 'card' ? 'bg-white/20 text-white' : 'bg-slate-100 text-slate-700'
+                      }`}>
+                        Bank
+                      </span>
+                      {paymentMethod === 'card' && <CheckCircle2 className="w-4 h-4 text-white" />}
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-black tracking-tight">Card</h4>
+                      <p className={`text-[10px] font-bold ${paymentMethod === 'card' ? 'text-slate-300' : 'text-slate-500'}`}>
+                        Visa / Master / Nexus
+                      </p>
+                    </div>
+                  </button>
+                </div>
+
+                {/* Gateway Specific Form Card */}
+                <div className="bg-white rounded-3xl p-6 border border-slate-200 shadow-card relative overflow-hidden">
+                  
+                  {/* 1. bKash View */}
+                  {paymentMethod === 'bkash' && (
+                    <div className="space-y-5 animate-in fade-in">
+                      <div className="flex items-center justify-between pb-3 border-b border-pink-100">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-[#E2136E] text-white flex items-center justify-center font-black text-sm shadow-sm">
+                            ব
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black text-[#E2136E]">bKash Payment Gateway</h4>
+                            <p className="text-[11px] text-slate-500">Merchant Account • YEANA Transit Services</p>
+                          </div>
+                        </div>
+                        <span className="text-xs font-black text-[#E2136E] bg-pink-50 px-2.5 py-1 rounded-lg border border-pink-200">
+                          ৳{totalFare} BDT
+                        </span>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                            Your bKash Account Number
+                          </label>
+                          <div className="relative">
+                            <input
+                              type="tel"
+                              value={bkashNumber}
+                              onChange={(e) => setBkashNumber(e.target.value)}
+                              placeholder="017XXXXXXXX"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#E2136E] focus:ring-2 focus:ring-[#E2136E]/20"
+                            />
+                            <span className="absolute right-3 top-3 text-[11px] font-bold text-slate-400">Personal</span>
+                          </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                              Verification Code (OTP)
+                            </label>
+                            <input
+                              type="text"
+                              value={bkashOtp}
+                              onChange={(e) => setBkashOtp(e.target.value)}
+                              placeholder="6-digit OTP"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#E2136E]"
+                            />
+                            <span className="text-[10px] text-slate-400 mt-1 block">Simulated OTP: 582914</span>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                              bKash 5-Digit PIN
+                            </label>
+                            <input
+                              type="password"
+                              value={bkashPin}
+                              onChange={(e) => setBkashPin(e.target.value)}
+                              placeholder="•••••"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#E2136E]"
+                            />
+                            <span className="text-[10px] text-slate-400 mt-1 block">End-to-end encrypted</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleExecutePayment}
+                        disabled={isProcessingPayment}
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#E2136E] to-[#C20F5D] hover:from-[#C20F5D] hover:to-[#A00C4C] text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-[#E2136E]/30 active:scale-98 transition-all disabled:opacity-50"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>Pay ৳{totalFare} BDT with bKash</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 2. Nagad View */}
+                  {paymentMethod === 'nogod' && (
+                    <div className="space-y-5 animate-in fade-in">
+                      <div className="flex items-center justify-between pb-3 border-b border-orange-100">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-[#F7941D] text-white flex items-center justify-center font-black text-sm shadow-sm">
+                            ন
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black text-[#F7941D]">Nagad Payment Gateway</h4>
+                            <p className="text-[11px] text-slate-500">Postal Department Digital Service • YEANA Travel</p>
+                          </div>
+                        </div>
+                        <span className="text-xs font-black text-[#F7941D] bg-orange-50 px-2.5 py-1 rounded-lg border border-orange-200">
+                          ৳{totalFare} BDT
+                        </span>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                            Your Nagad Account Number
+                          </label>
+                          <input
+                            type="tel"
+                            value={nagadNumber}
+                            onChange={(e) => setNagadNumber(e.target.value)}
+                            placeholder="01XXXXXXXXX"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#F7941D] focus:ring-2 focus:ring-[#F7941D]/20"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                              OTP Verification Code
+                            </label>
+                            <input
+                              type="text"
+                              value={nagadOtp}
+                              onChange={(e) => setNagadOtp(e.target.value)}
+                              placeholder="6-digit OTP"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#F7941D]"
+                            />
+                            <span className="text-[10px] text-slate-400 mt-1 block">Simulated OTP: 716293</span>
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                              Nagad 4-Digit PIN
+                            </label>
+                            <input
+                              type="password"
+                              value={nagadPin}
+                              onChange={(e) => setNagadPin(e.target.value)}
+                              placeholder="••••"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#F7941D]"
+                            />
+                            <span className="text-[10px] text-slate-400 mt-1 block">Protected by Nagad Shield</span>
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleExecutePayment}
+                        disabled={isProcessingPayment}
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#F7941D] to-[#DE8114] hover:from-[#DE8114] hover:to-[#B86506] text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-[#F7941D]/30 active:scale-98 transition-all disabled:opacity-50"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>Pay ৳{totalFare} BDT with Nagad</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 3. Rocket View */}
+                  {paymentMethod === 'rocket' && (
+                    <div className="space-y-5 animate-in fade-in">
+                      <div className="flex items-center justify-between pb-3 border-b border-purple-100">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-10 h-10 rounded-xl bg-[#8C3494] text-white flex items-center justify-center font-black text-sm shadow-sm">
+                            DBBL
+                          </div>
+                          <div>
+                            <h4 className="text-sm font-black text-[#8C3494]">Rocket (Dutch-Bangla Bank)</h4>
+                            <p className="text-[11px] text-slate-500">Core Banking Electronic Gateway • YEANA Travel</p>
+                          </div>
+                        </div>
+                        <span className="text-xs font-black text-[#8C3494] bg-purple-50 px-2.5 py-1 rounded-lg border border-purple-200">
+                          ৳{totalFare} BDT
+                        </span>
+                      </div>
+
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                            Rocket 12-Digit Mobile Account Number (with check digit)
+                          </label>
+                          <input
+                            type="tel"
+                            value={rocketNumber}
+                            onChange={(e) => setRocketNumber(e.target.value)}
+                            placeholder="01XXXXXXXXXX"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#8C3494] focus:ring-2 focus:ring-[#8C3494]/20"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">
+                            Rocket 4-Digit Security PIN
+                          </label>
+                          <input
+                            type="password"
+                            value={rocketPin}
+                            onChange={(e) => setRocketPin(e.target.value)}
+                            placeholder="••••"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-[#8C3494]"
+                          />
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleExecutePayment}
+                        disabled={isProcessingPayment}
+                        className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#8C3494] to-[#722579] hover:from-[#722579] hover:to-[#55185B] text-white text-sm font-black flex items-center justify-center gap-2 shadow-lg shadow-[#8C3494]/30 active:scale-98 transition-all disabled:opacity-50"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>Pay ৳{totalFare} BDT with Rocket</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* 4. Card View */}
+                  {paymentMethod === 'card' && (
+                    <div className="space-y-5 animate-in fade-in">
+                      {/* Virtual Card Graphic */}
+                      <div className="rounded-2xl bg-gradient-to-r from-slate-900 via-slate-800 to-indigo-950 p-5 text-white shadow-xl space-y-4 border border-slate-700">
+                        <div className="flex items-center justify-between">
+                          <span className="text-[10px] font-black uppercase tracking-widest text-emerald-400">
+                            YEANA SECURE PAY
+                          </span>
+                          <div className="flex items-center gap-1.5 text-xs font-black">
+                            <CreditCard className="w-4 h-4 text-emerald-400" />
+                            <span>VISA / MASTERCARD / NEXUS</span>
+                          </div>
+                        </div>
+
+                        <div className="space-y-1">
+                          <p className="text-[10px] text-slate-400 uppercase tracking-wider">Card Number</p>
+                          <p className="font-mono text-lg sm:text-xl font-bold tracking-widest text-slate-100">
+                            {cardNumber || '•••• •••• •••• ••••'}
+                          </p>
+                        </div>
+
+                        <div className="flex items-center justify-between text-xs pt-1">
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase">Cardholder</p>
+                            <p className="font-bold tracking-wide uppercase truncate max-w-[180px]">
+                              {cardHolder || 'TRAVELER NAME'}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[9px] text-slate-400 uppercase">Expires</p>
+                            <p className="font-mono font-bold">{cardExpiry || 'MM/YY'}</p>
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Card Inputs */}
+                      <div className="space-y-4">
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">Card Number</label>
+                          <input
+                            type="text"
+                            value={cardNumber}
+                            onChange={(e) => setCardNumber(e.target.value)}
+                            placeholder="4321 •••• •••• 9812"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-900"
+                          />
+                        </div>
+
+                        <div>
+                          <label className="block text-xs font-bold text-slate-700 mb-1.5">Name on Card</label>
+                          <input
+                            type="text"
+                            value={cardHolder}
+                            onChange={(e) => setCardHolder(e.target.value)}
+                            placeholder="e.g. MOHAMMED YEAD"
+                            className="w-full px-4 py-3 rounded-xl border border-slate-200 text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-900"
+                          />
+                        </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">Expiry Date</label>
+                            <input
+                              type="text"
+                              value={cardExpiry}
+                              onChange={(e) => setCardExpiry(e.target.value)}
+                              placeholder="MM/YY"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-900"
+                            />
+                          </div>
+
+                          <div>
+                            <label className="block text-xs font-bold text-slate-700 mb-1.5">CVV / CVC</label>
+                            <input
+                              type="password"
+                              value={cardCvv}
+                              onChange={(e) => setCardCvv(e.target.value)}
+                              placeholder="•••"
+                              className="w-full px-4 py-3 rounded-xl border border-slate-200 font-mono text-sm font-bold text-slate-900 bg-slate-50 focus:bg-white focus:outline-none focus:border-slate-900"
+                            />
+                          </div>
+                        </div>
+                      </div>
+
+                      <button
+                        type="button"
+                        onClick={handleExecutePayment}
+                        disabled={isProcessingPayment}
+                        className="w-full py-4 rounded-2xl bg-slate-900 hover:bg-slate-800 text-white text-sm font-black flex items-center justify-center gap-2 shadow-xl shadow-slate-900/20 active:scale-98 transition-all disabled:opacity-50"
+                      >
+                        <Lock className="w-4 h-4" />
+                        <span>Pay ৳{totalFare} BDT with Card</span>
+                      </button>
+                    </div>
+                  )}
+
+                  {/* Payment Loading Modal Overlay */}
+                  {isProcessingPayment && (
+                    <div className="absolute inset-0 bg-slate-950/85 backdrop-blur-sm rounded-3xl flex flex-col items-center justify-center p-6 text-white text-center space-y-4 z-20 animate-in fade-in duration-150">
+                      <div className="w-14 h-14 rounded-2xl bg-white/10 flex items-center justify-center text-emerald-400">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                      </div>
+                      <div className="space-y-1">
+                        <h4 className="text-base font-black">Authorizing Payment</h4>
+                        <p className="text-xs text-slate-300 font-medium">{processingStatus}</p>
+                      </div>
+                      <p className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
+                        <ShieldCheck className="w-3.5 h-3.5" />
+                        <span>256-Bit SSL Encrypted & Verified</span>
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+              </div>
+
+            </div>
+          </div>
+        )}
+
+        {/* ========================================================================= */}
+        {/* STEP 3: CONFIRMED DIGITAL E-TICKET BOARDING PASS                          */}
         {/* ========================================================================= */}
         {step === 'ticket' && confirmedBooking && (
           <div className="p-5 sm:p-8 space-y-6 flex-1 bg-slate-50">
@@ -1146,11 +1774,16 @@ export const SeatSelectionModal: React.FC<SeatSelectionModalProps> = ({
                   </div>
 
                   <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100 space-y-0.5">
-                    <span className="text-[10px] font-bold text-slate-400 uppercase">Fare Status</span>
+                    <span className="text-[10px] font-bold text-slate-400 uppercase">Payment & Status</span>
                     <p className="text-sm font-black text-emerald-700 font-mono">৳{confirmedBooking.totalFare} BDT</p>
-                    <span className="text-[10px] bg-emerald-100 text-emerald-800 px-1.5 py-0.2 rounded font-extrabold inline-block">
-                      VERIFIED
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap pt-0.5">
+                      <span className="text-[9px] bg-emerald-100 text-emerald-800 px-1.5 py-0.5 rounded font-black inline-block uppercase">
+                        PAID VIA {confirmedBooking.paymentMethod.toUpperCase()}
+                      </span>
+                      <span className="text-[9px] text-slate-500 font-mono">
+                        {confirmedBooking.transactionId}
+                      </span>
+                    </div>
                   </div>
                 </div>
 

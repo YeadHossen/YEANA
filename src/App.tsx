@@ -33,6 +33,7 @@ import { KeepNotesView } from './views/KeepNotesView';
 import { FavoritesView } from './views/FavoritesView';
 import { ProfileView } from './views/ProfileView';
 import { AdminView } from './views/AdminView';
+import { EmergencyServiceView } from './views/EmergencyServiceView';
 
 import { Place, Hotel, Restaurant } from './types';
 import { CheckCircle2, ArrowLeft, RotateCcw } from 'lucide-react';
@@ -57,6 +58,7 @@ const TAB_LABELS: Record<string, string> = {
   notes: 'KEEP NOTES (নোট ও খরচের হিসাব)',
   favorites: 'Saved Favorites (সংরক্ষিত)',
   shopping: 'Local Crafts (কেনাকাটা)',
+  emergency: 'Emergency Service (জরুরি সেবা)',
   profile: 'My Profile (প্রোফাইল)',
   admin: 'Admin Dashboard (অ্যাডমিন)'
 };
@@ -390,10 +392,15 @@ const AppContent: React.FC = () => {
               />
             )}
 
+            {currentTab === 'emergency' && (
+              <EmergencyServiceView />
+            )}
+
             {currentTab === 'profile' && (
               <ProfileView
                 onNavigateTab={handleNavigateTab}
                 onOpenAuth={() => setIsAuthOpen(true)}
+                onOpenPrivacy={() => setIsPrivacyOpen(true)}
               />
             )}
 

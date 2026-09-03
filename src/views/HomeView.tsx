@@ -285,11 +285,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Quick Service Tab Selectors */}
               <div className="flex items-center justify-start sm:justify-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-slate-900/80 border border-white/15 backdrop-blur-xl w-full max-w-full scrollbar-none">
                 {[
-                  { id: 'destinations', label: language === 'bn' ? '📍 দর্শনীয় স্থান' : '📍 Destinations' },
-                  { id: 'hotels', label: language === 'bn' ? '🏨 হোটেল ও রিসোর্ট' : '🏨 Hotels & Stays' },
-                  { id: 'transport', label: language === 'bn' ? '🚌 বাস ও ট্রেন সিট' : '🚌 Transit Seats' },
-                  { id: 'food', label: language === 'bn' ? '🍛 বিখ্যাত খাবার' : '🍛 Famous Food' },
-                  { id: 'shopping', label: language === 'bn' ? '🛍️ তাঁত ও পোশাক' : '🛍️ Native Crafts' },
+                  { id: 'destinations', label: language === 'bn' ? '📍 দর্শনীয় স্থান' : '📍 Destinations', activeBg: 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-950/30' },
+                  { id: 'hotels', label: language === 'bn' ? '🏨 হোটেল ও রিসোর্ট' : '🏨 Hotels & Stays', activeBg: 'bg-gradient-to-r from-indigo-600 to-blue-600 shadow-indigo-950/30' },
+                  { id: 'transport', label: language === 'bn' ? '🚌 বাস ও ট্রেন সিট' : '🚌 Transit Seats', activeBg: 'bg-gradient-to-r from-sky-600 to-cyan-600 shadow-sky-950/30' },
+                  { id: 'food', label: language === 'bn' ? '🍛 বিখ্যাত খাবার' : '🍛 Famous Food', activeBg: 'bg-gradient-to-r from-amber-600 to-orange-600 shadow-amber-950/30' },
+                  { id: 'shopping', label: language === 'bn' ? '🛍️ তাঁত ও পোশাক' : '🛍️ Native Crafts', activeBg: 'bg-gradient-to-r from-purple-600 to-fuchsia-600 shadow-purple-950/30' },
                 ].map(tab => (
                   <button
                     key={tab.id}
@@ -297,7 +297,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                     onClick={() => setActiveSearchTab(tab.id as any)}
                     className={`px-3 py-1.5 rounded-xl text-xs font-bold whitespace-nowrap transition-all shrink-0 ${
                       activeSearchTab === tab.id
-                        ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md'
+                        ? `${tab.activeBg} text-white shadow-md scale-102`
                         : 'text-slate-300 hover:text-white hover:bg-white/10'
                     }`}
                   >
@@ -330,7 +330,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-emerald-700 to-teal-800 hover:from-emerald-800 hover:to-teal-900 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-700/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 hover:shadow-glow-emerald text-center"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-amber-600 hover:from-emerald-800 hover:to-amber-700 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-700/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 hover:shadow-glow-emerald text-center"
                 >
                   <Search className="w-4 h-4" />
                   <span>{language === 'bn' ? 'সন্ধান করুন' : 'Search'}</span>
@@ -339,20 +339,20 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Trending Destination Pills */}
               <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-1 text-xs max-w-full">
-                <span className="text-shorisha-300 font-bold">{language === 'bn' ? 'জনপ্রিয়:' : 'Popular:'}</span>
+                <span className="text-amber-400 font-bold">{language === 'bn' ? 'জনপ্রিয়:' : 'Popular:'}</span>
                 {[
-                  { name: language === 'bn' ? 'কক্সবাজার' : "Cox's Bazar", query: "Cox's Bazar", icon: '🌊' },
-                  { name: language === 'bn' ? 'সাজেক' : 'Sajek', query: 'Sajek', icon: '☁️' },
-                  { name: language === 'bn' ? 'সুন্দরবন' : 'Sundarbans', query: 'Sundarbans', icon: '🌿' },
-                  { name: language === 'bn' ? 'শ্রীমঙ্গল' : 'Sreemangal', query: 'Sreemangal', icon: '☕' },
-                  { name: language === 'bn' ? 'টাঙ্গুয়ার হাওড়' : 'Tanguar Haor', query: 'Tahirpur', icon: '⛵' },
-                  { name: language === 'bn' ? 'কুয়াকাটা' : 'Kuakata', query: 'Kuakata', icon: '🌅' },
-                  { name: language === 'bn' ? 'বান্দরবান' : 'Bandarban', query: 'Bandarban', icon: '🏞️' },
+                  { name: language === 'bn' ? 'কক্সবাজার' : "Cox's Bazar", query: "Cox's Bazar", icon: '🌊', color: 'hover:border-sky-400 hover:text-sky-300' },
+                  { name: language === 'bn' ? 'সাজেক' : 'Sajek', query: 'Sajek', icon: '☁️', color: 'hover:border-emerald-400 hover:text-emerald-300' },
+                  { name: language === 'bn' ? 'সুন্দরবন' : 'Sundarbans', query: 'Sundarbans', icon: '🌿', color: 'hover:border-green-400 hover:text-green-300' },
+                  { name: language === 'bn' ? 'শ্রীমঙ্গল' : 'Sreemangal', query: 'Sreemangal', icon: '☕', color: 'hover:border-teal-400 hover:text-teal-300' },
+                  { name: language === 'bn' ? 'টাঙ্গুয়ার হাওড়' : 'Tanguar Haor', query: 'Tahirpur', icon: '⛵', color: 'hover:border-cyan-400 hover:text-cyan-300' },
+                  { name: language === 'bn' ? 'কুয়াকাটা' : 'Kuakata', query: 'Kuakata', icon: '🌅', color: 'hover:border-amber-400 hover:text-amber-300' },
+                  { name: language === 'bn' ? 'বান্দরবান' : 'Bandarban', query: 'Bandarban', icon: '🏞️', color: 'hover:border-rose-400 hover:text-rose-300' },
                 ].map(item => (
                   <button
                     key={item.query}
                     onClick={() => onNavigateTab('places', { search: item.query })}
-                    className="px-2.5 sm:px-3 py-1 rounded-full bg-white/10 hover:bg-emerald-500 hover:text-slate-950 text-white font-bold border border-white/20 transition-all backdrop-blur-md shadow-xs flex items-center gap-1 text-[11px] sm:text-xs"
+                    className={`px-2.5 sm:px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 transition-all backdrop-blur-md shadow-xs flex items-center gap-1 text-[11px] sm:text-xs ${item.color}`}
                   >
                     <span>{item.icon}</span>
                     <span>{item.name}</span>
@@ -362,23 +362,23 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             </div>
 
-            {/* Real-time Metric Badges */}
+            {/* Real-time Metric Badges with Jewel-tone Colors */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 max-w-2xl mx-auto text-white w-full">
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 backdrop-blur-md shadow-lg shadow-emerald-950/30">
                 <span className="text-xl font-black text-emerald-400 font-heading block">64</span>
-                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'সমগ্র বাংলাদেশ কাভারেজ' : 'Districts Covered'}</span>
+                <span className="text-[11px] text-emerald-200/90 font-semibold">{language === 'bn' ? 'সমগ্র বাংলাদেশ কাভারেজ' : 'Districts Covered'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
+              <div className="p-3 rounded-2xl bg-sky-950/50 border border-sky-500/40 backdrop-blur-md shadow-lg shadow-sky-950/30">
                 <span className="text-xl font-black text-sky-400 font-heading block">2,500+</span>
-                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'প্রাকৃতিক ও ঐতিহ্য স্থান' : 'Scenic Spots'}</span>
+                <span className="text-[11px] text-sky-200/90 font-semibold">{language === 'bn' ? 'প্রাকৃতিক ও ঐতিহ্য স্থান' : 'Scenic Spots'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-                <span className="text-xl font-black text-shorisha-400 font-heading block">1,000+</span>
-                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'লাইভ রুম রিজার্ভেশন' : 'Verified Hotels'}</span>
+              <div className="p-3 rounded-2xl bg-indigo-950/50 border border-indigo-500/40 backdrop-blur-md shadow-lg shadow-indigo-950/30">
+                <span className="text-xl font-black text-indigo-300 font-heading block">1,000+</span>
+                <span className="text-[11px] text-indigo-200/90 font-semibold">{language === 'bn' ? 'লাইভ রুম রিজার্ভেশন' : 'Verified Hotels'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-md">
-                <span className="text-xl font-black text-surjo-400 font-heading block">Live</span>
-                <span className="text-[11px] text-slate-300 font-medium">{language === 'bn' ? 'বাস, ট্রেন ও লঞ্চ সিট' : 'Bus & Train Seats'}</span>
+              <div className="p-3 rounded-2xl bg-amber-950/50 border border-amber-500/40 backdrop-blur-md shadow-lg shadow-amber-950/30">
+                <span className="text-xl font-black text-amber-400 font-heading block">Live</span>
+                <span className="text-[11px] text-amber-200/90 font-semibold">{language === 'bn' ? 'বাস, ট্রেন ও লঞ্চ সিট' : 'Transit Seats'}</span>
               </div>
             </div>
 
@@ -388,33 +388,99 @@ export const HomeView: React.FC<HomeViewProps> = ({
       </section>
 
       {/* ========================================================================= */}
-      {/* 2. QUICK CATEGORY PILLS                                                   */}
+      {/* 2. QUICK CATEGORY PILLS (MULTI-COLOR JEWEL-TONE CARDS)                   */}
       {/* ========================================================================= */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6">
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
           {[
-            { id: 'places', label: language === 'bn' ? 'দর্শনীয় স্থান' : 'Places', en: 'Destinations', icon: Compass, color: 'bg-emerald-50/90 text-emerald-900 border-emerald-200/90 hover:border-emerald-500 shadow-emerald-950/5' },
-            { id: 'hotels', label: language === 'bn' ? 'হোটেল ও রিসোর্ট' : 'Hotels', en: 'Accommodations', icon: HotelIcon, color: 'bg-sky-50/90 text-sky-900 border-sky-200/90 hover:border-sky-500 shadow-sky-950/5' },
-            { id: 'food', label: language === 'bn' ? 'ঐতিহ্যবাহী খাবার' : 'Local Food', en: 'Cuisine & Dining', icon: Utensils, color: 'bg-amber-50/90 text-amber-950 border-amber-200/90 hover:border-amber-500 shadow-amber-950/5' },
-            { id: 'transport', label: language === 'bn' ? 'বাস ও ট্রেন সিট' : 'Transport', en: 'Bus & Train Routes', icon: Bus, color: 'bg-teal-50/90 text-teal-900 border-teal-200/90 hover:border-teal-500 shadow-teal-950/5' },
-            { id: 'shopping', label: language === 'bn' ? 'তাঁত ও জিআই পণ্য' : 'Native Crafts', en: 'Regional Handloom', icon: ShoppingBag, color: 'bg-purple-50/90 text-purple-900 border-purple-200/90 hover:border-purple-500 shadow-purple-950/5' },
-            { id: 'ride', label: language === 'bn' ? 'গাড়ি ও রাইড' : 'Rentals', en: 'Cars & Jeeps', icon: Car, color: 'bg-rose-50/90 text-rose-900 border-rose-200/90 hover:border-rose-500 shadow-rose-950/5' },
+            { 
+              id: 'places', 
+              label: language === 'bn' ? 'দর্শনীয় স্থান' : 'Places', 
+              en: 'Destinations', 
+              icon: Compass, 
+              cardClass: 'cat-card-emerald', 
+              iconColor: 'text-emerald-700', 
+              iconBg: 'bg-emerald-100/90 border border-emerald-200', 
+              badge: '🌿 Natural', 
+              badgeColor: 'bg-emerald-100 text-emerald-800' 
+            },
+            { 
+              id: 'hotels', 
+              label: language === 'bn' ? 'হোটেল ও রিসোর্ট' : 'Hotels', 
+              en: 'Accommodations', 
+              icon: HotelIcon, 
+              cardClass: 'cat-card-indigo', 
+              iconColor: 'text-indigo-700', 
+              iconBg: 'bg-indigo-100/90 border border-indigo-200', 
+              badge: '⭐ Verified', 
+              badgeColor: 'bg-indigo-100 text-indigo-800' 
+            },
+            { 
+              id: 'food', 
+              label: language === 'bn' ? 'ঐতিহ্যবাহী খাবার' : 'Local Food', 
+              en: 'Cuisine & Dining', 
+              icon: Utensils, 
+              cardClass: 'cat-card-amber', 
+              iconColor: 'text-amber-700', 
+              iconBg: 'bg-amber-100/90 border border-amber-200', 
+              badge: '🍛 GI Taste', 
+              badgeColor: 'bg-amber-100 text-amber-900' 
+            },
+            { 
+              id: 'transport', 
+              label: language === 'bn' ? 'বাস ও ট্রেন সিট' : 'Transport', 
+              en: 'Transit Routes', 
+              icon: Bus, 
+              cardClass: 'cat-card-sky', 
+              iconColor: 'text-sky-700', 
+              iconBg: 'bg-sky-100/90 border border-sky-200', 
+              badge: '🎫 Live Seats', 
+              badgeColor: 'bg-sky-100 text-sky-800' 
+            },
+            { 
+              id: 'shopping', 
+              label: language === 'bn' ? 'তাঁত ও জিআই পণ্য' : 'Native Crafts', 
+              en: 'Regional Handloom', 
+              icon: ShoppingBag, 
+              cardClass: 'cat-card-purple', 
+              iconColor: 'text-purple-700', 
+              iconBg: 'bg-purple-100/90 border border-purple-200', 
+              badge: '✨ Artisan', 
+              badgeColor: 'bg-purple-100 text-purple-800' 
+            },
+            { 
+              id: 'ride', 
+              label: language === 'bn' ? 'গাড়ি ও রাইড' : 'Rentals', 
+              en: 'Cars & Jeeps', 
+              icon: Car, 
+              cardClass: 'cat-card-rose', 
+              iconColor: 'text-rose-700', 
+              iconBg: 'bg-rose-100/90 border border-rose-200', 
+              badge: '🚙 4x4 Jeeps', 
+              badgeColor: 'bg-rose-100 text-rose-800' 
+            },
           ].map(cat => {
             const Icon = cat.icon;
             return (
               <button
                 key={cat.id}
                 onClick={() => onNavigateTab(cat.id)}
-                className={`p-4 rounded-3xl border transition-all duration-300 flex flex-col items-center justify-center gap-2 group shadow-sm hover:shadow-xl hover:-translate-y-1 ${cat.color}`}
+                className={`p-4 rounded-3xl transition-all duration-300 flex flex-col items-center justify-center gap-2.5 group hover:-translate-y-1.5 relative overflow-hidden ${cat.cardClass}`}
               >
-                <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:shadow-md transition-all duration-300 border border-slate-100">
-                  <Icon className="w-6 h-6 text-slate-800 group-hover:text-emerald-700 transition-colors" />
+                {/* Floating Micro Badge */}
+                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cat.badgeColor} shadow-2xs`}>
+                  {cat.badge}
+                </span>
+
+                <div className={`w-12 h-12 rounded-2xl ${cat.iconBg} shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:shadow-md transition-all duration-300`}>
+                  <Icon className={`w-6 h-6 ${cat.iconColor} transition-transform duration-300 group-hover:scale-105`} />
                 </div>
+                
                 <div className="text-center">
                   <span className="text-xs font-black text-slate-900 tracking-tight block">
                     {cat.label}
                   </span>
-                  <span className="text-[10px] text-slate-500 font-medium">
+                  <span className="text-[10px] text-slate-600 font-medium">
                     {cat.en}
                   </span>
                 </div>

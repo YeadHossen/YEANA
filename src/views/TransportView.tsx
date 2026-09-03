@@ -62,15 +62,11 @@ export const TransportView: React.FC = () => {
   // Static DB routes
   const [staticTransports, setStaticTransports] = useState<TransportRoute[]>([]);
   
-  // Selection State
-  const [fromQuery, setFromQuery] = useState<string>('Dhaka');
-  const [toQuery, setToQuery] = useState<string>("Benapole Land Port & Immigration (বেনাপোল)");
-  const [fromLocation, setFromLocation] = useState<SearchableLocation>(() => {
-    return getLocationByNameOrId('dhaka') || ALL_SEARCHABLE_LOCATIONS[0];
-  });
-  const [toLocation, setToLocation] = useState<SearchableLocation>(() => {
-    return getLocationByNameOrId('border-benapole') || ALL_SEARCHABLE_LOCATIONS[0];
-  });
+  // Selection State (Clean Initial State: No default Dhaka or Benapole)
+  const [fromQuery, setFromQuery] = useState<string>('');
+  const [toQuery, setToQuery] = useState<string>('');
+  const [fromLocation, setFromLocation] = useState<SearchableLocation | null>(null);
+  const [toLocation, setToLocation] = useState<SearchableLocation | null>(null);
 
   // Autocomplete UI dropdowns
   const [showFromDropdown, setShowFromDropdown] = useState<boolean>(false);
@@ -188,21 +184,28 @@ export const TransportView: React.FC = () => {
   const handleSearchRoutes = () => {
     handleEnterFrom();
     handleEnterTo();
-    showToast(`Calculating best routes from ${fromLocation.name} ➔ ${toLocation.name}...`);
-    const resultsEl = document.getElementById('transport-results-section');
-    if (resultsEl) {
-      resultsEl.scrollIntoView({ behavior: 'smooth' });
+    if (fromLocation && toLocation) {
+      showToast(`Calculating best routes from ${fromLocation.name} ➔ ${toLocation.name}...`);
+      const resultsEl = document.getElementById('transport-results-section');
+      if (resultsEl) {
+        resultsEl.scrollIntoView({ behavior: 'smooth' });
+      }
+    } else {
+      showToast('Please select both Departure and Arrival places.');
     }
   };
 
   const handleSwap = () => {
+    if (!fromLocation && !toLocation) return;
     const tempLoc = fromLocation;
     const tempQuery = fromQuery;
     setFromLocation(toLocation);
     setFromQuery(toQuery);
     setToLocation(tempLoc);
     setToQuery(tempQuery);
-    showToast(`Swapped: ${toLocation.name} ➔ ${fromLocation.name}`);
+    if (toLocation && tempLoc) {
+      showToast(`Swapped: ${toLocation.name} ➔ ${tempLoc.name}`);
+    }
   };
 
   const handleSelectShortcut = (shortcut: typeof POPULAR_ROUTE_SHORTCUTS[0]) => {
@@ -377,9 +380,15 @@ export const TransportView: React.FC = () => {
                 <MapPin className="w-3.5 h-3.5 text-emerald-600" />
                 <span className="font-extrabold text-emerald-900">Departure Place (ছাড়ার স্থান):</span>
               </span>
-              <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
-                {fromLocation.name} {fromLocation.name_bn ? `(${fromLocation.name_bn})` : ''}
-              </span>
+              {fromLocation ? (
+                <span className="text-[10px] font-bold text-emerald-800 bg-emerald-100 px-2 py-0.5 rounded-md">
+                  {fromLocation.name} {fromLocation.name_bn ? `(${fromLocation.name_bn})` : ''}
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-slate-400 italic">
+                  Not selected
+                </span>
+              )}
             </label>
             <div className="relative flex items-center">
               <input
@@ -440,7 +449,7 @@ export const TransportView: React.FC = () => {
                       key={`from-${loc.id}`}
                       onClick={() => handleSelectFrom(loc)}
                       className={`w-full text-left p-2.5 rounded-xl text-xs font-bold flex items-center justify-between hover:bg-emerald-50 hover:text-emerald-900 transition-all ${
-                        fromLocation.id === loc.id ? 'bg-emerald-100/70 text-emerald-900' : 'text-slate-800'
+                        fromLocation?.id === loc.id ? 'bg-emerald-100/70 text-emerald-900' : 'text-slate-800'
                       }`}
                     >
                       <div className="space-y-0.5">
@@ -504,9 +513,15 @@ export const TransportView: React.FC = () => {
                 <MapPin className="w-3.5 h-3.5 text-teal-600" />
                 <span className="font-extrabold text-teal-900">Arrival Place (গন্তব্য স্থান):</span>
               </span>
-              <span className="text-[10px] font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded-md">
-                {toLocation.name} {toLocation.name_bn ? `(${toLocation.name_bn})` : ''}
-              </span>
+              {toLocation ? (
+                <span className="text-[10px] font-bold text-teal-800 bg-teal-100 px-2 py-0.5 rounded-md">
+                  {toLocation.name} {toLocation.name_bn ? `(${toLocation.name_bn})` : ''}
+                </span>
+              ) : (
+                <span className="text-[10px] font-medium text-slate-400 italic">
+                  Not selected
+                </span>
+              )}
             </label>
             <div className="relative flex items-center">
               <input
@@ -567,7 +582,7 @@ export const TransportView: React.FC = () => {
                       key={`to-${loc.id}`}
                       onClick={() => handleSelectTo(loc)}
                       className={`w-full text-left p-2.5 rounded-xl text-xs font-bold flex items-center justify-between hover:bg-teal-50 hover:text-teal-900 transition-all ${
-                        toLocation.id === loc.id ? 'bg-teal-100/70 text-teal-900' : 'text-slate-800'
+                        toLocation?.id === loc.id ? 'bg-teal-100/70 text-teal-900' : 'text-slate-800'
                       }`}
                     >
                       <div className="space-y-0.5">
@@ -764,15 +779,15 @@ export const TransportView: React.FC = () => {
             <div className="space-y-2">
               <div className="flex items-center gap-2 text-slate-900 font-black text-lg sm:text-xl flex-wrap">
                 <span className={`px-3 py-1 rounded-xl text-white text-xs sm:text-sm font-extrabold shadow-sm ${
-                  fromLocation.type === 'border_checkpost' ? 'bg-purple-700' : 'bg-emerald-600'
+                  fromLocation?.type === 'border_checkpost' ? 'bg-purple-700' : 'bg-emerald-600'
                 }`}>
-                  Departure: {fromLocation.name} {fromLocation.name_bn ? `(${fromLocation.name_bn})` : ''}
+                  Departure: {fromLocation?.name || 'Selected Origin'} {fromLocation?.name_bn ? `(${fromLocation.name_bn})` : ''}
                 </span>
                 <ArrowRight className={`w-5 h-5 shrink-0 ${routeResult.isBorderRoute ? 'text-purple-600' : 'text-emerald-600'}`} />
                 <span className={`px-3 py-1 rounded-xl text-white text-xs sm:text-sm font-extrabold shadow-sm ${
-                  toLocation.type === 'border_checkpost' ? 'bg-purple-700' : 'bg-teal-600'
+                  toLocation?.type === 'border_checkpost' ? 'bg-purple-700' : 'bg-teal-600'
                 }`}>
-                  Arrival: {toLocation.name} {toLocation.name_bn ? `(${toLocation.name_bn})` : ''}
+                  Arrival: {toLocation?.name || 'Selected Destination'} {toLocation?.name_bn ? `(${toLocation.name_bn})` : ''}
                 </span>
               </div>
               
@@ -957,11 +972,11 @@ export const TransportView: React.FC = () => {
                 {/* Middle Column: Route & Timing with Departure / Arrival Place Names */}
                 <div className="grid grid-cols-3 gap-2 bg-slate-50 p-4 rounded-2xl border border-slate-100 text-center text-xs lg:min-w-[360px]">
                   <div>
-                    <p className="text-[10px] text-emerald-700 font-extrabold uppercase truncate" title={`Departure: ${fromLocation.name}`}>
-                      From: {fromLocation.name}
+                    <p className="text-[10px] text-emerald-700 font-extrabold uppercase truncate" title={`Departure: ${fromLocation?.name || route.from_district}`}>
+                      From: {fromLocation?.name || route.from_district}
                     </p>
                     <p className="font-black text-slate-900 mt-1 text-sm">{route.departure_time.split('/')[0]}</p>
-                    <p className="text-[10px] text-slate-500">{fromLocation.name_bn || 'Departure'}</p>
+                    <p className="text-[10px] text-slate-500">{fromLocation?.name_bn || route.from_district}</p>
                   </div>
                   
                   <div className="flex flex-col items-center justify-center">
@@ -977,11 +992,11 @@ export const TransportView: React.FC = () => {
                   </div>
 
                   <div>
-                    <p className="text-[10px] text-teal-700 font-extrabold uppercase truncate" title={`Arrival: ${toLocation.name}`}>
-                      To: {toLocation.name}
+                    <p className="text-[10px] text-teal-700 font-extrabold uppercase truncate" title={`Arrival: ${toLocation?.name || route.to_district}`}>
+                      To: {toLocation?.name || route.to_district}
                     </p>
                     <p className="font-black text-slate-900 mt-1 text-sm">{route.arrival_time.split('/')[0]}</p>
-                    <p className="text-[10px] text-slate-500">{toLocation.name_bn || 'Arrival'}</p>
+                    <p className="text-[10px] text-slate-500">{toLocation?.name_bn || route.to_district}</p>
                   </div>
                 </div>
 
@@ -1055,6 +1070,47 @@ export const TransportView: React.FC = () => {
               </div>
             );
           })
+        ) : (!fromLocation || !toLocation) ? (
+          <div className="text-center py-16 px-6 bg-gradient-to-b from-slate-50 to-white rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div className="w-16 h-16 rounded-2xl bg-emerald-100/80 border border-emerald-200 flex items-center justify-center text-emerald-700 mx-auto shadow-xs">
+              <Compass className="w-8 h-8" />
+            </div>
+            <div className="max-w-md mx-auto space-y-1">
+              <h3 className="text-lg font-black text-slate-900">
+                Choose Your Departure & Arrival Places
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 leading-relaxed">
+                Type your starting point and destination above to view verified inter-district bus, train, launch, flight schedules, and book seats.
+              </p>
+            </div>
+            {/* Quick Suggestions */}
+            <div className="pt-2 max-w-xl mx-auto">
+              <p className="text-xs font-bold text-slate-600 mb-2.5">Or choose a popular corridor:</p>
+              <div className="flex flex-wrap items-center justify-center gap-2">
+                {[
+                  { from: 'Dhaka', to: "Cox's Bazar", label: "Dhaka ➔ Cox's Bazar" },
+                  { from: 'Dhaka', to: 'Sylhet', label: 'Dhaka ➔ Sylhet' },
+                  { from: 'Dhaka', to: 'Benapole Land Port & Immigration (বেনাপোল)', label: 'Dhaka ➔ Benapole' },
+                  { from: 'Chattogram', to: 'Sajek', label: 'Chattogram ➔ Sajek' },
+                  { from: 'Dhaka', to: 'Kuakata', label: 'Dhaka ➔ Kuakata' },
+                  { from: 'Dhaka', to: 'Sreemangal', label: 'Dhaka ➔ Sreemangal' },
+                ].map(pair => (
+                  <button
+                    key={pair.label}
+                    onClick={() => {
+                      const f = getLocationByNameOrId(pair.from) || ALL_SEARCHABLE_LOCATIONS[0];
+                      const t = getLocationByNameOrId(pair.to) || ALL_SEARCHABLE_LOCATIONS[1];
+                      handleSelectFrom(f);
+                      handleSelectTo(t);
+                    }}
+                    className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white hover:bg-emerald-50 text-slate-700 hover:text-emerald-800 border border-slate-200 shadow-2xs transition-all hover:scale-102"
+                  >
+                    {pair.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
         ) : (
           <div className="text-center py-16 bg-white rounded-3xl border border-slate-200 space-y-3">
             <Bus className="w-12 h-12 text-slate-300 mx-auto" />
@@ -1109,13 +1165,13 @@ export const TransportView: React.FC = () => {
               <div className="flex items-center justify-between gap-2">
                 <div>
                   <p className="text-base sm:text-lg font-black text-slate-900">
-                    {fromLocation.name}
+                    {fromLocation?.name || detailRouteModal.from_district}
                   </p>
                   <p className="text-xs font-extrabold text-emerald-700">
                     {detailRouteModal.departure_time.split('/')[0]}
                   </p>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {fromLocation.name_bn || fromLocation.districtName}
+                    {fromLocation?.name_bn || fromLocation?.districtName || detailRouteModal.from_district}
                   </p>
                 </div>
 
@@ -1128,13 +1184,13 @@ export const TransportView: React.FC = () => {
 
                 <div className="text-right">
                   <p className="text-base sm:text-lg font-black text-slate-900">
-                    {toLocation.name}
+                    {toLocation?.name || detailRouteModal.to_district}
                   </p>
                   <p className="text-xs font-extrabold text-teal-700">
                     {detailRouteModal.arrival_time.split('/')[0]}
                   </p>
                   <p className="text-[11px] text-slate-500 font-medium">
-                    {toLocation.name_bn || toLocation.districtName}
+                    {toLocation?.name_bn || toLocation?.districtName || detailRouteModal.to_district}
                   </p>
                 </div>
               </div>
@@ -1148,7 +1204,7 @@ export const TransportView: React.FC = () => {
                   <span>Boarding Counters / Stands:</span>
                 </span>
                 <p className="text-slate-600 leading-relaxed font-medium">
-                  {detailRouteModal.boarding_points?.join(', ') || `${fromLocation.name} Main Bus Terminal / Railway Station`}
+                  {detailRouteModal.boarding_points?.join(', ') || `${fromLocation?.name || detailRouteModal.from_district} Main Bus Terminal / Railway Station`}
                 </p>
               </div>
 
@@ -1158,7 +1214,7 @@ export const TransportView: React.FC = () => {
                   <span>Dropping Stand / Destination:</span>
                 </span>
                 <p className="text-slate-600 leading-relaxed font-medium">
-                  {detailRouteModal.dropping_points?.join(', ') || `${toLocation.name} Main Stand / Resort Gateway`}
+                  {detailRouteModal.dropping_points?.join(', ') || `${toLocation?.name || detailRouteModal.to_district} Main Stand / Resort Gateway`}
                 </p>
               </div>
             </div>

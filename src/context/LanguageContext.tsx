@@ -21,6 +21,7 @@ const translations: Record<string, { en: string; bn: string }> = {
   'nav.ride': { en: 'Ride', bn: 'গাড়ি/বাইক ভাড়া' },
   'nav.trips': { en: 'Trip Planner', bn: 'ভ্রমণ পরিকল্পনা' },
   'nav.notes': { en: 'KEEP NOTES', bn: 'নোট ও খরচ' },
+  'nav.emergency': { en: 'Emergency Service', bn: 'জরুরি সেবা' },
   'nav.favorites': { en: 'Favorites', bn: 'প্রিয় তালিকা' },
   'nav.profile': { en: 'Profile', bn: 'প্রোফাইল' },
   'nav.admin': { en: 'Admin Portal', bn: 'অ্যাডমিন প্যানেল' },

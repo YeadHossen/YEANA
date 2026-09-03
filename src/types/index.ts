@@ -490,6 +490,8 @@ export interface TransportBooking {
   boarding_point: string;
   dropping_point: string;
   total_fare: number;
+  payment_method?: 'card' | 'bkash' | 'rocket' | 'nogod';
+  transaction_id?: string;
   status: BookingStatus;
   booked_at: string;
 }
