@@ -807,7 +807,7 @@ app.get('/api/portal/stats', (req, res) => {
     const { company } = req.query;
 
     // Transport Stats
-    let trQuery = 'SELECT COUNT(*) as total_bookings, SUM(seat_count) as total_seats_sold, SUM(total_fare) as total_revenue FROM transport_bookings WHERE status != "cancelled"';
+    let trQuery = "SELECT COUNT(*) as total_bookings, SUM(seat_count) as total_seats_sold, SUM(total_fare) as total_revenue FROM transport_bookings WHERE status != 'cancelled'";
     const trParams = [];
     if (company && company !== 'All') {
       trQuery += ' AND company LIKE ?';
@@ -816,7 +816,7 @@ app.get('/api/portal/stats', (req, res) => {
     const transportStats = db.prepare(trQuery).get(...trParams);
 
     // Hotel Stats
-    let htlQuery = 'SELECT COUNT(*) as total_reservations, SUM(room_count) as total_rooms_booked, SUM(total_cost) as total_revenue FROM hotel_bookings WHERE status != "cancelled"';
+    let htlQuery = "SELECT COUNT(*) as total_reservations, SUM(room_count) as total_rooms_booked, SUM(total_cost) as total_revenue FROM hotel_bookings WHERE status != 'cancelled'";
     const htlParams = [];
     if (company && company !== 'All') {
       htlQuery += ' AND hotel_name LIKE ?';
