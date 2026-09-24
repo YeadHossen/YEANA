@@ -41,7 +41,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   onOpenAuth
 }) => {
   const { language, toggleLanguage, t } = useLanguage();
-  const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, isCompany, logout } = useAuth();
   const { favorites } = useFavorites();
   const { unreadAdminCount, unreadTravelerCount, openTravelerChat } = useChat();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -202,6 +202,20 @@ export const Navbar: React.FC<NavbarProps> = ({
                   <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 )}
               </button>
+            ) : isCompany ? (
+              <button
+                onClick={() => setCurrentTab('admin')}
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-xs ${
+                  currentTab === 'admin'
+                    ? 'bg-blue-600 text-white border-blue-500 shadow-md ring-2 ring-blue-400/40'
+                    : 'bg-blue-50 hover:bg-blue-100 text-blue-900 border-blue-200'
+                }`}
+                title="YEANA Partner & Company E-Portal (Active)"
+              >
+                <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                <span>Company Portal</span>
+                <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              </button>
             ) : (
               <button
                 onClick={() => setCurrentTab('admin')}
@@ -210,7 +224,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                     ? 'bg-slate-950 text-emerald-400 border-slate-800 shadow-md ring-2 ring-emerald-500/20'
                     : 'bg-slate-900 hover:bg-slate-800 text-white border-slate-800'
                 }`}
-                title="YEANA Partner & Company E-Portal (Restricted)"
+                title="YEANA Partner & Company E-Portal (Password Required)"
               >
                 <Building2 className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Company Portal</span>
@@ -277,6 +291,16 @@ export const Navbar: React.FC<NavbarProps> = ({
                       >
                         <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
                         <span>{t('nav.admin')}</span>
+                      </button>
+                    )}
+
+                    {isCompany && (
+                      <button
+                        onClick={() => { setCurrentTab('admin'); setUserDropdownOpen(false); }}
+                        className="w-full px-4 py-2 text-left text-xs font-bold text-blue-700 hover:bg-blue-50 flex items-center gap-2"
+                      >
+                        <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                        <span>Company E-Portal</span>
                       </button>
                     )}
 
@@ -362,6 +386,19 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>{t('nav.admin')}</span>
+              </button>
+            )}
+
+            {isCompany && (
+              <button
+                onClick={() => {
+                  setCurrentTab('admin');
+                  setMobileMenuOpen(false);
+                }}
+                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white flex items-center justify-center gap-2"
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Company E-Portal</span>
               </button>
             )}
           </div>

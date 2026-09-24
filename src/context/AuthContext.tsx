@@ -6,8 +6,11 @@ interface AuthContextType {
   user: UserProfile | null;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  isCompany: boolean;
   isLoading: boolean;
   login: (email: string, password?: string) => Promise<boolean>;
+  loginAdminWithPassword: (password: string) => Promise<boolean>;
+  loginCompanyWithPassword: (password: string) => Promise<boolean>;
   loginDemoAdmin: () => void;
   loginDemoTraveler: () => void;
   signup: (email: string, fullName: string, password?: string) => Promise<boolean>;
@@ -35,6 +38,17 @@ const DEFAULT_DEMO_ADMIN: UserProfile = {
   avatar_url: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150',
   role: 'admin',
   bio: 'Platform Lead & Verified Destination Curator at YEANA Bangladesh.',
+  preferred_language: 'en'
+};
+
+const DEFAULT_COMPANY_USER: UserProfile = {
+  id: 'usr-company-01',
+  full_name: 'Green Line Transport & Hospitality Ltd.',
+  email: 'partner@yeana.bd',
+  phone: '+880 1900-555111',
+  avatar_url: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?w=150',
+  role: 'partner',
+  bio: 'Verified Fleet & Accommodation Partner on YEANA Bangladesh.',
   preferred_language: 'en'
 };
 
@@ -111,13 +125,44 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       }
 
       // Fallback local login for current session
-      const isAdminEmail = email.toLowerCase().trim() === 'admin@yeana.com.bd' || email.toLowerCase().trim() === 'admin@yeana.bd';
+      const normalizedEmail = email.toLowerCase().trim();
+      const isAdminEmail = normalizedEmail === 'admin@yeana.com.bd' || normalizedEmail === 'admin@yeana.bd';
+      const isCompanyEmail = normalizedEmail === 'partner@yeana.bd' || 
+                             normalizedEmail === 'company@yeana.bd' || 
+                             normalizedEmail.endsWith('@partner.yeana.bd');
+
+      // STRICT ADMIN PASSWORD POLICY: Must enter admin password every time
+      if (isAdminEmail) {
+        if (!password || (password.trim() !== 'admin123' && password.trim() !== 'yeana2026')) {
+          console.warn('Admin authentication rejected: Valid password required.');
+          setIsLoading(false);
+          return false;
+        }
+        setUser(DEFAULT_DEMO_ADMIN);
+        sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_DEMO_ADMIN));
+        setIsLoading(false);
+        return true;
+      }
+
+      // STRICT COMPANY PASSWORD POLICY: Must enter company password every time
+      if (isCompanyEmail) {
+        if (!password || (password.trim() !== 'partner123' && password.trim() !== 'company123')) {
+          console.warn('Company partner authentication rejected: Valid password required.');
+          setIsLoading(false);
+          return false;
+        }
+        setUser(DEFAULT_COMPANY_USER);
+        sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_COMPANY_USER));
+        setIsLoading(false);
+        return true;
+      }
+
       const fallbackUser: UserProfile = {
         id: `usr-${Date.now()}`,
         full_name: email.split('@')[0],
         email: email,
         avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        role: isAdminEmail ? 'admin' : 'user',
+        role: 'user',
         bio: 'Explorer discovering Bangladesh with YEANA.',
         preferred_language: 'en'
       };
@@ -132,9 +177,33 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     }
   };
 
+  const loginAdminWithPassword = async (password: string): Promise<boolean> => {
+    setIsLoading(true);
+    if (password && (password.trim() === 'admin123' || password.trim() === 'yeana2026')) {
+      setUser(DEFAULT_DEMO_ADMIN);
+      sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_DEMO_ADMIN));
+      setIsLoading(false);
+      return true;
+    }
+    setIsLoading(false);
+    return false;
+  };
+
+  const loginCompanyWithPassword = async (password: string): Promise<boolean> => {
+    setIsLoading(true);
+    if (password && (password.trim() === 'partner123' || password.trim() === 'company123')) {
+      setUser(DEFAULT_COMPANY_USER);
+      sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_COMPANY_USER));
+      setIsLoading(false);
+      return true;
+    }
+    setIsLoading(false);
+    return false;
+  };
+
   const loginDemoAdmin = () => {
-    setUser(DEFAULT_DEMO_ADMIN);
-    sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_DEMO_ADMIN));
+    // Deprecated: password entry required every time
+    console.warn('Direct loginDemoAdmin without password is restricted.');
   };
 
   const loginDemoTraveler = () => {
@@ -240,8 +309,11 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       user,
       isAuthenticated: Boolean(user),
       isAdmin: user?.role === 'admin',
+      isCompany: user?.role === 'partner' || user?.role === 'admin',
       isLoading,
       login,
+      loginAdminWithPassword,
+      loginCompanyWithPassword,
       loginDemoAdmin,
       loginDemoTraveler,
       signup,

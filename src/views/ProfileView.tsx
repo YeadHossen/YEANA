@@ -16,7 +16,9 @@ import {
   Settings,
   Receipt,
   Trash2,
-  AlertTriangle
+  AlertTriangle,
+  Building2,
+  Lock
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTrip } from '../context/TripContext';
@@ -32,7 +34,7 @@ interface ProfileViewProps {
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenAuth, onOpenPrivacy }) => {
-  const { user, isAuthenticated, isAdmin, logout, updateProfile, loginDemoAdmin, loginDemoTraveler, deleteAccount } = useAuth();
+  const { user, isAuthenticated, isAdmin, isCompany, logout, updateProfile, loginDemoTraveler, deleteAccount } = useAuth();
   const { trips } = useTrip();
   const { favorites } = useFavorites();
   const { expenses, notes } = useNotes();
@@ -291,24 +293,34 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
             </div>
           </div>
 
-          {/* Switch Demo Roles */}
-          <div className="flex items-center justify-between pt-4">
+          {/* Switch Roles / Enterprise Portals */}
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
             <div>
-              <p className="font-bold text-slate-800">Switch Demo Persona</p>
-              <p className="text-slate-400">Test different user roles for demonstration</p>
+              <p className="font-bold text-slate-800">Persona & Enterprise Portals</p>
+              <p className="text-slate-400 text-xs">Admin and Company portals require password every time</p>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <button
                 onClick={loginDemoTraveler}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold"
+                className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs"
               >
                 Traveler
               </button>
               <button
-                onClick={loginDemoAdmin}
-                className="px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 font-bold"
+                onClick={() => onNavigateTab('admin')}
+                className="px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                title="Requires Admin Password (admin123)"
               >
-                Admin
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Admin Console</span>
+              </button>
+              <button
+                onClick={() => onNavigateTab('admin')}
+                className="px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                title="Requires Company Password (partner123)"
+              >
+                <Building2 className="w-3.5 h-3.5" />
+                <span>Company E-Portal</span>
               </button>
             </div>
           </div>
@@ -318,13 +330,29 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
             <div className="flex items-center justify-between pt-4">
               <div>
                 <p className="font-bold text-amber-900">Admin Control Center</p>
-                <p className="text-slate-400">Add, edit, or remove platform destinations and listings</p>
+                <p className="text-slate-400 text-xs">Add, edit, or remove platform destinations and listings</p>
               </div>
               <button
                 onClick={() => onNavigateTab('admin')}
-                className="px-4 py-2 rounded-xl bg-amber-500 text-white font-bold hover:bg-amber-600"
+                className="px-4 py-2 rounded-xl bg-amber-500 text-white font-bold text-xs hover:bg-amber-600 shadow-xs"
               >
                 Open Admin Portal
+              </button>
+            </div>
+          )}
+
+          {/* Company Panel Deep Link if Company Partner */}
+          {isCompany && (
+            <div className="flex items-center justify-between pt-4">
+              <div>
+                <p className="font-bold text-blue-900">Company & Fleet E-Portal</p>
+                <p className="text-slate-400 text-xs">Real-time bus seat charts, room inventory & passenger booking manifests</p>
+              </div>
+              <button
+                onClick={() => onNavigateTab('admin')}
+                className="px-4 py-2 rounded-xl bg-blue-600 text-white font-bold text-xs hover:bg-blue-700 shadow-xs"
+              >
+                Open Company Portal
               </button>
             </div>
           )}

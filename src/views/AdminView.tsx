@@ -10,21 +10,22 @@ import {
   Users, 
   Calendar, 
   CheckCircle2, 
-  X,
-  MapPin,
-  MessageSquare,
-  Send,
-  Phone,
-  Mail,
-  Printer,
-  Sparkles,
-  Search,
-  ShoppingBag,
-  Car,
-  AlertCircle,
-  Clock,
-  ChevronRight,
-  Building2
+  X, 
+  MapPin, 
+  MessageSquare, 
+  Send, 
+  Phone, 
+  Mail, 
+  Printer, 
+  Sparkles, 
+  Search, 
+  ShoppingBag, 
+  Car, 
+  AlertCircle, 
+  Clock, 
+  ChevronRight, 
+  Building2,
+  Lock
 } from 'lucide-react';
 import { DataService } from '../services/dataService';
 import { Place, Hotel, Restaurant, TransportRoute, District, TravelerInquiry, InquiryCategory, InquiryStatus } from '../types';
@@ -37,8 +38,9 @@ interface AdminViewProps {
 }
 
 export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
-  const { user, isAdmin, loginDemoAdmin } = useAuth();
-  const [adminPin, setAdminPin] = useState('');
+  const { user, isAdmin, isCompany, loginAdminWithPassword, loginCompanyWithPassword, logout } = useAuth();
+  const [gatewayMode, setGatewayMode] = useState<'admin' | 'company'>('admin');
+  const [passwordInput, setPasswordInput] = useState('');
   const [pinError, setPinError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const { 
@@ -333,28 +335,42 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
     await loadAll();
   };
 
-  const handleVerifyPin = (e: React.FormEvent) => {
+  const handleVerifyPin = async (e: React.FormEvent) => {
     e.preventDefault();
     setPinError('');
     setIsVerifying(true);
-    if (adminPin.trim() === 'admin123' || adminPin.trim() === 'yeana2026' || adminPin.trim() === 'admin') {
-      loginDemoAdmin();
-      setSuccessToast('✓ Security Gateway unlocked: Authenticated as YEANA Platform Admin');
-      setTimeout(() => setSuccessToast(''), 4000);
+
+    if (gatewayMode === 'admin') {
+      const success = await loginAdminWithPassword(passwordInput);
+      if (success) {
+        setSuccessToast('✓ Security Gateway unlocked: Authenticated as YEANA Platform Admin');
+        setPasswordInput('');
+        setTimeout(() => setSuccessToast(''), 4000);
+      } else {
+        setPinError('Invalid Admin Password. Password (admin123) is required every time.');
+      }
     } else {
-      setPinError('Invalid Admin Key or PIN. For testing use "admin123" or click the 1-Click Evaluator Bypass.');
+      const success = await loginCompanyWithPassword(passwordInput);
+      if (success) {
+        setActiveTab('portal');
+        setSuccessToast('✓ Security Gateway unlocked: Authenticated as Company & Fleet Partner');
+        setPasswordInput('');
+        setTimeout(() => setSuccessToast(''), 4000);
+      } else {
+        setPinError('Invalid Company Partner Password. Password (partner123) is required every time.');
+      }
     }
     setIsVerifying(false);
   };
 
-  if (!isAdmin) {
+  if (!isAdmin && !isCompany) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-16">
         <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 relative overflow-hidden">
           
           {/* Ambient Security Glow */}
           <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-xl mx-auto text-center space-y-6">
             
@@ -370,17 +386,51 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                 YEANA Enterprise Security Gateway
               </h1>
               <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                This portal contains confidential passenger booking manifests, guest telephone numbers, payment reconciliation data, and listing deletion rights.
+                This portal contains confidential passenger booking manifests, guest telephone numbers, payment reconciliation data, and fleet inventories. Password verification is strictly required every time.
               </p>
             </div>
 
+            {/* Mode Switcher: Admin Console vs Company Partner */}
+            <div className="flex rounded-2xl bg-slate-900 p-1.5 border border-slate-800 text-xs font-black max-w-md mx-auto">
+              <button
+                type="button"
+                onClick={() => { setGatewayMode('admin'); setPinError(''); setPasswordInput(''); }}
+                className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+                  gatewayMode === 'admin'
+                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <ShieldCheck className="w-4 h-4" />
+                <span>Admin Console</span>
+              </button>
+              <button
+                type="button"
+                onClick={() => { setGatewayMode('company'); setPinError(''); setPasswordInput(''); }}
+                className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
+                  gatewayMode === 'company'
+                    ? 'bg-blue-600 text-white shadow-md font-black'
+                    : 'text-slate-400 hover:text-white'
+                }`}
+              >
+                <Building2 className="w-4 h-4" />
+                <span>Company E-Portal</span>
+              </button>
+            </div>
+
             {/* Security Warning Box */}
-            <div className="p-4 rounded-2xl bg-amber-950/40 border border-amber-500/30 text-left flex items-start gap-3">
-              <AlertCircle className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
-              <div className="text-xs text-amber-200/90 space-y-1">
-                <p className="font-bold text-amber-300">Administrative Authorization Required</p>
-                <p>
-                  You are currently logged in as <span className="font-mono text-white font-semibold">{user?.email || 'Guest Traveler'}</span>. Enter your administrator key or authenticate as an authorized YEANA manager.
+            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-left flex items-start gap-3">
+              <Lock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+              <div className="text-xs text-slate-300 space-y-1">
+                <p className="font-bold text-white">
+                  {gatewayMode === 'admin' 
+                    ? 'Platform Administrator Authentication' 
+                    : 'Company & Fleet Partner Verification'}
+                </p>
+                <p className="text-slate-400 leading-relaxed">
+                  {gatewayMode === 'admin'
+                    ? 'Unlock complete control of platform places, hotels, transports, customer inquiries, and booking manifests.'
+                    : 'Unlock live company booking manifests, bus seat allocation charts, customer passenger numbers, and room reservation tracking.'}
                 </p>
               </div>
             </div>
@@ -395,14 +445,16 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
 
               <div>
                 <label className="block text-xs font-bold text-slate-300 mb-1">
-                  Administrator PIN or Master Key
+                  {gatewayMode === 'admin' 
+                    ? 'Administrator Master Password (PIN)' 
+                    : 'Company & Partner Access Password'}
                 </label>
                 <div className="relative">
                   <input
                     type="password"
-                    value={adminPin}
-                    onChange={(e) => setAdminPin(e.target.value)}
-                    placeholder="Enter admin PIN (e.g. admin123)"
+                    value={passwordInput}
+                    onChange={(e) => setPasswordInput(e.target.value)}
+                    placeholder={gatewayMode === 'admin' ? 'Enter admin password (e.g. admin123)' : 'Enter company password (e.g. partner123)'}
                     className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all font-mono"
                     autoFocus
                   />
@@ -411,41 +463,41 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
 
               <button
                 type="submit"
-                disabled={isVerifying || !adminPin.trim()}
-                className="w-full py-3 rounded-xl bg-amber-500 hover:bg-amber-600 active:scale-98 text-slate-950 font-black text-sm flex items-center justify-center gap-2 shadow-lg shadow-amber-500/20 transition-all disabled:opacity-40"
+                disabled={isVerifying || !passwordInput.trim()}
+                className={`w-full py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-40 ${
+                  gatewayMode === 'admin'
+                    ? 'bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-amber-500/20'
+                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20'
+                }`}
               >
-                <ShieldCheck className="w-4 h-4 text-slate-950" />
-                <span>Unlock Management Console</span>
+                <Lock className="w-4 h-4" />
+                <span>
+                  {gatewayMode === 'admin' 
+                    ? 'Unlock Admin Console' 
+                    : 'Unlock Company E-Portal'}
+                </span>
               </button>
             </form>
 
-            {/* Quick Demo Bypass for Evaluator & Devs */}
-            <div className="pt-2 border-t border-slate-800 space-y-2">
-              <p className="text-[11px] text-slate-400 font-semibold">Testing or Evaluating?</p>
-              <div className="flex flex-col sm:flex-row items-center justify-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => {
-                    loginDemoAdmin();
-                    setSuccessToast('✓ Security Gateway unlocked: Logged in as YEANA Admin');
-                    setTimeout(() => setSuccessToast(''), 4000);
-                  }}
-                  className="w-full sm:w-auto px-4 py-2 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 text-white text-xs font-bold transition-all flex items-center justify-center gap-1.5"
-                >
-                  <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                  <span>1-Click Evaluator Bypass (Admin Demo)</span>
-                </button>
+            {/* Official Credentials Hint for Evaluator/Testing */}
+            <div className="pt-3 border-t border-slate-800/80 space-y-2 text-xs">
+              <p className="text-[11px] text-slate-400 font-semibold">Testing Credentials (Password Required Every Time):</p>
+              <div className="text-[11px] text-slate-300 font-mono space-y-1">
+                <p>Admin: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-amber-400 font-bold">admin@yeana.com.bd</code> | Password: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-amber-300 font-bold">admin123</code></p>
+                <p>Company: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-cyan-400 font-bold">partner@yeana.bd</code> | Password: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-cyan-300 font-bold">partner123</code></p>
+              </div>
 
-                {onBackToHome && (
+              {onBackToHome && (
+                <div className="pt-2">
                   <button
                     type="button"
                     onClick={onBackToHome}
-                    className="w-full sm:w-auto px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all"
+                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all"
                   >
                     Return to Traveler Home
                   </button>
-                )}
-              </div>
+                </div>
+              )}
             </div>
 
           </div>
@@ -462,29 +514,52 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
         <div className="space-y-2">
           <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-amber-800 bg-amber-100 px-3 py-1 rounded-full">
             <ShieldCheck className="w-4 h-4 text-amber-700" />
-            <span>YEANA Management Console</span>
+            <span>{isAdmin ? 'YEANA Management Console' : 'YEANA Partner & Company E-Portal'}</span>
           </div>
           <h1 className="text-3xl sm:text-4xl font-black text-slate-900 font-sans">
-            Platform Admin & Traveler Messaging Portal
+            {isAdmin ? 'Platform Admin & Traveler Messaging Portal' : 'Fleet & Accommodation Partner E-Portal'}
           </h1>
           <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
-            Monitor incoming traveler messages, inspect customized choices (itineraries, hotels, rides, specialties), and manage platform listings.
+            {isAdmin 
+              ? 'Monitor incoming traveler messages, inspect customized choices (itineraries, hotels, rides, specialties), and manage platform listings.'
+              : 'Inspect live booking manifests, passenger contact numbers, bus seat allocations, and hotel room reservations.'}
           </p>
         </div>
 
         <div className="flex items-center gap-2">
-          <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shadow-2xs">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-            <span>Admin: {user?.email}</span>
-          </div>
+          {isAdmin ? (
+            <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs font-bold shadow-2xs">
+              <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+              <span>Admin: {user?.email}</span>
+            </div>
+          ) : (
+            <div className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-2xl bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold shadow-2xs">
+              <Building2 className="w-3.5 h-3.5 text-blue-700" />
+              <span>Partner: {user?.full_name}</span>
+            </div>
+          )}
 
           <button
-            onClick={() => setIsAddModalOpen(true)}
-            className="px-5 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-700/20 transition-all flex items-center gap-2"
+            onClick={async () => {
+              await logout();
+              onBackToHome?.();
+            }}
+            className="px-3.5 py-2 rounded-2xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs"
+            title="Lock session and require password on next entry"
           >
-            <Plus className="w-4 h-4" />
-            <span>Add New Listing</span>
+            <Lock className="w-3.5 h-3.5" />
+            <span>Lock Portal</span>
           </button>
+
+          {isAdmin && (
+            <button
+              onClick={() => setIsAddModalOpen(true)}
+              className="px-5 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-700/20 transition-all flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              <span>Add New Listing</span>
+            </button>
+          )}
         </div>
       </div>
 
@@ -496,8 +571,8 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
         </div>
       )}
 
-      {/* Live Traveler Notification Alert Banner */}
-      {unreadAdminCount > 0 && (
+      {/* Live Traveler Notification Alert Banner (Admin Only) */}
+      {isAdmin && unreadAdminCount > 0 && (
         <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-500 via-orange-500 to-amber-600 text-white shadow-lg flex items-center justify-between gap-4 animate-in slide-in-from-top-2">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
@@ -522,78 +597,155 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
       )}
 
       {/* METRICS CARDS */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-        
-        {/* Inquiries & Messaging Metric (Highlighted) */}
-        <div 
-          onClick={() => setActiveTab('inquiries')}
-          className={`p-4 rounded-3xl border cursor-pointer transition-all ${
-            activeTab === 'inquiries' 
-              ? 'bg-brand-900 text-white border-brand-800 shadow-lg' 
-              : 'bg-white border-brand-200 hover:border-brand-500 shadow-card'
-          }`}
-        >
-          <div className="flex items-center justify-between mb-2">
-            <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-              activeTab === 'inquiries' ? 'bg-white/20 text-white' : 'bg-brand-50 text-brand-700'
-            }`}>
-              <MessageSquare className="w-4 h-4" />
+      {isAdmin ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          
+          {/* Inquiries & Messaging Metric (Highlighted) */}
+          <div 
+            onClick={() => setActiveTab('inquiries')}
+            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+              activeTab === 'inquiries' 
+                ? 'bg-brand-900 text-white border-brand-800 shadow-lg' 
+                : 'bg-white border-brand-200 hover:border-brand-500 shadow-card'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                activeTab === 'inquiries' ? 'bg-white/20 text-white' : 'bg-brand-50 text-brand-700'
+              }`}>
+                <MessageSquare className="w-4 h-4" />
+              </div>
+              {unreadAdminCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
+                  {unreadAdminCount} New
+                </span>
+              )}
             </div>
-            {unreadAdminCount > 0 && (
-              <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
-                {unreadAdminCount} New
+            <p className="text-2xl font-black font-mono">{inquiries.length}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              activeTab === 'inquiries' ? 'text-brand-200' : 'text-slate-400'
+            }`}>
+              Traveler Inquiries
+            </p>
+          </div>
+
+          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
+            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center mb-2">
+              <Users className="w-4 h-4" />
+            </div>
+            <p className="text-2xl font-black text-slate-900 font-mono">{stats.totalUsers}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">Total Users</p>
+          </div>
+
+          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
+            <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-2">
+              <Compass className="w-4 h-4" />
+            </div>
+            <p className="text-2xl font-black text-teal-700 font-mono">{stats.totalPlaces}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">Places</p>
+          </div>
+
+          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
+            <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center mb-2">
+              <HotelIcon className="w-4 h-4" />
+            </div>
+            <p className="text-2xl font-black text-sky-700 font-mono">{stats.totalHotels}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">Hotels</p>
+          </div>
+
+          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
+            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-2">
+              <Utensils className="w-4 h-4" />
+            </div>
+            <p className="text-2xl font-black text-amber-700 font-mono">{stats.totalRestaurants}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">Restaurants</p>
+          </div>
+
+          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
+            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2">
+              <Bus className="w-4 h-4" />
+            </div>
+            <p className="text-2xl font-black text-emerald-700 font-mono">{stats.totalTransports}</p>
+            <p className="text-[10px] text-slate-400 font-bold uppercase">Transports</p>
+          </div>
+
+        </div>
+      ) : (
+        /* Company Partner Specific Metrics */
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+          <div 
+            onClick={() => setActiveTab('portal')}
+            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+              activeTab === 'portal' 
+                ? 'bg-blue-900 text-white border-blue-800 shadow-lg' 
+                : 'bg-white border-slate-200 hover:border-blue-400 shadow-card'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                activeTab === 'portal' ? 'bg-white/20 text-white' : 'bg-blue-50 text-blue-700'
+              }`}>
+                <Building2 className="w-4 h-4" />
+              </div>
+              <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black">
+                Live Portal
               </span>
-            )}
+            </div>
+            <p className="text-lg font-black font-sans">Seat & Room Allocation</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              activeTab === 'portal' ? 'text-blue-200' : 'text-slate-400'
+            }`}>
+              Company E-Portal Control
+            </p>
           </div>
-          <p className="text-2xl font-black font-mono">{inquiries.length}</p>
-          <p className={`text-[10px] font-bold uppercase tracking-wider ${
-            activeTab === 'inquiries' ? 'text-brand-200' : 'text-slate-400'
-          }`}>
-            Traveler Inquiries
-          </p>
-        </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center mb-2">
-            <Users className="w-4 h-4" />
+          <div 
+            onClick={() => setActiveTab('transports')}
+            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+              activeTab === 'transports' 
+                ? 'bg-emerald-900 text-white border-emerald-800 shadow-lg' 
+                : 'bg-white border-slate-200 hover:border-emerald-400 shadow-card'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                activeTab === 'transports' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'
+              }`}>
+                <Bus className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-black font-mono">{stats.totalTransports}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              activeTab === 'transports' ? 'text-emerald-200' : 'text-slate-400'
+            }`}>
+              Fleet Routes & Schedules
+            </p>
           </div>
-          <p className="text-2xl font-black text-slate-900 font-mono">{stats.totalUsers}</p>
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Total Users</p>
-        </div>
 
-        <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-2">
-            <Compass className="w-4 h-4" />
+          <div 
+            onClick={() => setActiveTab('hotels')}
+            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+              activeTab === 'hotels' 
+                ? 'bg-sky-900 text-white border-sky-800 shadow-lg' 
+                : 'bg-white border-slate-200 hover:border-sky-400 shadow-card'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                activeTab === 'hotels' ? 'bg-white/20 text-white' : 'bg-sky-50 text-sky-700'
+              }`}>
+                <HotelIcon className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-black font-mono">{stats.totalHotels}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              activeTab === 'hotels' ? 'text-sky-200' : 'text-slate-400'
+            }`}>
+              Accommodation Partner Listings
+            </p>
           </div>
-          <p className="text-2xl font-black text-teal-700 font-mono">{stats.totalPlaces}</p>
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Places</p>
         </div>
-
-        <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center mb-2">
-            <HotelIcon className="w-4 h-4" />
-          </div>
-          <p className="text-2xl font-black text-sky-700 font-mono">{stats.totalHotels}</p>
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Hotels</p>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-2">
-            <Utensils className="w-4 h-4" />
-          </div>
-          <p className="text-2xl font-black text-amber-700 font-mono">{stats.totalRestaurants}</p>
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Restaurants</p>
-        </div>
-
-        <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-          <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2">
-            <Bus className="w-4 h-4" />
-          </div>
-          <p className="text-2xl font-black text-emerald-700 font-mono">{stats.totalTransports}</p>
-          <p className="text-[10px] text-slate-400 font-bold uppercase">Transports</p>
-        </div>
-
-      </div>
+      )}
 
       {/* Navigation Tabs */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
@@ -604,7 +756,15 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
           { id: 'hotels', label: `Manage Hotels (${hotels.length})`, icon: HotelIcon },
           { id: 'restaurants', label: `Manage Restaurants (${restaurants.length})`, icon: Utensils },
           { id: 'transports', label: `Manage Transport (${transports.length})`, icon: Bus },
-        ].map(tab => {
+        ]
+        .filter(tab => {
+          if (isCompany && !isAdmin) {
+            // Company partners access Company E-Portal, Transports, and Hotels
+            return tab.id === 'portal' || tab.id === 'transports' || tab.id === 'hotels';
+          }
+          return true;
+        })
+        .map(tab => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (

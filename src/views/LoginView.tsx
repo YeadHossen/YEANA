@@ -15,7 +15,8 @@ import {
   ArrowRight,
   Shield,
   HeartHandshake,
-  MapPin
+  MapPin,
+  Building2
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -27,7 +28,7 @@ interface LoginViewProps {
 }
 
 export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onOpenPrivacy }) => {
-  const { login, signup, loginDemoAdmin, loginDemoTraveler, isLoading } = useAuth();
+  const { login, signup, loginDemoTraveler, isLoading } = useAuth();
   const { language, toggleLanguage, t } = useLanguage();
 
   const [isSignUp, setIsSignUp] = useState<boolean>(false);
@@ -71,6 +72,24 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onOpenPriv
         setErrorMsg(language === 'bn' ? 'একাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।' : 'Could not register account. Please try again.');
       }
     } else {
+      const normalizedEmail = email.toLowerCase().trim();
+      const isAdmin = normalizedEmail === 'admin@yeana.com.bd' || normalizedEmail === 'admin@yeana.bd';
+      const isCompany = normalizedEmail === 'partner@yeana.bd' || normalizedEmail === 'company@yeana.bd' || normalizedEmail.endsWith('@partner.yeana.bd');
+
+      if (isAdmin && (!password || (password.trim() !== 'admin123' && password.trim() !== 'yeana2026'))) {
+        setErrorMsg(language === 'bn' 
+          ? 'ভুল পাসওয়ার্ড! অ্যাডমিন অ্যাক্সেসের জন্য পাসওয়ার্ড (admin123) প্রয়োজন।' 
+          : 'Access Denied: Incorrect Admin Password. Password required every time.');
+        return;
+      }
+
+      if (isCompany && (!password || (password.trim() !== 'partner123' && password.trim() !== 'company123'))) {
+        setErrorMsg(language === 'bn' 
+          ? 'ভুল পাসওয়ার্ড! কোম্পানি পার্টনার পোর্টালের জন্য পাসওয়ার্ড (partner123) প্রয়োজন।' 
+          : 'Access Denied: Incorrect Company Password. Password required every time.');
+        return;
+      }
+
       const success = await login(email, password);
       if (success) {
         setSuccessMsg(language === 'bn' ? 'সফলভাবে লগইন হয়েছে!' : 'Signed in successfully!');
@@ -86,9 +105,24 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onOpenPriv
     if (onLoginSuccess) onLoginSuccess();
   };
 
-  const handleDemoAdmin = () => {
-    loginDemoAdmin();
-    if (onLoginSuccess) onLoginSuccess();
+  const handleSelectAdmin = () => {
+    setIsSignUp(false);
+    setEmail('admin@yeana.com.bd');
+    setPassword('');
+    setErrorMsg('');
+    setSuccessMsg(language === 'bn' 
+      ? 'অ্যাডমিন অ্যাকাউন্ট সিলেক্ট করা হয়েছে। প্রবেশ করতে পাসওয়ার্ড (admin123) দিন।' 
+      : 'Admin account selected. Enter password (admin123) to sign in.');
+  };
+
+  const handleSelectCompany = () => {
+    setIsSignUp(false);
+    setEmail('partner@yeana.bd');
+    setPassword('');
+    setErrorMsg('');
+    setSuccessMsg(language === 'bn' 
+      ? 'কোম্পানি পার্টনার সিলেক্ট করা হয়েছে। প্রবেশ করতে পাসওয়ার্ড (partner123) দিন।' 
+      : 'Company partner selected. Enter password (partner123) to sign in.');
   };
 
   return (
@@ -222,37 +256,55 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onOpenPriv
                 </button>
               </div>
 
-              {/* 1-Click Demo Quick Test Header */}
-              <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-200 space-y-2 text-xs">
+              {/* Quick Persona Form-Fillers (Passwords Strictly Enforced) */}
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 space-y-2.5 text-xs">
                 <div className="flex items-center justify-between">
-                  <span className="font-extrabold text-emerald-950 flex items-center gap-1.5">
+                  <span className="font-extrabold text-slate-800 flex items-center gap-1.5">
                     <Sparkles className="w-3.5 h-3.5 text-emerald-600" />
-                    <span>{language === 'bn' ? 'দ্রুত টেস্ট লগইন (১-ক্লিক):' : 'Instant 1-Click Demo Login:'}</span>
+                    <span>{language === 'bn' ? 'অ্যাকাউন্ট টাইপ সিলেক্ট করুন:' : 'Select Account Persona:'}</span>
                   </span>
-                  <span className="text-[10px] text-emerald-700 font-semibold bg-emerald-100/80 px-2 py-0.5 rounded-full">
-                    Demo Mode
+                  <span className="text-[10px] text-amber-700 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+                    <Lock className="w-3 h-3 text-amber-600" />
+                    <span>Password Required</span>
                   </span>
                 </div>
-                <div className="grid grid-cols-2 gap-2">
+
+                <div className="grid grid-cols-3 gap-1.5">
                   <button
                     type="button"
                     onClick={handleDemoTraveler}
-                    className="py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1"
+                    className="py-2 px-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-xs transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-center"
+                    title="1-Click Traveler Access"
                   >
-                    <span>{language === 'bn' ? 'ট্রাভেলার (আফরিন)' : 'Traveler (Anika)'}</span>
+                    <User className="w-3.5 h-3.5 text-emerald-200" />
+                    <span>{language === 'bn' ? 'ট্রাভেলার' : 'Traveler'}</span>
                   </button>
+
                   <button
                     type="button"
-                    onClick={handleDemoAdmin}
-                    className="py-2 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1"
+                    onClick={handleSelectAdmin}
+                    className="py-2 px-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] shadow-xs transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-center border border-slate-700"
+                    title="Admin login - Password required"
                   >
                     <ShieldCheck className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{language === 'bn' ? 'অ্যাডমিন ডেমো' : 'Admin Demo'}</span>
+                    <span>{language === 'bn' ? 'অ্যাডমিন' : 'Admin'}</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={handleSelectCompany}
+                    className="py-2 px-2 rounded-xl bg-blue-900 hover:bg-blue-800 text-white font-bold text-[11px] shadow-xs transition-all active:scale-95 flex flex-col items-center justify-center gap-0.5 text-center border border-blue-700"
+                    title="Company login - Password required"
+                  >
+                    <Building2 className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>{language === 'bn' ? 'কোম্পানি' : 'Company'}</span>
                   </button>
                 </div>
-                <p className="text-[10px] text-emerald-800/80 text-center pt-0.5">
-                  Admin: <code className="font-mono bg-white/70 px-1 py-0.2 rounded">admin@yeana.com.bd</code> (PIN: <code className="font-mono bg-white/70 px-1 py-0.2 rounded">admin123</code>)
-                </p>
+
+                <div className="text-[10px] text-slate-500 text-center space-y-0.5 pt-1 border-t border-slate-200/80">
+                  <p>Admin: <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">admin@yeana.com.bd</code> (Pass: <code className="font-mono text-amber-700 font-bold bg-amber-50 px-1 py-0.5 rounded border border-amber-200">admin123</code>)</p>
+                  <p>Company: <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200">partner@yeana.bd</code> (Pass: <code className="font-mono text-blue-700 font-bold bg-blue-50 px-1 py-0.5 rounded border border-blue-200">partner123</code>)</p>
+                </div>
               </div>
 
               {/* Error and Success Feedback */}

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { X, Mail, Lock, User, ShieldCheck, CheckCircle2, Sparkles, Eye, EyeOff } from 'lucide-react';
+import { X, Mail, Lock, User, ShieldCheck, CheckCircle2, Sparkles, Eye, EyeOff, Building2 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 
@@ -9,7 +9,7 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
-  const { login, signup, loginDemoAdmin, loginDemoTraveler, isLoading } = useAuth();
+  const { login, signup, loginDemoTraveler, isLoading } = useAuth();
   const { t } = useLanguage();
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
@@ -54,6 +54,20 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         setErrorMsg('Could not register account. Try again.');
       }
     } else {
+      const normalizedEmail = email.toLowerCase().trim();
+      const isAdmin = normalizedEmail === 'admin@yeana.com.bd' || normalizedEmail === 'admin@yeana.bd';
+      const isCompany = normalizedEmail === 'partner@yeana.bd' || normalizedEmail === 'company@yeana.bd' || normalizedEmail.endsWith('@partner.yeana.bd');
+
+      if (isAdmin && (!password || (password.trim() !== 'admin123' && password.trim() !== 'yeana2026'))) {
+        setErrorMsg('Access Denied: Incorrect Admin Password. Password required every time.');
+        return;
+      }
+
+      if (isCompany && (!password || (password.trim() !== 'partner123' && password.trim() !== 'company123'))) {
+        setErrorMsg('Access Denied: Incorrect Company Password. Password required every time.');
+        return;
+      }
+
       const success = await login(email, password);
       if (success) {
         setSuccessMsg('Signed in successfully!');
@@ -95,29 +109,60 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           </p>
         </div>
 
-        {/* Quick Demo Logins Banner */}
-        <div className="p-4 bg-brand-50 border-b border-brand-100 space-y-2 text-xs">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-2">
-            <span className="font-semibold text-brand-900">Quick 1-Click Testing:</span>
-            <div className="flex items-center gap-2 w-full sm:w-auto">
-              <button
-                type="button"
-                onClick={() => { loginDemoTraveler(); onClose(); }}
-                className="flex-1 sm:flex-none px-2.5 py-1.5 rounded-lg bg-white border border-brand-200 text-brand-700 hover:bg-brand-100 font-bold shadow-2xs transition-colors"
-              >
-                Traveler Demo
-              </button>
-              <button
-                type="button"
-                onClick={() => { loginDemoAdmin(); onClose(); }}
-                className="flex-1 sm:flex-none px-2.5 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold shadow-2xs transition-colors flex items-center justify-center gap-1"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" /> Admin Demo
-              </button>
-            </div>
+        {/* Account Persona Selectors (Password Required for Admin & Company) */}
+        <div className="p-4 bg-slate-50 border-b border-slate-200 space-y-2.5 text-xs">
+          <div className="flex items-center justify-between">
+            <span className="font-semibold text-slate-800 flex items-center gap-1.5">
+              <Sparkles className="w-3.5 h-3.5 text-brand-600" />
+              <span>Select Account Type:</span>
+            </span>
+            <span className="text-[10px] text-amber-700 font-bold bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full flex items-center gap-1">
+              <Lock className="w-3 h-3 text-amber-600" />
+              <span>Password Required</span>
+            </span>
           </div>
-          <p className="text-[10px] text-brand-800/80 text-center">
-            Admin: <code className="font-mono bg-white/70 px-1 py-0.2 rounded">admin@yeana.com.bd</code> (PIN: <code className="font-mono bg-white/70 px-1 py-0.2 rounded">admin123</code>)
+
+          <div className="grid grid-cols-3 gap-1.5">
+            <button
+              type="button"
+              onClick={() => { loginDemoTraveler(); onClose(); }}
+              className="py-1.5 px-2 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-[11px] shadow-2xs transition-colors flex flex-col items-center justify-center gap-0.5"
+            >
+              <User className="w-3 h-3 text-emerald-200" />
+              <span>Traveler</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { 
+                setIsSignUp(false); 
+                setEmail('admin@yeana.com.bd'); 
+                setPassword(''); 
+                setErrorMsg('');
+                setSuccessMsg('Admin selected. Enter password (admin123).');
+              }}
+              className="py-1.5 px-2 rounded-lg bg-slate-900 hover:bg-slate-800 text-white font-bold text-[11px] shadow-2xs transition-colors flex flex-col items-center justify-center gap-0.5 border border-slate-700"
+            >
+              <ShieldCheck className="w-3 h-3 text-amber-400" />
+              <span>Admin</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => { 
+                setIsSignUp(false); 
+                setEmail('partner@yeana.bd'); 
+                setPassword(''); 
+                setErrorMsg('');
+                setSuccessMsg('Company selected. Enter password (partner123).');
+              }}
+              className="py-1.5 px-2 rounded-lg bg-blue-900 hover:bg-blue-800 text-white font-bold text-[11px] shadow-2xs transition-colors flex flex-col items-center justify-center gap-0.5 border border-blue-700"
+            >
+              <Building2 className="w-3 h-3 text-cyan-300" />
+              <span>Company</span>
+            </button>
+          </div>
+
+          <p className="text-[10px] text-slate-500 text-center">
+            Admin Pass: <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200 text-amber-700 font-bold">admin123</code> | Company Pass: <code className="font-mono bg-white px-1 py-0.5 rounded border border-slate-200 text-blue-700 font-bold">partner123</code>
           </p>
         </div>
 
