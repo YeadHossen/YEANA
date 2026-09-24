@@ -25,7 +25,8 @@ import {
   Clock, 
   ChevronRight, 
   Building2,
-  Lock
+  Lock,
+  ArrowLeft
 } from 'lucide-react';
 import { DataService } from '../services/dataService';
 import { Place, Hotel, Restaurant, TransportRoute, District, TravelerInquiry, InquiryCategory, InquiryStatus } from '../types';
@@ -389,6 +390,34 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                 This portal contains confidential passenger booking manifests, guest telephone numbers, payment reconciliation data, and fleet inventories. Password verification is strictly required every time.
               </p>
             </div>
+
+            {/* Traveler Account Notice (If traveler user accidentally navigates here) */}
+            {user && user.role === 'user' && (
+              <div className="p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 text-left flex items-start gap-3 text-xs shadow-md">
+                <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+                <div className="space-y-1.5 w-full">
+                  <div className="flex items-center justify-between">
+                    <p className="font-bold text-emerald-300">Signed in as Traveler ({user.full_name})</p>
+                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black">
+                      Traveler Account
+                    </span>
+                  </div>
+                  <p className="text-slate-300 text-[11px] leading-relaxed">
+                    You are currently using your personal Traveler Portal. Admin and Company enterprise portals require staff verification.
+                  </p>
+                  {onBackToHome && (
+                    <button
+                      type="button"
+                      onClick={onBackToHome}
+                      className="mt-1 px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs inline-flex items-center gap-2 transition-all shadow-md active:scale-95"
+                    >
+                      <ArrowLeft className="w-3.5 h-3.5" />
+                      <span>Return to Traveler Portal (ট্রাভেলার পোর্টালে যান)</span>
+                    </button>
+                  )}
+                </div>
+              </div>
+            )}
 
             {/* Mode Switcher: Admin Console vs Company Partner */}
             <div className="flex rounded-2xl bg-slate-900 p-1.5 border border-slate-800 text-xs font-black max-w-md mx-auto">

@@ -181,7 +181,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Portal / Admin Access: Unified & Role-Adaptive */}
+            {/* Portal / Admin Access: Strictly Role-Adaptive (Hidden for Travelers) */}
             {isAdmin ? (
               <button
                 onClick={() => setCurrentTab('admin')}
@@ -216,21 +216,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <span>Company Portal</span>
                 <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
               </button>
-            ) : (
-              <button
-                onClick={() => setCurrentTab('admin')}
-                className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-xs ${
-                  currentTab === 'admin'
-                    ? 'bg-slate-950 text-emerald-400 border-slate-800 shadow-md ring-2 ring-emerald-500/20'
-                    : 'bg-slate-900 hover:bg-slate-800 text-white border-slate-800'
-                }`}
-                title="YEANA Partner & Company E-Portal (Password Required)"
-              >
-                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Company Portal</span>
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              </button>
-            )}
+            ) : null}
 
             {/* User Profile / Login */}
             {isAuthenticated ? (
@@ -365,7 +351,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               );
             })}
-            {isAdmin ? (
+            {isAdmin && (
               <button
                 onClick={() => {
                   setCurrentTab('admin');
@@ -376,7 +362,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <ShieldCheck className="w-4 h-4" />
                 <span>{t('nav.admin')}</span>
               </button>
-            ) : isCompany ? (
+            )}
+
+            {isCompany && (
               <button
                 onClick={() => {
                   setCurrentTab('admin');
@@ -386,17 +374,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <Building2 className="w-4 h-4" />
                 <span>Company E-Portal</span>
-              </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setCurrentTab('admin');
-                  setMobileMenuOpen(false);
-                }}
-                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-slate-900 text-emerald-400 border border-slate-800 flex items-center justify-center gap-2 shadow-sm"
-              >
-                <Building2 className="w-4 h-4 text-emerald-400" />
-                <span>🏢 Company Portal (Partner Access)</span>
               </button>
             )}
           </div>

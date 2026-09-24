@@ -1,6 +1,7 @@
 import React from 'react';
 import { Compass, PhoneCall, ShieldCheck, Heart, Mail, Globe, MapPin } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface FooterProps {
   onNavigate: (tab: string) => void;
@@ -9,6 +10,7 @@ interface FooterProps {
 
 export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPrivacy }) => {
   const { t } = useLanguage();
+  const { isAdmin, isCompany } = useAuth();
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-24 xl:pb-12 border-t border-slate-800">
@@ -86,7 +88,13 @@ export const Footer: React.FC<FooterProps> = ({ onNavigate, onOpenPrivacy }) => 
               <li><button onClick={() => onNavigate('notes')} className="hover:text-emerald-400 text-emerald-300 font-semibold transition-colors">Keep Notes & Expenses (নোট ও খরচ)</button></li>
               <li><button onClick={() => onNavigate('favorites')} className="hover:text-brand-400 transition-colors">Saved Offline Guides</button></li>
               <li><button onClick={() => onNavigate('profile')} className="hover:text-brand-400 transition-colors">My Traveler Profile</button></li>
-              <li><button onClick={() => onNavigate('admin')} className="hover:text-brand-400 transition-colors text-amber-400">Admin Portal</button></li>
+              <li><button onClick={() => onNavigate('emergency')} className="hover:text-rose-400 text-rose-300 font-semibold transition-colors">Emergency Services (৯৯৯ সেবা)</button></li>
+              {isAdmin && (
+                <li><button onClick={() => onNavigate('admin')} className="hover:text-amber-300 transition-colors text-amber-400 font-semibold">Admin Portal</button></li>
+              )}
+              {isCompany && (
+                <li><button onClick={() => onNavigate('admin')} className="hover:text-blue-300 transition-colors text-blue-400 font-semibold">Company Portal</button></li>
+              )}
             </ul>
           </div>
 

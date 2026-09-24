@@ -293,7 +293,7 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
             </div>
           </div>
 
-          {/* Enterprise Portal Access */}
+          {/* Role-Specific Portal Access: Enterprise for Admin/Company, Traveler Portal for Travelers */}
           {isAdmin ? (
             <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <div>
@@ -329,26 +329,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
           ) : (
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
               <div>
-                <p className="font-bold text-slate-800">Enterprise Access Portals</p>
-                <p className="text-slate-400 text-xs">Admin & Company Partner portals (Password required)</p>
+                <p className="font-bold text-slate-800 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-600" />
+                  <span>Verified Traveler Portal (ভেরিফায়েড ট্রাভেলার পোর্টাল)</span>
+                </p>
+                <p className="text-slate-400 text-xs">
+                  Active traveler privileges: 64 districts discovery, multi-day itinerary planner, offline bookmarks & expense notes
+                </p>
               </div>
-              <div className="flex items-center gap-2 flex-wrap">
-                <button
-                  onClick={() => onNavigateTab('admin')}
-                  className="px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 font-bold text-xs flex items-center gap-1.5 shadow-xs"
-                  title="Requires Admin Password (admin123)"
-                >
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Admin Console</span>
-                </button>
-                <button
-                  onClick={() => onNavigateTab('admin')}
-                  className="px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs flex items-center gap-1.5 shadow-xs"
-                  title="Requires Company Password (partner123)"
-                >
-                  <Building2 className="w-3.5 h-3.5" />
-                  <span>Company Portal</span>
-                </button>
+              <div className="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-xs font-bold shrink-0 shadow-2xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                <span>Traveler Portal Active</span>
               </div>
             </div>
           )}
