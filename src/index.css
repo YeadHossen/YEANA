@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -18,11 +19,11 @@
   }
 
   /* Remove default blue tap highlight and blue focus outline on touch/click */
-  button, 
-  a, 
-  input, 
-  select, 
-  textarea, 
+  button,
+  a,
+  input,
+  select,
+  textarea,
   [role="button"] {
     -webkit-tap-highlight-color: transparent !important;
     -webkit-touch-callout: none;
@@ -47,10 +48,12 @@
 
   body {
     @apply bg-slate-50 text-slate-900 font-sans;
-    background-image: 
-      radial-gradient(at 0% 0%, rgba(13, 148, 136, 0.04) 0px, transparent 50%),
-      radial-gradient(at 100% 0%, rgba(14, 165, 233, 0.04) 0px, transparent 50%),
-      radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.03) 0px, transparent 50%);
+    background-image:
+      radial-gradient(at 0% 0%, rgba(4, 120, 87, 0.08) 0px, transparent 48%),
+      radial-gradient(at 100% 0%, rgba(2, 132, 199, 0.08) 0px, transparent 48%),
+      radial-gradient(at 50% 45%, rgba(245, 158, 11, 0.055) 0px, transparent 52%),
+      radial-gradient(at 10% 85%, rgba(13, 148, 136, 0.07) 0px, transparent 50%),
+      radial-gradient(at 95% 90%, rgba(225, 29, 72, 0.05) 0px, transparent 50%);
     background-attachment: fixed;
     overflow-x: hidden;
     max-width: 100vw;
@@ -64,11 +67,17 @@
   }
 
   ::selection {
-    background-color: #10b981;
+    background-color: #059669;
     color: #ffffff;
   }
 
-  h1, h2, h3, h4, h5, h6, .font-heading {
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  .font-heading {
     font-family: 'Outfit', 'Plus Jakarta Sans', system-ui, sans-serif;
   }
 
@@ -83,119 +92,180 @@
 /* ========================================================================= */
 
 .glass-panel {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.82);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  box-shadow: 0 8px 32px 0 rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.03), 0 8px 32px 0 rgba(15, 23, 42, 0.06), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95);
 }
 
 .glass-card {
-  background: rgba(255, 255, 255, 0.82);
+  background: rgba(255, 255, 255, 0.88);
   backdrop-filter: blur(16px);
   -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.8);
-  box-shadow: 0 10px 30px -5px rgba(15, 23, 42, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.9);
+  box-shadow: 0 1px 2px 0 rgba(15, 23, 42, 0.03), 0 10px 30px -5px rgba(15, 23, 42, 0.06), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
   transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .glass-card:hover {
   transform: translateY(-4px);
-  background: rgba(255, 255, 255, 0.95);
-  border-color: rgba(13, 148, 136, 0.3);
-  box-shadow: 0 20px 40px -10px rgba(13, 148, 136, 0.15), 0 0 20px -2px rgba(13, 148, 136, 0.1);
+  background: rgba(255, 255, 255, 0.98);
+  border-color: rgba(5, 150, 105, 0.35);
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.04), 0 20px 40px -8px rgba(5, 150, 105, 0.18), 0 0 20px -2px rgba(16, 185, 129, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .glass-card-dark {
-  background: rgba(15, 23, 42, 0.8);
+  background: rgba(15, 23, 42, 0.85);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 12px 36px 0 rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
 }
 
 .glass-pill {
-  background: rgba(255, 255, 255, 0.65);
+  background: rgba(255, 255, 255, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.7);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03), inset 0 1px 0 rgba(255, 255, 255, 0.9);
 }
 
 .glass-pill-dark {
-  background: rgba(15, 23, 42, 0.7);
+  background: rgba(15, 23, 42, 0.75);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 }
 
-/* Radiant Text Gradients */
+/* Radiant Multi-Stop Text Gradients */
 .text-gradient-emerald {
-  background: linear-gradient(135deg, #006A4E 0%, #059669 45%, #0ea5e9 100%);
+  background: linear-gradient(135deg, #024e3a 0%, #059669 45%, #0284c7 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-gold {
-  background: linear-gradient(135deg, #b45309 0%, #f59e0b 50%, #e11d48 100%);
+  background: linear-gradient(135deg, #92400e 0%, #d97706 40%, #f59e0b 80%, #ea580c 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-crimson {
-  background: linear-gradient(135deg, #be123c 0%, #e11d48 50%, #f59e0b 100%);
+  background: linear-gradient(135deg, #9f1239 0%, #e11d48 45%, #f59e0b 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
 .text-gradient-ocean {
-  background: linear-gradient(135deg, #0284c7 0%, #059669 50%, #6366f1 100%);
+  background: linear-gradient(135deg, #0369a1 0%, #0ea5e9 45%, #10b981 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
-/* Cultural Badges */
+.text-gradient-aurora {
+  background: linear-gradient(135deg, #047857 0%, #0ea5e9 45%, #8b5cf6 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-sunset {
+  background: linear-gradient(135deg, #be123c 0%, #f43f5e 45%, #f59e0b 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-sapphire {
+  background: linear-gradient(135deg, #1e3a8a 0%, #0284c7 50%, #38bdf8 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Cultural & Jewel Badges */
 .badge-heritage-green {
-  background: linear-gradient(135deg, rgba(0, 106, 78, 0.12) 0%, rgba(5, 150, 105, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(0, 106, 78, 0.14) 0%, rgba(5, 150, 105, 0.08) 100%);
   color: #065f46;
-  border: 1px solid rgba(5, 150, 105, 0.3);
+  border: 1px solid rgba(5, 150, 105, 0.35);
+  box-shadow: 0 1px 2px rgba(6, 95, 70, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .badge-sunset-red {
-  background: linear-gradient(135deg, rgba(225, 29, 72, 0.12) 0%, rgba(244, 63, 94, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(225, 29, 72, 0.14) 0%, rgba(244, 63, 94, 0.08) 100%);
   color: #9f1239;
-  border: 1px solid rgba(225, 29, 72, 0.3);
+  border: 1px solid rgba(225, 29, 72, 0.35);
+  box-shadow: 0 1px 2px rgba(159, 18, 57, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .badge-mustard-gold {
-  background: linear-gradient(135deg, rgba(245, 158, 11, 0.15) 0%, rgba(217, 119, 6, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(245, 158, 11, 0.18) 0%, rgba(217, 119, 6, 0.09) 100%);
   color: #78350f;
-  border: 1px solid rgba(245, 158, 11, 0.35);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  box-shadow: 0 1px 2px rgba(120, 53, 15, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
 .badge-haor-blue {
-  background: linear-gradient(135deg, rgba(2, 132, 199, 0.12) 0%, rgba(14, 165, 233, 0.08) 100%);
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.14) 0%, rgba(14, 165, 233, 0.08) 100%);
   color: #0369a1;
-  border: 1px solid rgba(2, 132, 199, 0.3);
+  border: 1px solid rgba(2, 132, 199, 0.35);
+  box-shadow: 0 1px 2px rgba(3, 105, 161, 0.06), inset 0 1px 0 rgba(255, 255, 255, 0.85);
 }
 
-/* Bangladeshi Alpona / Mesh Ambient Background */
+.badge-jewel-emerald {
+  background: linear-gradient(135deg, rgba(236, 253, 245, 0.95) 0%, rgba(209, 250, 229, 0.85) 100%);
+  color: #047857;
+  border: 1px solid rgba(5, 150, 105, 0.35);
+  box-shadow: 0 1px 2px rgba(5, 150, 105, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.badge-jewel-gold {
+  background: linear-gradient(135deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.85) 100%);
+  color: #92400e;
+  border: 1px solid rgba(217, 119, 6, 0.35);
+  box-shadow: 0 1px 2px rgba(217, 119, 6, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.badge-jewel-sky {
+  background: linear-gradient(135deg, rgba(224, 242, 254, 0.95) 0%, rgba(186, 230, 253, 0.85) 100%);
+  color: #0369a1;
+  border: 1px solid rgba(2, 132, 199, 0.35);
+  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.badge-jewel-rose {
+  background: linear-gradient(135deg, rgba(255, 228, 230, 0.95) 0%, rgba(254, 205, 211, 0.85) 100%);
+  color: #9f1239;
+  border: 1px solid rgba(225, 29, 72, 0.35);
+  box-shadow: 0 1px 2px rgba(225, 29, 72, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+.badge-jewel-purple {
+  background: linear-gradient(135deg, rgba(243, 232, 255, 0.95) 0%, rgba(233, 213, 255, 0.85) 100%);
+  color: #6b21a8;
+  border: 1px solid rgba(147, 51, 234, 0.35);
+  box-shadow: 0 1px 2px rgba(147, 51, 234, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Bangladeshi Alpona / Radiant Mesh Ambient Background */
 .bg-bangla-mesh {
-  background-color: #fafbfc;
-  background-image: 
-    radial-gradient(at 0% 0%, rgba(0, 106, 78, 0.07) 0px, transparent 50%),
-    radial-gradient(at 100% 0%, rgba(225, 29, 72, 0.05) 0px, transparent 45%),
-    radial-gradient(at 50% 100%, rgba(245, 158, 11, 0.05) 0px, transparent 50%),
-    radial-gradient(at 100% 100%, rgba(2, 132, 199, 0.06) 0px, transparent 50%);
+  background-color: #f8fafc;
+  background-image:
+    radial-gradient(at 5% 0%, rgba(4, 120, 87, 0.09) 0px, transparent 48%),
+    radial-gradient(at 95% 4%, rgba(2, 132, 199, 0.09) 0px, transparent 48%),
+    radial-gradient(at 50% 35%, rgba(245, 158, 11, 0.065) 0px, transparent 52%),
+    radial-gradient(at 10% 70%, rgba(13, 148, 136, 0.075) 0px, transparent 50%),
+    radial-gradient(at 90% 85%, rgba(225, 29, 72, 0.055) 0px, transparent 50%);
   background-attachment: fixed;
 }
 
 /* Floating Animations */
 @keyframes floatGentle {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0px);
   }
+
   50% {
     transform: translateY(-6px);
   }
@@ -206,9 +276,12 @@
 }
 
 @keyframes pulseGlow {
-  0%, 100% {
+
+  0%,
+  100% {
     box-shadow: 0 0 15px -3px rgba(5, 150, 105, 0.4);
   }
+
   50% {
     box-shadow: 0 0 30px 2px rgba(5, 150, 105, 0.7);
   }
@@ -261,10 +334,11 @@
   border: none !important;
   border-radius: 1rem !important;
   overflow: hidden !important;
-  box-shadow: 0 8px 24px rgba(0,0,0,0.12) !important;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12) !important;
 }
 
-.leaflet-control-zoom-in, .leaflet-control-zoom-out {
+.leaflet-control-zoom-in,
+.leaflet-control-zoom-out {
   background-color: rgba(255, 255, 255, 0.9) !important;
   backdrop-filter: blur(10px) !important;
   color: #0f766e !important;
@@ -278,76 +352,282 @@
 }
 
 /* ========================================================================= */
-/* JEWEL-TONED CATEGORY COLOR THEMES                                         */
+/* JEWEL-TONED CATEGORY COLOR THEMES & LUMINOUS BUTTONS                     */
 /* ========================================================================= */
 
 .cat-card-emerald {
-  background: linear-gradient(135deg, rgba(236, 253, 245, 0.92) 0%, rgba(209, 250, 229, 0.65) 100%);
-  border: 1px solid rgba(5, 150, 105, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(5, 150, 105, 0.12);
+  background: linear-gradient(145deg, rgba(240, 253, 244, 0.95) 0%, rgba(220, 252, 231, 0.85) 50%, rgba(187, 247, 208, 0.55) 100%);
+  border: 1px solid rgba(5, 150, 105, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(5, 150, 105, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cat-card-emerald:hover {
-  border-color: rgba(5, 150, 105, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(5, 150, 105, 0.25);
+  border-color: rgba(5, 150, 105, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(5, 150, 105, 0.28), 0 0 18px -2px rgba(16, 185, 129, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .cat-card-indigo {
-  background: linear-gradient(135deg, rgba(238, 242, 255, 0.92) 0%, rgba(224, 231, 255, 0.65) 100%);
-  border: 1px solid rgba(79, 70, 229, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(79, 70, 229, 0.12);
+  background: linear-gradient(145deg, rgba(238, 242, 255, 0.95) 0%, rgba(224, 231, 255, 0.85) 50%, rgba(199, 210, 254, 0.55) 100%);
+  border: 1px solid rgba(79, 70, 229, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(79, 70, 229, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cat-card-indigo:hover {
-  border-color: rgba(79, 70, 229, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(79, 70, 229, 0.25);
+  border-color: rgba(79, 70, 229, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(79, 70, 229, 0.28), 0 0 18px -2px rgba(99, 102, 241, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .cat-card-amber {
-  background: linear-gradient(135deg, rgba(254, 243, 199, 0.92) 0%, rgba(253, 230, 138, 0.65) 100%);
-  border: 1px solid rgba(217, 119, 6, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(217, 119, 6, 0.12);
+  background: linear-gradient(145deg, rgba(254, 243, 199, 0.95) 0%, rgba(253, 230, 138, 0.85) 50%, rgba(252, 211, 77, 0.55) 100%);
+  border: 1px solid rgba(217, 119, 6, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(217, 119, 6, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cat-card-amber:hover {
-  border-color: rgba(217, 119, 6, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(217, 119, 6, 0.25);
+  border-color: rgba(217, 119, 6, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(217, 119, 6, 0.28), 0 0 18px -2px rgba(245, 158, 11, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .cat-card-sky {
-  background: linear-gradient(135deg, rgba(224, 242, 254, 0.92) 0%, rgba(186, 230, 253, 0.65) 100%);
-  border: 1px solid rgba(2, 132, 199, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(2, 132, 199, 0.12);
+  background: linear-gradient(145deg, rgba(224, 242, 254, 0.95) 0%, rgba(186, 230, 253, 0.85) 50%, rgba(125, 211, 252, 0.55) 100%);
+  border: 1px solid rgba(2, 132, 199, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(2, 132, 199, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cat-card-sky:hover {
-  border-color: rgba(2, 132, 199, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(2, 132, 199, 0.25);
+  border-color: rgba(2, 132, 199, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(2, 132, 199, 0.28), 0 0 18px -2px rgba(14, 165, 233, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .cat-card-purple {
-  background: linear-gradient(135deg, rgba(243, 232, 255, 0.92) 0%, rgba(233, 213, 255, 0.65) 100%);
-  border: 1px solid rgba(147, 51, 234, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(147, 51, 234, 0.12);
+  background: linear-gradient(145deg, rgba(243, 232, 255, 0.95) 0%, rgba(233, 213, 255, 0.85) 50%, rgba(216, 180, 254, 0.55) 100%);
+  border: 1px solid rgba(147, 51, 234, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(147, 51, 234, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cat-card-purple:hover {
-  border-color: rgba(147, 51, 234, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(147, 51, 234, 0.25);
+  border-color: rgba(147, 51, 234, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(147, 51, 234, 0.28), 0 0 18px -2px rgba(168, 85, 247, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .cat-card-rose {
-  background: linear-gradient(135deg, rgba(255, 228, 230, 0.92) 0%, rgba(254, 205, 211, 0.65) 100%);
-  border: 1px solid rgba(225, 29, 72, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(225, 29, 72, 0.12);
+  background: linear-gradient(145deg, rgba(255, 228, 230, 0.95) 0%, rgba(254, 205, 211, 0.85) 50%, rgba(251, 113, 133, 0.45) 100%);
+  border: 1px solid rgba(225, 29, 72, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(225, 29, 72, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
+
 .cat-card-rose:hover {
-  border-color: rgba(225, 29, 72, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(225, 29, 72, 0.25);
+  border-color: rgba(225, 29, 72, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(225, 29, 72, 0.28), 0 0 18px -2px rgba(244, 63, 94, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
 }
 
 .cat-card-teal {
-  background: linear-gradient(135deg, rgba(204, 251, 241, 0.92) 0%, rgba(153, 246, 228, 0.65) 100%);
-  border: 1px solid rgba(13, 148, 136, 0.3);
-  box-shadow: 0 8px 24px -4px rgba(13, 148, 136, 0.12);
-}
-.cat-card-teal:hover {
-  border-color: rgba(13, 148, 136, 0.7);
-  box-shadow: 0 16px 36px -6px rgba(13, 148, 136, 0.25);
+  background: linear-gradient(145deg, rgba(204, 251, 241, 0.95) 0%, rgba(153, 246, 228, 0.85) 50%, rgba(94, 234, 212, 0.55) 100%);
+  border: 1px solid rgba(13, 148, 136, 0.32);
+  box-shadow: 0 4px 16px -2px rgba(13, 148, 136, 0.12), inset 0 1.5px 0 rgba(255, 255, 255, 0.95);
 }
 
+.cat-card-teal:hover {
+  border-color: rgba(13, 148, 136, 0.65);
+  box-shadow: 0 16px 36px -6px rgba(13, 148, 136, 0.28), 0 0 18px -2px rgba(20, 184, 166, 0.22), inset 0 1.5px 0 rgba(255, 255, 255, 1);
+}
+
+/* Luminous Action Buttons with Jewel-Cut Sheen */
+.btn-emerald-glow {
+  background: linear-gradient(135deg, #047857 0%, #059669 50%, #0d9488 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px 0 rgba(5, 150, 105, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-emerald-glow:hover {
+  background: linear-gradient(135deg, #065f46 0%, #047857 50%, #0f766e 100%);
+  box-shadow: 0 8px 24px -2px rgba(5, 150, 105, 0.48), 0 0 15px 0 rgba(16, 185, 129, 0.35);
+  transform: translateY(-1.5px);
+}
+
+.btn-amber-glow {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 50%, #f59e0b 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px 0 rgba(217, 119, 6, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-amber-glow:hover {
+  background: linear-gradient(135deg, #92400e 0%, #b45309 50%, #d97706 100%);
+  box-shadow: 0 8px 24px -2px rgba(217, 119, 6, 0.48), 0 0 15px 0 rgba(245, 158, 11, 0.35);
+  transform: translateY(-1.5px);
+}
+
+.btn-haor-glow {
+  background: linear-gradient(135deg, #0369a1 0%, #0284c7 50%, #0ea5e9 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px 0 rgba(2, 132, 199, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-haor-glow:hover {
+  background: linear-gradient(135deg, #0c4a6e 0%, #0369a1 50%, #0284c7 100%);
+  box-shadow: 0 8px 24px -2px rgba(2, 132, 199, 0.48), 0 0 15px 0 rgba(14, 165, 233, 0.35);
+  transform: translateY(-1.5px);
+}
+
+.btn-primary-gradient {
+  background: linear-gradient(135deg, #047857 0%, #059669 45%, #0284c7 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px 0 rgba(5, 150, 105, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.btn-primary-gradient:hover {
+  background: linear-gradient(135deg, #065f46 0%, #047857 45%, #0369a1 100%);
+  box-shadow: 0 8px 24px -2px rgba(5, 150, 105, 0.48), 0 0 18px 0 rgba(16, 185, 129, 0.35);
+  transform: translateY(-1.5px);
+}
+
+/* ========================================================================= */
+/* REALISTIC & SAFE TRUST DESIGN SYSTEM UTILITIES */
+/* ========================================================================= */
+
+/* Contained Icon Squircles - Provides institutional weight & clarity */
+.icon-squircle-emerald {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #ecfdf5;
+  border: 1px solid rgba(4, 120, 87, 0.22);
+  color: #047857;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px rgba(4, 120, 87, 0.05);
+}
+
+.icon-squircle-cobalt {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f0f9ff;
+  border: 1px solid rgba(2, 132, 199, 0.22);
+  color: #0284c7;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px rgba(2, 132, 199, 0.05);
+}
+
+.icon-squircle-amber {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fffbeb;
+  border: 1px solid rgba(217, 119, 6, 0.22);
+  color: #b45309;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px rgba(217, 119, 6, 0.05);
+}
+
+.icon-squircle-crimson {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #fff1f2;
+  border: 1px solid rgba(225, 29, 72, 0.22);
+  color: #be123c;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px rgba(225, 29, 72, 0.05);
+}
+
+.icon-squircle-slate {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8fafc;
+  border: 1px solid rgba(100, 116, 139, 0.22);
+  color: #1e293b;
+  border-radius: 0.875rem;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+/* Realistic Physical Cards with Dual-Layer Tactile Shadows */
+.card-realistic {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 1.25rem;
+  box-shadow: 0 1px 3px 0 rgba(15, 23, 42, 0.04), 0 10px 24px -5px rgba(15, 23, 42, 0.06);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.card-realistic:hover {
+  transform: translateY(-3px);
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(15, 23, 42, 0.05), 0 20px 35px -6px rgba(4, 120, 87, 0.12);
+}
+
+.card-realistic:active {
+  transform: scale(0.985);
+}
+
+/* Verified Trust & Safety Badges */
+.badge-trust-verified {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  background: #ecfdf5;
+  color: #065f46;
+  border: 1px solid #a7f3d0;
+  box-shadow: 0 1px 2px rgba(6, 95, 70, 0.05);
+}
+
+.badge-trust-police {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  background: #fff1f2;
+  color: #9f1239;
+  border: 1px solid #fecdd3;
+  box-shadow: 0 1px 2px rgba(159, 18, 57, 0.05);
+}
+
+.badge-trust-official {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: 0.625rem;
+  font-size: 0.6875rem;
+  font-weight: 800;
+  letter-spacing: 0.025em;
+  background: #f0f9ff;
+  color: #075985;
+  border: 1px solid #bae6fd;
+  box-shadow: 0 1px 2px rgba(7, 89, 133, 0.05);
+}
+
+.badge-real-photo {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+}

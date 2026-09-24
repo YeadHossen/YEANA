@@ -13,6 +13,7 @@ interface AuthContextType {
   signup: (email: string, fullName: string, password?: string) => Promise<boolean>;
   logout: () => Promise<void>;
   updateProfile: (updates: Partial<UserProfile>) => Promise<void>;
+  deleteAccount: () => Promise<boolean>;
 }
 
 const DEFAULT_DEMO_TRAVELER: UserProfile = {
@@ -42,17 +43,28 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<UserProfile | null>(() => {
     try {
-      const saved = localStorage.getItem('yeana_user');
-      return saved ? JSON.parse(saved) : DEFAULT_DEMO_TRAVELER;
+      // Clear legacy localStorage so the user is never kept logged in across app restarts
+      localStorage.removeItem('yeana_user');
+
+      // Only restore user if actively logged in during this specific browser/app session
+      const sessionSaved = sessionStorage.getItem('yeana_session_user');
+      return sessionSaved ? JSON.parse(sessionSaved) : null;
     } catch {
-      return DEFAULT_DEMO_TRAVELER;
+      return null;
     }
   });
-  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    // Clear legacy persistent storage
+    try {
+      localStorage.removeItem('yeana_user');
+    } catch (e) {}
+
     async function checkSession() {
-      if (isSupabaseConfigured && supabase) {
+      // Only restore Supabase session if this active app session has logged in
+      const hasActiveSession = sessionStorage.getItem('yeana_session_user');
+      if (hasActiveSession && isSupabaseConfigured && supabase) {
         try {
           const { data: { session } } = await supabase.auth.getSession();
           if (session?.user) {
@@ -64,7 +76,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
             if (profile) {
               setUser(profile as UserProfile);
-              localStorage.setItem('yeana_user', JSON.stringify(profile));
+              sessionStorage.setItem('yeana_session_user', JSON.stringify(profile));
             }
           }
         } catch (err) {
@@ -91,25 +103,26 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             .single();
           if (profile) {
             setUser(profile as UserProfile);
-            localStorage.setItem('yeana_user', JSON.stringify(profile));
+            sessionStorage.setItem('yeana_session_user', JSON.stringify(profile));
             setIsLoading(false);
             return true;
           }
         }
       }
 
-      // Fallback local login
+      // Fallback local login for current session
+      const isAdminEmail = email.toLowerCase().trim() === 'admin@yeana.com.bd' || email.toLowerCase().trim() === 'admin@yeana.bd';
       const fallbackUser: UserProfile = {
         id: `usr-${Date.now()}`,
         full_name: email.split('@')[0],
         email: email,
         avatar_url: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150',
-        role: email.toLowerCase().includes('admin') ? 'admin' : 'user',
+        role: isAdminEmail ? 'admin' : 'user',
         bio: 'Explorer discovering Bangladesh with YEANA.',
         preferred_language: 'en'
       };
       setUser(fallbackUser);
-      localStorage.setItem('yeana_user', JSON.stringify(fallbackUser));
+      sessionStorage.setItem('yeana_session_user', JSON.stringify(fallbackUser));
       setIsLoading(false);
       return true;
     } catch (err) {
@@ -121,12 +134,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const loginDemoAdmin = () => {
     setUser(DEFAULT_DEMO_ADMIN);
-    localStorage.setItem('yeana_user', JSON.stringify(DEFAULT_DEMO_ADMIN));
+    sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_DEMO_ADMIN));
   };
 
   const loginDemoTraveler = () => {
     setUser(DEFAULT_DEMO_TRAVELER);
-    localStorage.setItem('yeana_user', JSON.stringify(DEFAULT_DEMO_TRAVELER));
+    sessionStorage.setItem('yeana_session_user', JSON.stringify(DEFAULT_DEMO_TRAVELER));
   };
 
   const signup = async (email: string, fullName: string, password?: string): Promise<boolean> => {
@@ -151,13 +164,13 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
             preferred_language: 'en'
           };
           setUser(newProfile);
-          localStorage.setItem('yeana_user', JSON.stringify(newProfile));
+          sessionStorage.setItem('yeana_session_user', JSON.stringify(newProfile));
           setIsLoading(false);
           return true;
         }
       }
 
-      // Fallback
+      // Fallback local registration for current session
       const newProfile: UserProfile = {
         id: `usr-${Date.now()}`,
         full_name: fullName,
@@ -168,7 +181,7 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
         preferred_language: 'en'
       };
       setUser(newProfile);
-      localStorage.setItem('yeana_user', JSON.stringify(newProfile));
+      sessionStorage.setItem('yeana_session_user', JSON.stringify(newProfile));
       setIsLoading(false);
       return true;
     } catch (err) {
@@ -180,9 +193,12 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
 
   const logout = async () => {
     if (isSupabaseConfigured && supabase) {
-      await supabase.auth.signOut();
+      try {
+        await supabase.auth.signOut();
+      } catch (e) {}
     }
     setUser(null);
+    sessionStorage.removeItem('yeana_session_user');
     localStorage.removeItem('yeana_user');
   };
 
@@ -190,10 +206,32 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
     if (!user) return;
     const updated = { ...user, ...updates };
     setUser(updated);
-    localStorage.setItem('yeana_user', JSON.stringify(updated));
+    sessionStorage.setItem('yeana_session_user', JSON.stringify(updated));
 
     if (isSupabaseConfigured && supabase) {
       await supabase.from('profiles').update(updates).eq('id', user.id);
+    }
+  };
+
+  const deleteAccount = async (): Promise<boolean> => {
+    if (!user) return false;
+    try {
+      if (isSupabaseConfigured && supabase) {
+        try {
+          await supabase.from('profiles').delete().eq('id', user.id);
+          await supabase.auth.signOut();
+        } catch (err) {
+          console.warn('Supabase profile delete warning:', err);
+        }
+      }
+      // Purge local sessions and cached user identity
+      sessionStorage.removeItem('yeana_session_user');
+      localStorage.removeItem('yeana_user');
+      setUser(null);
+      return true;
+    } catch (e) {
+      console.error('Delete account error:', e);
+      return false;
     }
   };
 
@@ -208,7 +246,8 @@ export const AuthProvider: React.FC<{ children: ReactNode }> = ({ children }) =>
       loginDemoTraveler,
       signup,
       logout,
-      updateProfile
+      updateProfile,
+      deleteAccount
     }}>
       {children}
     </AuthContext.Provider>

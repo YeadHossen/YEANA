@@ -13,7 +13,9 @@ import {
   Info,
   ArrowRight,
   Sparkles,
-  Dumbbell
+  Dumbbell,
+  ShieldCheck,
+  CheckCircle2
 } from 'lucide-react';
 import { Hotel } from '../../types';
 import { useFavorites } from '../../context/FavoritesContext';
@@ -36,7 +38,7 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
   return (
     <div 
       onClick={() => onSelect(hotel)}
-      className="group glass-card rounded-3xl border border-slate-200/80 shadow-glass hover:shadow-glass-hover hover:-translate-y-1.5 transition-all duration-300 flex flex-col overflow-hidden relative cursor-pointer bg-white/90"
+      className="group card-realistic border border-slate-200/90 shadow-card-realistic hover:shadow-card-hover transition-all duration-300 flex flex-col overflow-hidden relative cursor-pointer bg-white"
     >
       
       {/* Photo & Top Tags */}
@@ -51,10 +53,16 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
           }}
         />
 
-        {/* Price Tag Overlay */}
-        <div className="absolute top-3.5 left-3.5 bg-slate-950/85 backdrop-blur-md text-white px-3.5 py-1.5 rounded-2xl text-xs font-black shadow-lg border border-white/15 flex items-center gap-1.5 z-10">
-          <span className="text-emerald-400 font-mono text-sm font-black">৳{hotel.price_per_night.toLocaleString()}</span>
-          <span className="font-medium text-[10px] text-slate-300">/ night</span>
+        {/* Price Tag & Real Photo Stamp Overlay */}
+        <div className="absolute top-3.5 left-3.5 flex flex-col gap-1.5 z-10">
+          <div className="bg-slate-950/85 backdrop-blur-md text-white px-3.5 py-1.5 rounded-2xl text-xs font-black shadow-lg border border-white/15 flex items-center gap-1.5 w-fit">
+            <span className="text-emerald-400 font-mono text-sm font-black">৳{hotel.price_per_night.toLocaleString()}</span>
+            <span className="font-medium text-[10px] text-slate-300">/ night</span>
+          </div>
+          <span className="badge-real-photo w-fit shadow-md">
+            <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+            <span>100% Real Photos</span>
+          </span>
         </div>
 
         {/* Top Right Action & Photo Count */}
@@ -98,7 +106,7 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
       <div className="p-5 sm:p-6 flex-1 flex flex-col justify-between space-y-4">
         <div>
           <div className="flex items-start justify-between gap-2">
-            <div className="space-y-1">
+            <div className="space-y-1.5">
               <div className="flex items-center gap-1.5 flex-wrap">
                 <span className={`text-[10px] font-black uppercase px-2.5 py-0.5 rounded-lg ${
                   isResort 
@@ -109,6 +117,13 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
                 }`}>
                   {hotel.property_category || `${starCount}-Star Stay`}
                 </span>
+                
+                {/* Verified Trust Badge */}
+                <span className="badge-trust-verified">
+                  <ShieldCheck className="w-3 h-3 text-emerald-600" />
+                  <span>{language === 'bn' ? 'যাচাইকৃত হোটেল' : 'Verified Stay'}</span>
+                </span>
+
                 {hotel.upazila_name_bn && (
                   <span className="text-[10px] text-slate-400 font-bold">
                     ({hotel.upazila_name_bn})
@@ -122,8 +137,8 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
             </div>
 
             {/* User Rating Score */}
-            <div className="flex items-center gap-1 bg-emerald-50/90 px-2.5 py-1 rounded-xl border border-emerald-200/60 shrink-0 shadow-2xs">
-              <Star className="w-3.5 h-3.5 fill-emerald-500 text-emerald-500" />
+            <div className="flex items-center gap-1 bg-emerald-50 px-2.5 py-1 rounded-xl border border-emerald-200/80 shrink-0 shadow-2xs">
+              <Star className="w-3.5 h-3.5 fill-emerald-600 text-emerald-600" />
               <span className="text-xs font-black text-emerald-950">{hotel.rating}</span>
             </div>
           </div>
@@ -161,9 +176,9 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
             )}
             {/* Live Room Availability Badge */}
             <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg bg-emerald-50 text-emerald-800 text-[10px] font-extrabold border border-emerald-200 shadow-2xs font-bengali">
-              <Sparkles className="w-3 h-3 text-emerald-600" /> লাইভ রুম ফাঁকা আছে
+              <Sparkles className="w-3 h-3 text-emerald-600" /> {language === 'bn' ? 'লাইভ রুম ফাঁকা আছে' : 'Live Rooms Open'}
             </span>
-            {/* bKash / Pay At Hotel Badge */}
+            {/* Direct Pay Badge */}
             <span className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-pink-50 text-pink-700 text-[10px] font-bold border border-pink-200">
               💳 bKash / নগদ
             </span>
@@ -171,12 +186,12 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
         </div>
 
         {/* Bottom Actions with Explicit "View Details & Book" Button */}
-        <div className="pt-3.5 border-t border-slate-100/90 flex items-center justify-between gap-2">
+        <div className="pt-3.5 border-t border-slate-100 flex items-center justify-between gap-2">
           <a
             href={`tel:${hotel.contact_phone}`}
             onClick={(e) => e.stopPropagation()}
-            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100/80 hover:bg-slate-200 text-slate-700 border border-slate-200/60 transition-colors flex items-center gap-1.5 text-xs font-bold"
-            title="Call hotel reception desk"
+            className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200 transition-all flex items-center gap-1.5 text-xs font-bold active:scale-95 shadow-2xs"
+            title="Direct call to hotel reception desk"
           >
             <Phone className="w-3.5 h-3.5 text-emerald-600" />
             <span className="hidden sm:inline">Call Desk</span>
@@ -188,7 +203,7 @@ export const HotelCard: React.FC<HotelCardProps> = ({ hotel, onSelect, onInquire
                 e.stopPropagation();
                 onSelect(hotel);
               }}
-              className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-700 hover:from-emerald-700 hover:to-teal-800 text-white text-xs font-black transition-all shadow-sm hover:shadow-glow-emerald flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-brand-700 to-teal-800 hover:from-brand-800 hover:to-teal-900 text-white text-xs font-black transition-all shadow-sm active:scale-95 flex items-center gap-1.5"
             >
               <Info className="w-3.5 h-3.5 text-emerald-200" />
               <span>View Details & Book</span>

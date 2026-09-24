@@ -14,7 +14,9 @@ import {
   Globe,
   Bell,
   Settings,
-  Receipt
+  Receipt,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { useTrip } from '../context/TripContext';
@@ -30,7 +32,7 @@ interface ProfileViewProps {
 }
 
 export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenAuth, onOpenPrivacy }) => {
-  const { user, isAuthenticated, isAdmin, logout, updateProfile, loginDemoAdmin, loginDemoTraveler } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout, updateProfile, loginDemoAdmin, loginDemoTraveler, deleteAccount } = useAuth();
   const { trips } = useTrip();
   const { favorites } = useFavorites();
   const { expenses, notes } = useNotes();
@@ -41,6 +43,17 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
   const [phone, setPhone] = useState(user?.phone || '');
   const [bio, setBio] = useState(user?.bio || '');
   const [savedSuccess, setSavedSuccess] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const handleDeleteAccount = async () => {
+    setIsDeleting(true);
+    const success = await deleteAccount();
+    setIsDeleting(false);
+    if (success) {
+      setIsDeleteModalOpen(false);
+    }
+  };
 
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -340,21 +353,102 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
           {/* Logout */}
           <div className="flex items-center justify-between pt-4">
             <div>
-              <p className="font-bold text-rose-600">Sign Out</p>
+              <p className="font-bold text-slate-700">Sign Out</p>
               <p className="text-slate-400">Log out of your traveler account on this device</p>
             </div>
             <button
               onClick={logout}
-              className="px-4 py-2 rounded-xl bg-rose-50 text-rose-600 hover:bg-rose-100 font-bold flex items-center gap-1.5"
+              className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold flex items-center gap-1.5 transition-all"
             >
               <LogOut className="w-4 h-4" />
               <span>Sign Out</span>
             </button>
           </div>
 
+          {/* Delete Account (Google Play & Privacy Law Compliance) */}
+          <div className="flex items-center justify-between pt-4 border-t border-slate-100">
+            <div>
+              <p className="font-bold text-rose-600 flex items-center gap-1.5">
+                <Trash2 className="w-4 h-4 text-rose-600" />
+                <span>{language === 'bn' ? 'অ্যাকাউন্ট ও সমস্ত তথ্য মুছে ফেলুন' : 'Delete Account & Personal Data'}</span>
+              </p>
+              <p className="text-slate-400 text-xs">
+                {language === 'bn'
+                  ? 'গুগল প্লে স্টোর ও সাইবার সিকিউরিটি আইন অনুযায়ী স্থায়ীভাবে তথ্য অপসারণ'
+                  : 'Permanently purge profile, saved trips, and booking history (Google Play Policy)'}
+              </p>
+            </div>
+            <button
+              onClick={() => setIsDeleteModalOpen(true)}
+              className="px-3.5 py-1.5 rounded-xl border border-rose-300 text-rose-600 bg-rose-50 hover:bg-rose-100 font-bold text-xs transition-all shadow-2xs"
+            >
+              {language === 'bn' ? 'অ্যাকাউন্ট ডিলিট' : 'Delete Account'}
+            </button>
+          </div>
+
         </div>
 
       </div>
+
+      {/* Delete Account Confirmation Modal */}
+      {isDeleteModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white rounded-3xl p-6 sm:p-8 shadow-2xl border border-rose-100 space-y-5 animate-in zoom-in-95 duration-200">
+            <div className="w-14 h-14 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center mx-auto">
+              <AlertTriangle className="w-8 h-8" />
+            </div>
+
+            <div className="text-center space-y-2">
+              <h3 className="text-lg sm:text-xl font-black text-slate-900 font-sans">
+                {language === 'bn' ? 'অ্যাকাউন্ট স্থায়ীভাবে মুছে ফেলতে চান?' : 'Permanently Delete Account?'}
+              </h3>
+              <p className="text-xs text-slate-500 leading-relaxed">
+                {language === 'bn'
+                  ? 'আপনার প্রোফাইল, সংরক্ষিত ট্রিপ ও বুকিং হিস্ট্রি আমাদের সার্ভার ও এই ডিভাইস থেকে চিরতরে মুছে যাবে। গুগল প্লে ডেটা নীতিমালা অনুযায়ী এই প্রক্রিয়াটি অপরিবর্তনীয়।'
+                  : 'In compliance with Google Play Developer Policy and international data rights, this will permanently erase your traveler profile, custom itineraries, and booking history from our servers and this device. This action cannot be reversed.'}
+              </p>
+            </div>
+
+            <div className="bg-rose-50 border border-rose-200/80 rounded-2xl p-3.5 text-[11px] text-rose-800 space-y-1">
+              <p className="font-bold flex items-center gap-1.5">
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>{language === 'bn' ? 'যা মুছে যাবে:' : 'What will be deleted:'}</span>
+              </p>
+              <ul className="list-disc list-inside space-y-0.5 text-rose-700">
+                <li>{language === 'bn' ? 'ব্যক্তিগত তথ্য ও ফোন নম্বর' : 'Personal identity & phone records'}</li>
+                <li>{language === 'bn' ? 'পরিকল্পিত ট্রিপ ও খরচের হিসাব' : 'Saved trip itineraries & expense notes'}</li>
+                <li>{language === 'bn' ? 'সংরক্ষিত প্রিয় স্থান ও হোটেল' : 'Favorite places & hotel bookmarks'}</li>
+              </ul>
+            </div>
+
+            <div className="flex items-center gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setIsDeleteModalOpen(false)}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-4 rounded-xl border border-slate-200 hover:bg-slate-50 text-slate-700 font-bold text-xs transition-all"
+              >
+                {language === 'bn' ? 'বাতিল করুন' : 'Keep Account'}
+              </button>
+              <button
+                type="button"
+                onClick={handleDeleteAccount}
+                disabled={isDeleting}
+                className="flex-1 py-3 px-4 rounded-xl bg-rose-600 hover:bg-rose-700 text-white font-bold text-xs shadow-md shadow-rose-600/30 transition-all flex items-center justify-center gap-2"
+              >
+                {isDeleting ? (
+                  <span>{language === 'bn' ? 'ডিলিট হচ্ছে...' : 'Deleting...'}</span>
+                ) : (
+                  <>
+                    <Trash2 className="w-4 h-4" />
+                    <span>{language === 'bn' ? 'হ্যাঁ, ডিলিট করুন' : 'Confirm Deletion'}</span>
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
     </div>
   );

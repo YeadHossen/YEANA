@@ -4,7 +4,7 @@ import { App as CapApp } from '@capacitor/app';
 import { StatusBar, Style } from '@capacitor/status-bar';
 import { SplashScreen } from '@capacitor/splash-screen';
 
-import { AuthProvider } from './context/AuthContext';
+import { AuthProvider, useAuth } from './context/AuthContext';
 import { LanguageProvider } from './context/LanguageContext';
 import { FavoritesProvider } from './context/FavoritesContext';
 import { TripProvider, useTrip } from './context/TripContext';
@@ -18,22 +18,25 @@ import { AuthModal } from './components/auth/AuthModal';
 import { TravelerConciergeModal } from './components/chat/TravelerConciergeModal';
 import { PrivacyPolicyModal } from './components/common/PrivacyPolicyModal';
 
-// Views
+// Core views loaded immediately for instant initial render
 import { HomeView } from './views/HomeView';
 import { ExploreView } from './views/ExploreView';
 import { PlacesView } from './views/PlacesView';
 import { PlaceDetailView } from './views/PlaceDetailView';
-import { HotelsView } from './views/HotelsView';
-import { FoodView } from './views/FoodView';
-import { TransportView } from './views/TransportView';
-import { ShoppingView } from './views/ShoppingView';
-import { RideView } from './views/RideView';
-import { TripPlannerView } from './views/TripPlannerView';
-import { KeepNotesView } from './views/KeepNotesView';
-import { FavoritesView } from './views/FavoritesView';
 import { ProfileView } from './views/ProfileView';
-import { AdminView } from './views/AdminView';
-import { EmergencyServiceView } from './views/EmergencyServiceView';
+import { LoginView } from './views/LoginView';
+
+// Code-split heavy views to reduce initial bundle size and speed up mobile load
+const HotelsView = React.lazy(() => import('./views/HotelsView').then(m => ({ default: m.HotelsView })));
+const FoodView = React.lazy(() => import('./views/FoodView').then(m => ({ default: m.FoodView })));
+const TransportView = React.lazy(() => import('./views/TransportView').then(m => ({ default: m.TransportView })));
+const ShoppingView = React.lazy(() => import('./views/ShoppingView').then(m => ({ default: m.ShoppingView })));
+const RideView = React.lazy(() => import('./views/RideView').then(m => ({ default: m.RideView })));
+const TripPlannerView = React.lazy(() => import('./views/TripPlannerView').then(m => ({ default: m.TripPlannerView })));
+const KeepNotesView = React.lazy(() => import('./views/KeepNotesView').then(m => ({ default: m.KeepNotesView })));
+const FavoritesView = React.lazy(() => import('./views/FavoritesView').then(m => ({ default: m.FavoritesView })));
+const EmergencyServiceView = React.lazy(() => import('./views/EmergencyServiceView').then(m => ({ default: m.EmergencyServiceView })));
+const AdminView = React.lazy(() => import('./views/AdminView').then(m => ({ default: m.AdminView })));
 
 import { Place, Hotel, Restaurant } from './types';
 import { CheckCircle2, ArrowLeft, RotateCcw } from 'lucide-react';
@@ -63,7 +66,22 @@ const TAB_LABELS: Record<string, string> = {
   admin: 'Admin Dashboard (অ্যাডমিন)'
 };
 
+const ViewLoadingFallback: React.FC = () => (
+  <div className="flex flex-col items-center justify-center min-h-[50vh] p-8 space-y-4">
+    <div className="w-12 h-12 rounded-2xl bg-gradient-to-tr from-brand-600 to-teal-400 animate-spin flex items-center justify-center shadow-lg shadow-brand-500/25">
+      <div className="w-8 h-8 rounded-xl bg-white flex items-center justify-center">
+        <div className="w-4 h-4 rounded-lg bg-brand-600 animate-pulse" />
+      </div>
+    </div>
+    <div className="text-center space-y-1">
+      <p className="text-xs font-bold text-slate-700 tracking-wide">Loading YEANA...</p>
+      <p className="text-[11px] text-slate-400">Loading verified travel information</p>
+    </div>
+  </div>
+);
+
 const AppContent: React.FC = () => {
+  const { isAuthenticated } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [selectedHotelModal, setSelectedHotelModal] = useState<Hotel | null>(null);
@@ -262,6 +280,25 @@ const AppContent: React.FC = () => {
     ? historyStack[historyStack.length - 1].label || 'Previous Page'
     : currentTab !== 'home' ? 'Home' : null;
 
+  // Enforce user authentication every time the app is opened
+  if (!isAuthenticated) {
+    return (
+      <>
+        <LoginView 
+          onLoginSuccess={() => {
+            setCurrentTab('home');
+            showToast('✓ Welcome to YEANA Travel Bangladesh!');
+          }} 
+          onOpenPrivacy={() => setIsPrivacyOpen(true)} 
+        />
+        <PrivacyPolicyModal
+          isOpen={isPrivacyOpen}
+          onClose={() => setIsPrivacyOpen(false)}
+        />
+      </>
+    );
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden w-full max-w-full">
       
@@ -307,109 +344,109 @@ const AppContent: React.FC = () => {
 
       {/* Main View Area */}
       <main className="flex-1 pt-4 sm:pt-6 md:pt-8 pb-24 xl:pb-12">
-        
-        {/* If a place is selected, show PlaceDetailView regardless of tab */}
-        {selectedPlace ? (
-          <PlaceDetailView
-            place={selectedPlace}
-            onBack={handleBack}
-            onSelectHotel={handleSelectHotel}
-            onSelectRestaurant={handleSelectRestaurant}
-            onAddToTrip={handleAddToTrip}
-          />
-        ) : (
-          <>
-            {currentTab === 'home' && (
-              <HomeView
-                onSelectPlace={handleSelectPlace}
-                onSelectHotel={handleSelectHotel}
-                onSelectRestaurant={handleSelectRestaurant}
-                onNavigateTab={handleNavigateTab}
-                onAddToTrip={handleAddToTrip}
-              />
-            )}
+        <React.Suspense fallback={<ViewLoadingFallback />}>
+          {/* If a place is selected, show PlaceDetailView regardless of tab */}
+          {selectedPlace ? (
+            <PlaceDetailView
+              place={selectedPlace}
+              onBack={handleBack}
+              onSelectHotel={handleSelectHotel}
+              onSelectRestaurant={handleSelectRestaurant}
+              onAddToTrip={handleAddToTrip}
+            />
+          ) : (
+            <>
+              {currentTab === 'home' && (
+                <HomeView
+                  onSelectPlace={handleSelectPlace}
+                  onSelectHotel={handleSelectHotel}
+                  onSelectRestaurant={handleSelectRestaurant}
+                  onNavigateTab={handleNavigateTab}
+                  onAddToTrip={handleAddToTrip}
+                />
+              )}
 
-            {currentTab === 'explore' && (
-              <ExploreView
-                onSelectPlace={handleSelectPlace}
-                onSelectHotel={handleSelectHotel}
-                onSelectRestaurant={handleSelectRestaurant}
-                onAddToTrip={handleAddToTrip}
-                initialDistrictId={selectedDistrictId}
-              />
-            )}
+              {currentTab === 'explore' && (
+                <ExploreView
+                  onSelectPlace={handleSelectPlace}
+                  onSelectHotel={handleSelectHotel}
+                  onSelectRestaurant={handleSelectRestaurant}
+                  onAddToTrip={handleAddToTrip}
+                  initialDistrictId={selectedDistrictId}
+                />
+              )}
 
-            {currentTab === 'places' && (
-              <PlacesView
-                onSelectPlace={handleSelectPlace}
-                onAddToTrip={handleAddToTrip}
-                initialSearch={searchInitialQuery}
-              />
-            )}
+              {currentTab === 'places' && (
+                <PlacesView
+                  onSelectPlace={handleSelectPlace}
+                  onAddToTrip={handleAddToTrip}
+                  initialSearch={searchInitialQuery}
+                />
+              )}
 
-            {currentTab === 'hotels' && (
-              <HotelsView
-                onSelectHotel={handleSelectHotel}
-                selectedHotelModal={selectedHotelModal}
-                onCloseModal={() => setSelectedHotelModal(null)}
-              />
-            )}
+              {currentTab === 'hotels' && (
+                <HotelsView
+                  onSelectHotel={handleSelectHotel}
+                  selectedHotelModal={selectedHotelModal}
+                  onCloseModal={() => setSelectedHotelModal(null)}
+                />
+              )}
 
-            {currentTab === 'food' && (
-              <FoodView
-                onSelectRestaurant={handleSelectRestaurant}
-              />
-            )}
+              {currentTab === 'food' && (
+                <FoodView
+                  onSelectRestaurant={handleSelectRestaurant}
+                />
+              )}
 
-            {currentTab === 'transport' && (
-              <TransportView />
-            )}
+              {currentTab === 'transport' && (
+                <TransportView />
+              )}
 
-            {currentTab === 'shopping' && (
-              <ShoppingView />
-            )}
+              {currentTab === 'shopping' && (
+                <ShoppingView />
+              )}
 
-            {currentTab === 'ride' && (
-              <RideView />
-            )}
+              {currentTab === 'ride' && (
+                <RideView />
+              )}
 
-            {currentTab === 'trips' && (
-              <TripPlannerView
-                onSelectPlace={handleSelectPlace}
-              />
-            )}
+              {currentTab === 'trips' && (
+                <TripPlannerView
+                  onSelectPlace={handleSelectPlace}
+                />
+              )}
 
-            {currentTab === 'notes' && (
-              <KeepNotesView />
-            )}
+              {currentTab === 'notes' && (
+                <KeepNotesView />
+              )}
 
-            {currentTab === 'favorites' && (
-              <FavoritesView
-                onSelectPlace={handleSelectPlace}
-                onSelectHotel={handleSelectHotel}
-                onSelectRestaurant={handleSelectRestaurant}
-                onAddToTrip={handleAddToTrip}
-              />
-            )}
+              {currentTab === 'favorites' && (
+                <FavoritesView
+                  onSelectPlace={handleSelectPlace}
+                  onSelectHotel={handleSelectHotel}
+                  onSelectRestaurant={handleSelectRestaurant}
+                  onAddToTrip={handleAddToTrip}
+                />
+              )}
 
-            {currentTab === 'emergency' && (
-              <EmergencyServiceView />
-            )}
+              {currentTab === 'emergency' && (
+                <EmergencyServiceView />
+              )}
 
-            {currentTab === 'profile' && (
-              <ProfileView
-                onNavigateTab={handleNavigateTab}
-                onOpenAuth={() => setIsAuthOpen(true)}
-                onOpenPrivacy={() => setIsPrivacyOpen(true)}
-              />
-            )}
+              {currentTab === 'profile' && (
+                <ProfileView
+                  onNavigateTab={handleNavigateTab}
+                  onOpenAuth={() => setIsAuthOpen(true)}
+                  onOpenPrivacy={() => setIsPrivacyOpen(true)}
+                />
+              )}
 
-            {currentTab === 'admin' && (
-              <AdminView />
-            )}
-          </>
-        )}
-
+              {currentTab === 'admin' && (
+                <AdminView onBackToHome={() => handleNavigateTab('home')} />
+              )}
+            </>
+          )}
+        </React.Suspense>
       </main>
 
       {/* Footer */}

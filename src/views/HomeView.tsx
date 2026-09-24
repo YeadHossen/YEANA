@@ -237,37 +237,43 @@ export const HomeView: React.FC<HomeViewProps> = ({
       {/* ========================================================================= */}
       {/* 1. HERO SECTION: ALL-IN-ONE BANGLADESHI TRAVEL HUB                       */}
       {/* ========================================================================= */}
+      {/* ========================================================================= */}
+      {/* 1. HERO SECTION: ALL-IN-ONE BANGLADESHI TRAVEL HUB                       */}
+      {/* ========================================================================= */}
       <section className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 w-full">
-        <div className="relative rounded-3xl sm:rounded-4xl overflow-hidden bg-slate-950 text-white min-h-[500px] sm:min-h-[600px] flex flex-col justify-center px-4 sm:px-12 py-10 sm:py-20 shadow-2xl border border-white/10 w-full">
+        <div className="relative rounded-3xl sm:rounded-4xl overflow-hidden bg-slate-950 text-white min-h-[500px] sm:min-h-[600px] flex flex-col justify-center px-4 sm:px-12 py-10 sm:py-20 shadow-2xl border border-white/15 w-full">
 
-          {/* Ambient Nature Background */}
+          {/* Ambient Nature Background with Radiant Color Aura */}
           <div className="absolute inset-0 z-0">
             <img
               src="https://images.unsplash.com/photo-1596895111956-bf1cf0599ce5?w=1600&auto=format&fit=crop&q=85"
               alt="Explore Beautiful Bangladesh"
-              className="w-full h-full object-cover object-center opacity-40 scale-105 transition-transform duration-1000"
+              className="w-full h-full object-cover object-center opacity-45 scale-105 transition-transform duration-1000"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/75 to-slate-950/35" />
-            <div className="absolute -top-32 -left-32 w-96 h-96 bg-shyamol-600/25 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute -bottom-32 -right-32 w-96 h-96 bg-surjo-600/20 rounded-full blur-3xl pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-shorisha-500/15 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/80 to-slate-950/40" />
+            
+            {/* Luminous Colored Atmosphere Orbs */}
+            <div className="absolute -top-32 -left-32 w-[420px] h-[420px] bg-emerald-500/30 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute -bottom-32 -right-32 w-[420px] h-[420px] bg-sky-500/28 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-1/3 right-1/4 w-[340px] h-[340px] bg-amber-500/22 rounded-full blur-[90px] pointer-events-none" />
+            <div className="absolute -bottom-20 left-1/3 w-[300px] h-[300px] bg-rose-500/18 rounded-full blur-[90px] pointer-events-none" />
           </div>
 
           {/* Hero Content */}
           <div className="relative z-10 max-w-4xl space-y-6 mx-auto text-center w-full">
 
             {/* Dynamic Time Greeting & Seasonal Chip */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-900/80 border border-emerald-500/40 text-emerald-300 text-xs font-bold backdrop-blur-xl shadow-lg animate-float max-w-full">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-slate-900/85 border border-emerald-400/40 text-emerald-300 text-xs font-bold backdrop-blur-xl shadow-lg shadow-emerald-950/30 animate-float max-w-full">
               <span className="text-base">{greeting.icon}</span>
               <span className="font-bold text-white">{greeting.text}!</span>
               <span className="text-slate-400">•</span>
-              <span className="text-emerald-400 font-medium truncate">{greeting.tag}</span>
+              <span className="text-emerald-300 font-semibold truncate">{greeting.tag}</span>
             </div>
 
             <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black tracking-tight leading-tight font-heading">
               {language === 'bn' ? 'চলুন ঘুরে আসি ' : 'Explore Beautiful '}
               <br className="hidden sm:block" />
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-shorisha-400 to-surjo-400 drop-shadow-sm">
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 via-teal-200 via-amber-300 to-sky-300 drop-shadow-md">
                 {language === 'bn' ? 'রূপসী বাংলাদেশ' : 'Bangladesh'}
               </span>
             </h1>
@@ -283,13 +289,13 @@ export const HomeView: React.FC<HomeViewProps> = ({
             <div className="max-w-2xl mx-auto space-y-3 pt-2 w-full">
               
               {/* Quick Service Tab Selectors */}
-              <div className="flex items-center justify-start sm:justify-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-slate-900/80 border border-white/15 backdrop-blur-xl w-full max-w-full scrollbar-none">
+              <div className="flex items-center justify-start sm:justify-center gap-1.5 overflow-x-auto p-1.5 rounded-2xl bg-slate-900/85 border border-white/20 backdrop-blur-xl w-full max-w-full scrollbar-none shadow-lg">
                 {[
-                  { id: 'destinations', label: language === 'bn' ? '📍 দর্শনীয় স্থান' : '📍 Destinations', activeBg: 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-950/30' },
-                  { id: 'hotels', label: language === 'bn' ? '🏨 হোটেল ও রিসোর্ট' : '🏨 Hotels & Stays', activeBg: 'bg-gradient-to-r from-indigo-600 to-blue-600 shadow-indigo-950/30' },
-                  { id: 'transport', label: language === 'bn' ? '🚌 বাস ও ট্রেন সিট' : '🚌 Transit Seats', activeBg: 'bg-gradient-to-r from-sky-600 to-cyan-600 shadow-sky-950/30' },
-                  { id: 'food', label: language === 'bn' ? '🍛 বিখ্যাত খাবার' : '🍛 Famous Food', activeBg: 'bg-gradient-to-r from-amber-600 to-orange-600 shadow-amber-950/30' },
-                  { id: 'shopping', label: language === 'bn' ? '🛍️ তাঁত ও পোশাক' : '🛍️ Native Crafts', activeBg: 'bg-gradient-to-r from-purple-600 to-fuchsia-600 shadow-purple-950/30' },
+                  { id: 'destinations', label: language === 'bn' ? '📍 দর্শনীয় স্থান' : '📍 Destinations', activeBg: 'bg-gradient-to-r from-emerald-600 to-teal-600 shadow-emerald-950/40' },
+                  { id: 'hotels', label: language === 'bn' ? '🏨 হোটেল ও রিসোর্ট' : '🏨 Hotels & Stays', activeBg: 'bg-gradient-to-r from-indigo-600 to-blue-600 shadow-indigo-950/40' },
+                  { id: 'transport', label: language === 'bn' ? '🚌 বাস ও ট্রেন সিট' : '🚌 Transit Seats', activeBg: 'bg-gradient-to-r from-sky-600 to-cyan-600 shadow-sky-950/40' },
+                  { id: 'food', label: language === 'bn' ? '🍛 বিখ্যাত খাবার' : '🍛 Famous Food', activeBg: 'bg-gradient-to-r from-amber-600 to-orange-600 shadow-amber-950/40' },
+                  { id: 'shopping', label: language === 'bn' ? '🛍️ তাঁত ও পোশাক' : '🛍️ Native Crafts', activeBg: 'bg-gradient-to-r from-purple-600 to-fuchsia-600 shadow-purple-950/40' },
                 ].map(tab => (
                   <button
                     key={tab.id}
@@ -309,7 +315,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
               {/* Smart Search Form */}
               <form
                 onSubmit={handleHeroSearch}
-                className="p-1.5 sm:p-2.5 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-2xl border border-white/60 flex flex-col sm:flex-row items-center gap-2 shadow-emerald-950/20 w-full max-w-full"
+                className="p-1.5 sm:p-2.5 rounded-3xl bg-white/95 backdrop-blur-2xl shadow-2xl border border-white/80 flex flex-col sm:flex-row items-center gap-2 shadow-emerald-950/25 w-full max-w-full"
               >
                 <div className="flex items-center gap-2 px-3 sm:px-4 py-2 sm:py-2.5 flex-1 w-full min-w-0">
                   <MapPin className="w-5 h-5 text-emerald-700 shrink-0" />
@@ -330,7 +336,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                 <button
                   type="submit"
-                  className="w-full sm:w-auto px-6 py-3 sm:py-3.5 rounded-2xl bg-gradient-to-r from-emerald-700 via-teal-700 to-amber-600 hover:from-emerald-800 hover:to-amber-700 text-white text-xs sm:text-sm font-black shadow-lg shadow-emerald-700/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 hover:shadow-glow-emerald text-center"
+                  className="w-full sm:w-auto px-6 py-3 sm:py-3.5 rounded-2xl btn-primary-gradient text-white text-xs sm:text-sm font-black shadow-lg transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 text-center"
                 >
                   <Search className="w-4 h-4" />
                   <span>{language === 'bn' ? 'সন্ধান করুন' : 'Search'}</span>
@@ -339,7 +345,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
               {/* Trending Destination Pills */}
               <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 pt-1 text-xs max-w-full">
-                <span className="text-amber-400 font-bold">{language === 'bn' ? 'জনপ্রিয়:' : 'Popular:'}</span>
+                <span className="text-amber-300 font-black">{language === 'bn' ? 'জনপ্রিয়:' : 'Popular:'}</span>
                 {[
                   { name: language === 'bn' ? 'কক্সবাজার' : "Cox's Bazar", query: "Cox's Bazar", icon: '🌊', color: 'hover:border-sky-400 hover:text-sky-300' },
                   { name: language === 'bn' ? 'সাজেক' : 'Sajek', query: 'Sajek', icon: '☁️', color: 'hover:border-emerald-400 hover:text-emerald-300' },
@@ -352,7 +358,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   <button
                     key={item.query}
                     onClick={() => onNavigateTab('places', { search: item.query })}
-                    className={`px-2.5 sm:px-3 py-1 rounded-full bg-white/10 hover:bg-white/20 text-white font-bold border border-white/20 transition-all backdrop-blur-md shadow-xs flex items-center gap-1 text-[11px] sm:text-xs ${item.color}`}
+                    className={`px-2.5 sm:px-3 py-1 rounded-full bg-white/10 hover:bg-white/25 text-white font-bold border border-white/25 transition-all backdrop-blur-md shadow-xs flex items-center gap-1 text-[11px] sm:text-xs ${item.color}`}
                   >
                     <span>{item.icon}</span>
                     <span>{item.name}</span>
@@ -362,22 +368,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
             </div>
 
-            {/* Real-time Metric Badges with Jewel-tone Colors */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-3 max-w-2xl mx-auto text-white w-full">
-              <div className="p-3 rounded-2xl bg-emerald-950/50 border border-emerald-500/40 backdrop-blur-md shadow-lg shadow-emerald-950/30">
-                <span className="text-xl font-black text-emerald-400 font-heading block">64</span>
+            {/* Real-time Metric Badges with Radiant Jewel Tones */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 pt-3 max-w-2xl mx-auto text-white w-full">
+              <div className="p-3 rounded-2xl bg-emerald-950/60 border border-emerald-400/40 backdrop-blur-md shadow-lg shadow-emerald-950/40 hover:border-emerald-300 transition-colors">
+                <span className="text-xl font-black text-emerald-300 font-heading block">64</span>
                 <span className="text-[11px] text-emerald-200/90 font-semibold">{language === 'bn' ? 'সমগ্র বাংলাদেশ কাভারেজ' : 'Districts Covered'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-sky-950/50 border border-sky-500/40 backdrop-blur-md shadow-lg shadow-sky-950/30">
-                <span className="text-xl font-black text-sky-400 font-heading block">2,500+</span>
+              <div className="p-3 rounded-2xl bg-sky-950/60 border border-sky-400/40 backdrop-blur-md shadow-lg shadow-sky-950/40 hover:border-sky-300 transition-colors">
+                <span className="text-xl font-black text-sky-300 font-heading block">2,500+</span>
                 <span className="text-[11px] text-sky-200/90 font-semibold">{language === 'bn' ? 'প্রাকৃতিক ও ঐতিহ্য স্থান' : 'Scenic Spots'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-indigo-950/50 border border-indigo-500/40 backdrop-blur-md shadow-lg shadow-indigo-950/30">
+              <div className="p-3 rounded-2xl bg-indigo-950/60 border border-indigo-400/40 backdrop-blur-md shadow-lg shadow-indigo-950/40 hover:border-indigo-300 transition-colors">
                 <span className="text-xl font-black text-indigo-300 font-heading block">1,000+</span>
                 <span className="text-[11px] text-indigo-200/90 font-semibold">{language === 'bn' ? 'লাইভ রুম রিজার্ভেশন' : 'Verified Hotels'}</span>
               </div>
-              <div className="p-3 rounded-2xl bg-amber-950/50 border border-amber-500/40 backdrop-blur-md shadow-lg shadow-amber-950/30">
-                <span className="text-xl font-black text-amber-400 font-heading block">Live</span>
+              <div className="p-3 rounded-2xl bg-amber-950/60 border border-amber-400/40 backdrop-blur-md shadow-lg shadow-amber-950/40 hover:border-amber-300 transition-colors">
+                <span className="text-xl font-black text-amber-300 font-heading block">Live</span>
                 <span className="text-[11px] text-amber-200/90 font-semibold">{language === 'bn' ? 'বাস, ট্রেন ও লঞ্চ সিট' : 'Transit Seats'}</span>
               </div>
             </div>
@@ -400,9 +406,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               icon: Compass, 
               cardClass: 'cat-card-emerald', 
               iconColor: 'text-emerald-700', 
-              iconBg: 'bg-emerald-100/90 border border-emerald-200', 
+              iconBg: 'bg-emerald-100/90 border border-emerald-300/80 shadow-xs', 
               badge: '🌿 Natural', 
-              badgeColor: 'bg-emerald-100 text-emerald-800' 
+              badgeClass: 'badge-jewel-emerald' 
             },
             { 
               id: 'hotels', 
@@ -411,9 +417,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               icon: HotelIcon, 
               cardClass: 'cat-card-indigo', 
               iconColor: 'text-indigo-700', 
-              iconBg: 'bg-indigo-100/90 border border-indigo-200', 
+              iconBg: 'bg-indigo-100/90 border border-indigo-300/80 shadow-xs', 
               badge: '⭐ Verified', 
-              badgeColor: 'bg-indigo-100 text-indigo-800' 
+              badgeClass: 'badge-jewel-sky' 
             },
             { 
               id: 'food', 
@@ -422,9 +428,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               icon: Utensils, 
               cardClass: 'cat-card-amber', 
               iconColor: 'text-amber-700', 
-              iconBg: 'bg-amber-100/90 border border-amber-200', 
+              iconBg: 'bg-amber-100/90 border border-amber-300/80 shadow-xs', 
               badge: '🍛 GI Taste', 
-              badgeColor: 'bg-amber-100 text-amber-900' 
+              badgeClass: 'badge-jewel-gold' 
             },
             { 
               id: 'transport', 
@@ -433,9 +439,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               icon: Bus, 
               cardClass: 'cat-card-sky', 
               iconColor: 'text-sky-700', 
-              iconBg: 'bg-sky-100/90 border border-sky-200', 
+              iconBg: 'bg-sky-100/90 border border-sky-300/80 shadow-xs', 
               badge: '🎫 Live Seats', 
-              badgeColor: 'bg-sky-100 text-sky-800' 
+              badgeClass: 'badge-jewel-sky' 
             },
             { 
               id: 'shopping', 
@@ -444,9 +450,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               icon: ShoppingBag, 
               cardClass: 'cat-card-purple', 
               iconColor: 'text-purple-700', 
-              iconBg: 'bg-purple-100/90 border border-purple-200', 
+              iconBg: 'bg-purple-100/90 border border-purple-300/80 shadow-xs', 
               badge: '✨ Artisan', 
-              badgeColor: 'bg-purple-100 text-purple-800' 
+              badgeClass: 'badge-jewel-purple' 
             },
             { 
               id: 'ride', 
@@ -455,9 +461,9 @@ export const HomeView: React.FC<HomeViewProps> = ({
               icon: Car, 
               cardClass: 'cat-card-rose', 
               iconColor: 'text-rose-700', 
-              iconBg: 'bg-rose-100/90 border border-rose-200', 
+              iconBg: 'bg-rose-100/90 border border-rose-300/80 shadow-xs', 
               badge: '🚙 4x4 Jeeps', 
-              badgeColor: 'bg-rose-100 text-rose-800' 
+              badgeClass: 'badge-jewel-rose' 
             },
           ].map(cat => {
             const Icon = cat.icon;
@@ -468,11 +474,11 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 className={`p-4 rounded-3xl transition-all duration-300 flex flex-col items-center justify-center gap-2.5 group hover:-translate-y-1.5 relative overflow-hidden ${cat.cardClass}`}
               >
                 {/* Floating Micro Badge */}
-                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cat.badgeColor} shadow-2xs`}>
+                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cat.badgeClass}`}>
                   {cat.badge}
                 </span>
 
-                <div className={`w-12 h-12 rounded-2xl ${cat.iconBg} shadow-sm flex items-center justify-center group-hover:scale-110 group-hover:shadow-md transition-all duration-300`}>
+                <div className={`w-12 h-12 rounded-2xl ${cat.iconBg} flex items-center justify-center group-hover:scale-110 group-hover:shadow-md transition-all duration-300`}>
                   <Icon className={`w-6 h-6 ${cat.iconColor} transition-transform duration-300 group-hover:scale-105`} />
                 </div>
                 
@@ -906,18 +912,18 @@ export const HomeView: React.FC<HomeViewProps> = ({
               </h4>
             </div>
 
-            {/* Trusted Payment Badges */}
+            {/* Trusted Local & Global Payment Badges */}
             <div className="flex items-center gap-2 flex-wrap">
-              <span className="px-3 py-1.5 rounded-xl bg-pink-950/80 border border-pink-500/40 text-pink-300 font-black text-xs font-mono">
+              <span className="px-3 py-1.5 rounded-xl bg-[#e2136e]/20 border border-[#e2136e]/50 text-[#ff4d94] font-black text-xs font-mono shadow-xs">
                 bKash বিকাশ
               </span>
-              <span className="px-3 py-1.5 rounded-xl bg-amber-950/80 border border-amber-500/40 text-amber-300 font-black text-xs font-mono">
+              <span className="px-3 py-1.5 rounded-xl bg-[#f7941d]/20 border border-[#f7941d]/50 text-[#fbbf24] font-black text-xs font-mono shadow-xs">
                 Nagad নগদ
               </span>
-              <span className="px-3 py-1.5 rounded-xl bg-purple-950/80 border border-purple-500/40 text-purple-300 font-black text-xs font-mono">
+              <span className="px-3 py-1.5 rounded-xl bg-[#8c388c]/25 border border-[#c084fc]/50 text-[#d8b4fe] font-black text-xs font-mono shadow-xs">
                 Rocket রকেট
               </span>
-              <span className="px-3 py-1.5 rounded-xl bg-blue-950/80 border border-blue-500/40 text-blue-300 font-black text-xs font-mono">
+              <span className="px-3 py-1.5 rounded-xl bg-sky-500/20 border border-sky-400/50 text-sky-300 font-black text-xs font-mono shadow-xs">
                 Visa / Master
               </span>
             </div>
@@ -925,35 +931,72 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
           {/* Emergency Helplines for Travelers in Bangladesh */}
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-rose-500/20 text-rose-400 flex items-center justify-center font-black text-sm shrink-0">
-                🚨 999
+            <a 
+              href="tel:999"
+              className="p-4 rounded-2xl bg-white/5 hover:bg-rose-500/15 border border-white/10 hover:border-rose-400/50 flex items-center justify-between gap-3 transition-all active:scale-95 group shadow-xs hover:shadow-glow-crimson"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-rose-500/25 text-rose-300 flex items-center justify-center font-black text-sm shrink-0 border border-rose-500/40 shadow-xs">
+                  🚨 999
+                </div>
+                <div>
+                  <strong className="text-white block font-bold group-hover:text-rose-300 transition-colors">
+                    {language === 'bn' ? 'জাতীয় জরুরি সেবা (৯৯৯)' : 'National Emergency (999)'}
+                  </strong>
+                  <span className="text-slate-400 text-[11px]">
+                    {language === 'bn' ? 'পুলিশ, অ্যাম্বুলেন্স ও ফায়ার সার্ভিস' : 'Police, Ambulance & Fire Services'}
+                  </span>
+                </div>
               </div>
-              <div>
-                <strong className="text-white block font-bold">{language === 'bn' ? 'জাতীয় জরুরি সেবা' : 'National Emergency 999'}</strong>
-                <span className="text-slate-400 text-[11px]">{language === 'bn' ? 'পুলিশ, অ্যাম্বুলেন্স ও ফায়ার সার্ভিস' : 'Police, Ambulance & Fire Services'}</span>
-              </div>
-            </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-rose-500/25 text-rose-200 border border-rose-500/40 shrink-0">
+                {language === 'bn' ? 'কল করুন' : 'Tap to Call'}
+              </span>
+            </a>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-black text-sm shrink-0">
-                👮‍♂️ 01320
+            <a 
+              href="tel:01320163599"
+              className="p-4 rounded-2xl bg-white/5 hover:bg-emerald-500/15 border border-white/10 hover:border-emerald-400/50 flex items-center justify-between gap-3 transition-all active:scale-95 group shadow-xs hover:shadow-glow-emerald"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-emerald-500/25 text-emerald-300 flex items-center justify-center font-black text-sm shrink-0 border border-emerald-500/40 shadow-xs">
+                  👮‍♂️ SOS
+                </div>
+                <div>
+                  <strong className="text-white block font-bold group-hover:text-emerald-300 transition-colors">
+                    {language === 'bn' ? 'বাংলাদেশ ট্যুরিস্ট পুলিশ' : 'Bangladesh Tourist Police'}
+                  </strong>
+                  <span className="text-slate-400 text-[11px]">
+                    {language === 'bn' ? 'হটলাইন: 01320-163599' : 'Hotline: 01320-163599'}
+                  </span>
+                </div>
               </div>
-              <div>
-                <strong className="text-white block font-bold">{language === 'bn' ? 'বাংলাদেশ ট্যুরিস্ট পুলিশ' : 'Bangladesh Tourist Police'}</strong>
-                <span className="text-slate-400 text-[11px]">{language === 'bn' ? 'হটলাইন: 01320-163599' : 'Hotline: 01320-163599'}</span>
-              </div>
-            </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-emerald-500/25 text-emerald-200 border border-emerald-500/40 shrink-0">
+                {language === 'bn' ? 'কল করুন' : 'Direct Call'}
+              </span>
+            </a>
 
-            <div className="p-4 rounded-2xl bg-white/5 border border-white/10 flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-sky-500/20 text-sky-400 flex items-center justify-center font-black text-sm shrink-0">
-                💬 24/7
+            <button 
+              type="button"
+              onClick={() => onNavigateTab('emergency')}
+              className="p-4 rounded-2xl bg-white/5 hover:bg-sky-500/15 border border-white/10 hover:border-sky-400/50 flex items-center justify-between gap-3 transition-all active:scale-95 text-left group shadow-xs hover:shadow-glow-sky"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-xl bg-sky-500/25 text-sky-300 flex items-center justify-center font-black text-sm shrink-0 border border-sky-500/40 shadow-xs">
+                  🛡️ 24/7
+                </div>
+                <div>
+                  <strong className="text-white block font-bold group-hover:text-sky-300 transition-colors">
+                    {language === 'bn' ? '৬৪ জেলার জরুরি সেবা ডিরেক্টরি' : '64 District Safety Directory'}
+                  </strong>
+                  <span className="text-slate-400 text-[11px]">
+                    {language === 'bn' ? 'নিকটস্থ হাসপাতাল ও পুলিশ স্টেশন' : 'Nearest Police & Trauma Care'}
+                  </span>
+                </div>
               </div>
-              <div>
-                <strong className="text-white block font-bold">{language === 'bn' ? 'YEANA কনসিয়ার্জ হেল্প' : 'YEANA Concierge Help'}</strong>
-                <span className="text-slate-400 text-[11px]">{language === 'bn' ? 'লাইভ ট্রাভেল সাপোর্ট' : 'Live Chat & Instant Travel Support'}</span>
-              </div>
-            </div>
+              <span className="text-[10px] font-bold px-2.5 py-1 rounded-lg bg-sky-500/25 text-sky-200 border border-sky-500/40 shrink-0">
+                {language === 'bn' ? 'দেখুন' : 'Open'}
+              </span>
+            </button>
           </div>
 
         </div>

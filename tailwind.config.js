@@ -72,6 +72,17 @@ export default {
           rose: '#f43f5e',
           emerald: '#10b981',
           sky: '#0ea5e9',
+        },
+        trust: {
+          forest: '#064e3b',
+          emerald: '#047857',
+          mint: '#ecfdf5',
+          slate: '#0f172a',
+          navy: '#1e293b',
+          cobalt: '#0369a1',
+          amber: '#d97706',
+          brass: '#b45309',
+          crimson: '#be123c',
         }
       },
       fontFamily: {
@@ -82,6 +93,9 @@ export default {
       boxShadow: {
         'soft': '0 4px 20px -2px rgba(4, 120, 87, 0.08), 0 2px 6px -1px rgba(0, 0, 0, 0.04)',
         'card': '0 10px 30px -5px rgba(0, 0, 0, 0.06), 0 4px 10px -2px rgba(0, 0, 0, 0.02)',
+        'card-realistic': '0 1px 2px 0 rgba(15, 23, 42, 0.05), 0 10px 25px -4px rgba(15, 23, 42, 0.07)',
+        'card-hover': '0 2px 6px 0 rgba(15, 23, 42, 0.06), 0 16px 36px -6px rgba(4, 120, 87, 0.14)',
+        'tactile': '0 2px 4px 0 rgba(15, 23, 42, 0.04), 0 1px 2px 0 rgba(15, 23, 42, 0.02)',
         'elevated': '0 20px 40px -10px rgba(4, 120, 87, 0.18)',
         'glass': '0 8px 32px 0 rgba(15, 23, 42, 0.08)',
         'glass-hover': '0 16px 40px 0 rgba(5, 150, 105, 0.22)',
@@ -89,6 +103,10 @@ export default {
         'glow-gold': '0 0 25px -5px rgba(245, 158, 11, 0.45)',
         'glow-crimson': '0 0 25px -5px rgba(225, 29, 72, 0.45)',
         'glow-sky': '0 0 25px -5px rgba(14, 165, 233, 0.45)',
+        'glow-sapphire': '0 0 25px -5px rgba(2, 132, 199, 0.45)',
+        'glow-purple': '0 0 25px -5px rgba(147, 51, 234, 0.45)',
+        'glow-teal': '0 0 25px -5px rgba(13, 148, 136, 0.45)',
+        'jewel': '0 8px 24px -4px rgba(15, 23, 42, 0.08), inset 0 1px 1px 0 rgba(255, 255, 255, 0.95)',
       },
     },
   },

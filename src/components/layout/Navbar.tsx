@@ -75,7 +75,10 @@ export const Navbar: React.FC<NavbarProps> = ({
   }, []);
 
   return (
-    <header className="sticky top-0 z-40 bg-white/85 backdrop-blur-2xl border-b border-white/60 shadow-glass transition-all">
+    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-2xl border-b border-white/70 shadow-glass transition-all">
+      {/* Radiant Heritage Accent Top Line */}
+      <div className="h-[2.5px] w-full bg-gradient-to-r from-emerald-600 via-teal-400 via-amber-400 to-sky-500 opacity-90 shadow-xs" />
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           
@@ -96,7 +99,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                 <button
                   key={link.id}
                   onClick={() => setCurrentTab(link.id)}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border ${
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 border relative ${
                     isActive 
                       ? `${link.active} font-black shadow-xs scale-102` 
                       : 'border-transparent text-slate-600 hover:text-slate-900 hover:bg-white/80'
@@ -104,6 +107,9 @@ export const Navbar: React.FC<NavbarProps> = ({
                 >
                   <Icon className={`w-3.5 h-3.5 transition-colors ${isActive ? link.color : 'text-slate-400'}`} />
                   <span>{link.label}</span>
+                  {isActive && (
+                    <span className={`w-1.5 h-1.5 rounded-full ${link.dot} animate-pulse shrink-0`} />
+                  )}
                 </button>
               );
             })}
@@ -175,38 +181,40 @@ export const Navbar: React.FC<NavbarProps> = ({
               )}
             </button>
 
-            {/* Company E-Portal Live Access Button */}
-            <button
-              onClick={() => setCurrentTab('admin')}
-              className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-xs ${
-                currentTab === 'admin'
-                  ? 'bg-slate-950 text-emerald-400 border-slate-800 shadow-md ring-2 ring-emerald-500/20'
-                  : 'bg-slate-900 hover:bg-slate-800 text-white border-slate-800'
-              }`}
-              title="Company E-Portal & Booking System"
-            >
-              <Building2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Company Portal</span>
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            </button>
-
-            {/* Admin Badge/Link if Admin */}
-            {isAdmin && (
+            {/* Portal / Admin Access: Unified & Role-Adaptive */}
+            {isAdmin ? (
               <button
                 onClick={() => setCurrentTab('admin')}
-                className={`hidden md:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all relative ${
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all relative shadow-xs ${
                   currentTab === 'admin' 
-                    ? 'bg-amber-500 text-white shadow-sm' 
-                    : 'bg-amber-100 text-amber-900 hover:bg-amber-200'
+                    ? 'bg-amber-500 text-white shadow-md ring-2 ring-amber-400/40' 
+                    : 'bg-amber-100/90 text-amber-950 hover:bg-amber-200 border border-amber-300/60'
                 }`}
+                title="YEANA Administrator Console & Live Booking Portal"
               >
-                <ShieldCheck className="w-4 h-4" />
-                <span>Admin</span>
-                {unreadAdminCount > 0 && (
+                <ShieldCheck className="w-3.5 h-3.5 text-amber-700" />
+                <span>Admin Console</span>
+                {unreadAdminCount > 0 ? (
                   <span className="px-1.5 py-0.2 bg-rose-500 text-white text-[10px] font-black rounded-full animate-pulse">
                     {unreadAdminCount}
                   </span>
+                ) : (
+                  <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
                 )}
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrentTab('admin')}
+                className={`hidden sm:flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border shadow-xs ${
+                  currentTab === 'admin'
+                    ? 'bg-slate-950 text-emerald-400 border-slate-800 shadow-md ring-2 ring-emerald-500/20'
+                    : 'bg-slate-900 hover:bg-slate-800 text-white border-slate-800'
+                }`}
+                title="YEANA Partner & Company E-Portal (Restricted)"
+              >
+                <Building2 className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Company Portal</span>
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               </button>
             )}
 
