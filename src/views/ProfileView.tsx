@@ -293,44 +293,15 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
             </div>
           </div>
 
-          {/* Switch Roles / Enterprise Portals */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
-            <div>
-              <p className="font-bold text-slate-800">Persona & Enterprise Portals</p>
-              <p className="text-slate-400 text-xs">Admin and Company portals require password every time</p>
-            </div>
-            <div className="flex items-center gap-2 flex-wrap">
-              <button
-                onClick={loginDemoTraveler}
-                className="px-3 py-1.5 rounded-xl border border-slate-200 text-slate-700 hover:bg-slate-50 font-bold text-xs"
-              >
-                Traveler
-              </button>
-              <button
-                onClick={() => onNavigateTab('admin')}
-                className="px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 font-bold text-xs flex items-center gap-1.5 shadow-xs"
-                title="Requires Admin Password (admin123)"
-              >
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>Admin Console</span>
-              </button>
-              <button
-                onClick={() => onNavigateTab('admin')}
-                className="px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs flex items-center gap-1.5 shadow-xs"
-                title="Requires Company Password (partner123)"
-              >
-                <Building2 className="w-3.5 h-3.5" />
-                <span>Company E-Portal</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Admin Panel Deep Link if Admin */}
-          {isAdmin && (
-            <div className="flex items-center justify-between pt-4">
+          {/* Enterprise Portal Access */}
+          {isAdmin ? (
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <div>
-                <p className="font-bold text-amber-900">Admin Control Center</p>
-                <p className="text-slate-400 text-xs">Add, edit, or remove platform destinations and listings</p>
+                <p className="font-bold text-amber-900 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-amber-600" />
+                  <span>Admin Control Center</span>
+                </p>
+                <p className="text-slate-400 text-xs">Manage platform destinations, inquiries and listings</p>
               </div>
               <button
                 onClick={() => onNavigateTab('admin')}
@@ -339,14 +310,14 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
                 Open Admin Portal
               </button>
             </div>
-          )}
-
-          {/* Company Panel Deep Link if Company Partner */}
-          {isCompany && (
-            <div className="flex items-center justify-between pt-4">
+          ) : isCompany ? (
+            <div className="flex items-center justify-between pt-4 border-t border-slate-100">
               <div>
-                <p className="font-bold text-blue-900">Company & Fleet E-Portal</p>
-                <p className="text-slate-400 text-xs">Real-time bus seat charts, room inventory & passenger booking manifests</p>
+                <p className="font-bold text-blue-900 flex items-center gap-1.5">
+                  <Building2 className="w-4 h-4 text-blue-600" />
+                  <span>Company & Fleet E-Portal</span>
+                </p>
+                <p className="text-slate-400 text-xs">Real-time seat charts, room inventory & booking manifests</p>
               </div>
               <button
                 onClick={() => onNavigateTab('admin')}
@@ -354,6 +325,31 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
               >
                 Open Company Portal
               </button>
+            </div>
+          ) : (
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100">
+              <div>
+                <p className="font-bold text-slate-800">Enterprise Access Portals</p>
+                <p className="text-slate-400 text-xs">Admin & Company Partner portals (Password required)</p>
+              </div>
+              <div className="flex items-center gap-2 flex-wrap">
+                <button
+                  onClick={() => onNavigateTab('admin')}
+                  className="px-3 py-1.5 rounded-xl bg-amber-500 text-white hover:bg-amber-600 font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                  title="Requires Admin Password (admin123)"
+                >
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Admin Console</span>
+                </button>
+                <button
+                  onClick={() => onNavigateTab('admin')}
+                  className="px-3 py-1.5 rounded-xl bg-blue-600 text-white hover:bg-blue-700 font-bold text-xs flex items-center gap-1.5 shadow-xs"
+                  title="Requires Company Password (partner123)"
+                >
+                  <Building2 className="w-3.5 h-3.5" />
+                  <span>Company Portal</span>
+                </button>
+              </div>
             </div>
           )}
 

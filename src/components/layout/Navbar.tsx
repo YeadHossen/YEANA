@@ -365,40 +365,38 @@ export const Navbar: React.FC<NavbarProps> = ({
                 </button>
               );
             })}
-            <button
-              onClick={() => {
-                setCurrentTab('admin');
-                setMobileMenuOpen(false);
-              }}
-              className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-slate-900 text-emerald-400 border border-slate-800 flex items-center justify-center gap-2 shadow-sm"
-            >
-              <Building2 className="w-4 h-4 text-emerald-400" />
-              <span>🏢 Company E-Portal (কোম্পানি ই-পোর্টাল)</span>
-            </button>
-
-            {isAdmin && (
+            {isAdmin ? (
               <button
                 onClick={() => {
                   setCurrentTab('admin');
                   setMobileMenuOpen(false);
                 }}
-                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-amber-500 text-white flex items-center justify-center gap-2"
+                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-amber-500 text-white flex items-center justify-center gap-2 shadow-sm"
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>{t('nav.admin')}</span>
               </button>
-            )}
-
-            {isCompany && (
+            ) : isCompany ? (
               <button
                 onClick={() => {
                   setCurrentTab('admin');
                   setMobileMenuOpen(false);
                 }}
-                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white flex items-center justify-center gap-2"
+                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white flex items-center justify-center gap-2 shadow-sm"
               >
                 <Building2 className="w-4 h-4" />
                 <span>Company E-Portal</span>
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setCurrentTab('admin');
+                  setMobileMenuOpen(false);
+                }}
+                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-slate-900 text-emerald-400 border border-slate-800 flex items-center justify-center gap-2 shadow-sm"
+              >
+                <Building2 className="w-4 h-4 text-emerald-400" />
+                <span>🏢 Company Portal (Partner Access)</span>
               </button>
             )}
           </div>
