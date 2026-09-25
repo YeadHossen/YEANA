@@ -108,21 +108,21 @@ export const LoginView: React.FC<LoginViewProps> = ({ onLoginSuccess, onOpenPriv
   const handleSelectAdmin = () => {
     setIsSignUp(false);
     setEmail('admin@yeana.com.bd');
-    setPassword('');
+    setPassword('admin123');
     setErrorMsg('');
     setSuccessMsg(language === 'bn' 
-      ? 'অ্যাডমিন অ্যাকাউন্ট সিলেক্ট করা হয়েছে। প্রবেশ করতে পাসওয়ার্ড (admin123) দিন।' 
-      : 'Admin account selected. Enter password (admin123) to sign in.');
+      ? 'অ্যাডমিন অ্যাকাউন্ট সিলেক্ট করা হয়েছে (পাসওয়ার্ড: admin123)।' 
+      : 'Admin account selected (password filled: admin123).');
   };
 
   const handleSelectCompany = () => {
     setIsSignUp(false);
     setEmail('partner@yeana.bd');
-    setPassword('');
+    setPassword('partner123');
     setErrorMsg('');
     setSuccessMsg(language === 'bn' 
-      ? 'কোম্পানি পার্টনার সিলেক্ট করা হয়েছে। প্রবেশ করতে পাসওয়ার্ড (partner123) দিন।' 
-      : 'Company partner selected. Enter password (partner123) to sign in.');
+      ? 'কোম্পানি পার্টনার সিলেক্ট করা হয়েছে (পাসওয়ার্ড: partner123)।' 
+      : 'Company partner selected (password filled: partner123).');
   };
 
   return (

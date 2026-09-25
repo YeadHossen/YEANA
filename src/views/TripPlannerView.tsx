@@ -118,47 +118,62 @@ export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 space-y-8 pb-20">
       
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
-        <div className="space-y-2">
-          <div className="inline-flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-brand-700">
-            <Calendar className="w-4 h-4 text-brand-600" />
-            <span>Itinerary & Budget Creator</span>
+      {/* Visual Panoramic Header Banner */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-slate-900 via-teal-950 to-slate-900 p-6 sm:p-10 text-white shadow-elevated">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-teal-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+        <div className="relative z-10 space-y-4 max-w-3xl">
+          <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-teal-500/20 text-teal-300 text-xs font-black uppercase tracking-wider border border-teal-500/30">
+            <Calendar className="w-3.5 h-3.5" />
+            <span>Smart Tour Builder • Day-by-Day Itinerary & Budgeting</span>
           </div>
-          <h1 className="text-2xl sm:text-4xl font-black text-slate-900 font-sans">
-            Personalized Trip Planner
+
+          <h1 className="text-3xl sm:text-5xl font-black tracking-tight leading-tight font-heading">
+            {language === 'bn' ? 'স্মার্ট ট্যুর ও ভ্রমণ পরিকল্পনাকারী' : 'Personalized Trip & Tour Planner'}
           </h1>
-          <p className="text-sm text-slate-500 max-w-2xl leading-relaxed">
-            Create multi-day itineraries for Bangladesh, organize places per day, estimate total budget, and save for offline exploration.
+
+          <p className="text-sm sm:text-base text-slate-300 leading-relaxed font-normal">
+            {language === 'bn' 
+              ? 'দিনভিত্তিক আকর্ষণসমূহ সাজান, হোটেল ও যাতায়াত ব্যয় হিসাব করুন এবং সম্পূর্ণ ট্যুর প্ল্যান অফলাইনে ডাউনলোড করুন।' 
+              : 'Organize places day-by-day across Bangladesh, allocate budgets for hotels, food, and transport, and export your offline travel package.'}
           </p>
+
+          <div className="pt-1 flex items-center gap-3 flex-wrap">
+            <button
+              onClick={() => setIsCreatingTrip(true)}
+              className="px-5 py-3 rounded-2xl bg-teal-500 hover:bg-teal-400 text-slate-950 text-xs font-black shadow-lg shadow-teal-500/30 transition-all active:scale-95 flex items-center gap-2"
+            >
+              <Plus className="w-4 h-4 text-slate-950" />
+              <span>Create New Tour Plan (নতুন ট্যুর প্ল্যান)</span>
+            </button>
+          </div>
         </div>
 
-        <button
-          onClick={() => setIsCreatingTrip(true)}
-          className="px-5 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white text-xs sm:text-sm font-bold shadow-md shadow-brand-700/20 transition-all flex items-center gap-2 self-start md:self-auto active:scale-95"
-        >
-          <Plus className="w-4 h-4" />
-          <span>New Trip Itinerary</span>
-        </button>
+        <div className="absolute right-[-30px] bottom-[-30px] opacity-10 pointer-events-none">
+          <Compass className="w-80 h-80 text-white" />
+        </div>
       </div>
 
-      {/* Trips Selector Tabs */}
+      {/* Trips Selector Tabs - Modern Segmented Dock */}
       {trips.length > 0 && (
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200 scrollbar-none">
+        <div className="bg-slate-100/90 backdrop-blur-md p-1.5 rounded-3xl border border-slate-200/90 flex items-center gap-1.5 overflow-x-auto scrollbar-none shadow-inner">
           {trips.map(t => {
             const isActive = activeTrip?.id === t.id;
             return (
               <button
                 key={t.id}
                 onClick={() => setActiveTrip(t)}
-                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all flex items-center gap-2 ${
+                className={`px-4 py-2.5 rounded-2xl text-xs font-bold whitespace-nowrap transition-all duration-200 flex items-center gap-2 active:scale-95 ${
                   isActive 
-                    ? 'bg-slate-900 text-white shadow-sm' 
-                    : 'bg-white text-slate-700 hover:bg-slate-50 border border-slate-200'
+                    ? 'bg-slate-900 text-white shadow-md font-black scale-102 ring-1 ring-slate-800' 
+                    : 'bg-white/80 text-slate-700 hover:text-slate-950 hover:bg-white border border-transparent hover:border-slate-200/80 shadow-2xs'
                 }`}
               >
                 <span>{t.title}</span>
-                <span className={`text-[10px] px-1.5 py-0.5 rounded-md ${isActive ? 'bg-slate-800 text-teal-300' : 'bg-slate-100 text-slate-600'}`}>
+                <span className={`text-[10px] px-2 py-0.5 rounded-full font-black ${
+                  isActive ? 'bg-teal-400 text-slate-950' : 'bg-slate-200/80 text-slate-700'
+                }`}>
                   {t.duration_days} Days
                 </span>
               </button>

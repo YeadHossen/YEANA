@@ -28,6 +28,10 @@ import {
   Lock,
   ArrowLeft,
   Eye,
+  EyeOff,
+  KeyRound,
+  Copy,
+  Check,
   Save
 } from 'lucide-react';
 import { DataService } from '../services/dataService';
@@ -46,6 +50,8 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
   const [passwordInput, setPasswordInput] = useState('');
   const [pinError, setPinError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [copiedText, setCopiedText] = useState<string | null>(null);
   const { 
     inquiries, 
     activeInquiry, 
@@ -399,43 +405,44 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
   if (!isAdmin && !isCompany) {
     return (
       <div className="max-w-4xl mx-auto px-4 py-8 sm:py-16">
-        <div className="bg-slate-950 text-white rounded-3xl p-6 sm:p-10 shadow-2xl border border-slate-800 relative overflow-hidden">
+        <div className="bg-slate-950/95 backdrop-blur-2xl text-white rounded-3xl p-6 sm:p-12 shadow-2xl border border-slate-800/90 relative overflow-hidden">
           
-          {/* Ambient Security Glow */}
-          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Ambient Security Glow Radiance */}
+          <div className="absolute top-0 right-0 w-96 h-96 bg-amber-500/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-96 h-96 bg-blue-500/15 rounded-full blur-3xl pointer-events-none" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
           <div className="relative z-10 max-w-xl mx-auto text-center space-y-6">
             
             {/* Header Badge */}
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider">
+            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-black uppercase tracking-wider shadow-inner">
               <ShieldCheck className="w-4 h-4 text-amber-400" />
-              <span>Restricted Zone • Management & Partner Console</span>
+              <span>Restricted Zone • Enterprise Security Console</span>
             </div>
 
             {/* Title & Description */}
             <div className="space-y-2">
-              <h1 className="text-2xl sm:text-3xl font-black text-white font-sans">
+              <h1 className="text-2xl sm:text-4xl font-black text-white font-heading tracking-tight">
                 YEANA Enterprise Security Gateway
               </h1>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-                This portal contains confidential passenger booking manifests, guest telephone numbers, payment reconciliation data, and fleet inventories. Password verification is strictly required every time.
+              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
+                This portal contains confidential passenger manifests, phone directories, revenue reconciliation data, and transport fleet inventories. Password verification is strictly enforced every session.
               </p>
             </div>
 
-            {/* Traveler Account Notice (If traveler user accidentally navigates here) */}
+            {/* Traveler Account Notice (If personal traveler user accidentally navigates here) */}
             {user && user.role === 'user' && (
-              <div className="p-4 rounded-2xl bg-emerald-950/70 border border-emerald-500/40 text-left flex items-start gap-3 text-xs shadow-md">
+              <div className="p-4 rounded-2xl bg-emerald-950/80 border border-emerald-500/40 text-left flex items-start gap-3.5 text-xs shadow-lg backdrop-blur-md">
                 <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
-                <div className="space-y-1.5 w-full">
+                <div className="space-y-2 w-full">
                   <div className="flex items-center justify-between">
-                    <p className="font-bold text-emerald-300">Signed in as Traveler ({user.full_name})</p>
-                    <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black">
+                    <p className="font-bold text-emerald-200">Signed in as Traveler ({user.full_name})</p>
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 text-[10px] font-black border border-emerald-500/30">
                       Traveler Account
                     </span>
                   </div>
                   <p className="text-slate-300 text-[11px] leading-relaxed">
-                    You are currently using your personal Traveler Portal. Admin and Company enterprise portals require staff verification.
+                    You are currently using your personal Traveler account. Admin and Company enterprise portals require staff verification credentials.
                   </p>
                   {onBackToHome && (
                     <button
@@ -452,13 +459,13 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
             )}
 
             {/* Mode Switcher: Admin Console vs Company Partner */}
-            <div className="flex rounded-2xl bg-slate-900 p-1.5 border border-slate-800 text-xs font-black max-w-md mx-auto">
+            <div className="flex rounded-2xl bg-slate-900/90 p-1.5 border border-slate-800 text-xs font-black max-w-md mx-auto shadow-inner">
               <button
                 type="button"
                 onClick={() => { setGatewayMode('admin'); setPinError(''); setPasswordInput(''); }}
                 className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
                   gatewayMode === 'admin'
-                    ? 'bg-amber-500 text-slate-950 shadow-md font-black'
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 shadow-md font-black scale-102'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -470,7 +477,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                 onClick={() => { setGatewayMode('company'); setPinError(''); setPasswordInput(''); }}
                 className={`flex-1 py-2.5 rounded-xl transition-all flex items-center justify-center gap-2 ${
                   gatewayMode === 'company'
-                    ? 'bg-blue-600 text-white shadow-md font-black'
+                    ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md font-black scale-102'
                     : 'text-slate-400 hover:text-white'
                 }`}
               >
@@ -480,15 +487,17 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
             </div>
 
             {/* Security Warning Box */}
-            <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-left flex items-start gap-3">
-              <Lock className="w-5 h-5 text-amber-400 shrink-0 mt-0.5" />
+            <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800/90 text-left flex items-start gap-3.5 backdrop-blur-sm">
+              <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/20 shrink-0">
+                <Lock className="w-4 h-4 text-amber-400" />
+              </div>
               <div className="text-xs text-slate-300 space-y-1">
                 <p className="font-bold text-white">
                   {gatewayMode === 'admin' 
                     ? 'Platform Administrator Authentication' 
                     : 'Company & Fleet Partner Verification'}
                 </p>
-                <p className="text-slate-400 leading-relaxed">
+                <p className="text-slate-400 leading-relaxed text-[11px]">
                   {gatewayMode === 'admin'
                     ? 'Unlock complete control of platform places, hotels, transports, customer inquiries, and booking manifests.'
                     : 'Unlock live company booking manifests, bus seat allocation charts, customer passenger numbers, and room reservation tracking.'}
@@ -497,65 +506,110 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
             </div>
 
             {/* PIN / Password Challenge Form */}
-            <form onSubmit={handleVerifyPin} className="space-y-3 max-w-md mx-auto text-left">
+            <form onSubmit={handleVerifyPin} className="space-y-4 max-w-md mx-auto text-left">
               {pinError && (
-                <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-500/40 text-rose-300 text-xs font-bold animate-in fade-in">
-                  {pinError}
+                <div className="p-3.5 rounded-2xl bg-rose-950/80 border border-rose-500/50 text-rose-200 text-xs font-bold animate-in fade-in flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 text-rose-400 shrink-0" />
+                  <span>{pinError}</span>
                 </div>
               )}
 
               <div>
-                <label className="block text-xs font-bold text-slate-300 mb-1">
-                  {gatewayMode === 'admin' 
-                    ? 'Administrator Master Password (PIN)' 
-                    : 'Company & Partner Access Password'}
+                <label className="block text-xs font-bold text-slate-300 mb-1.5 flex items-center justify-between">
+                  <span>
+                    {gatewayMode === 'admin' 
+                      ? 'Administrator Master Password (PIN)' 
+                      : 'Company & Partner Access Password'}
+                  </span>
+                  <span className="text-[10px] text-amber-400 font-mono font-bold">
+                    {gatewayMode === 'admin' ? 'Pass: admin123' : 'Pass: partner123'}
+                  </span>
                 </label>
                 <div className="relative">
                   <input
-                    type="password"
+                    type={showPassword ? 'text' : 'password'}
                     value={passwordInput}
                     onChange={(e) => setPasswordInput(e.target.value)}
                     placeholder={gatewayMode === 'admin' ? 'Enter admin password (e.g. admin123)' : 'Enter company password (e.g. partner123)'}
-                    className="w-full px-4 py-3 rounded-xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all font-mono"
+                    className="w-full pl-4 pr-11 py-3.5 rounded-2xl bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-amber-500/40 focus:border-amber-500 transition-all font-mono shadow-inner"
                     autoFocus
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white p-1 transition-colors"
+                    title={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
+              </div>
+
+              {/* 1-Click Fast Fill Testing Chips */}
+              <div className="flex items-center gap-2 pt-0.5">
+                <span className="text-[10px] text-slate-400 font-semibold">Quick Autofill:</span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGatewayMode('admin');
+                    setPasswordInput('admin123');
+                    setPinError('');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 text-[11px] font-mono font-bold transition-all active:scale-95"
+                >
+                  ⚡ Fill "admin123"
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setGatewayMode('company');
+                    setPasswordInput('partner123');
+                    setPinError('');
+                  }}
+                  className="px-2.5 py-1 rounded-lg bg-blue-500/15 hover:bg-blue-500/25 border border-blue-500/30 text-cyan-300 text-[11px] font-mono font-bold transition-all active:scale-95"
+                >
+                  ⚡ Fill "partner123"
+                </button>
               </div>
 
               <button
                 type="submit"
                 disabled={isVerifying || !passwordInput.trim()}
-                className={`w-full py-3 rounded-xl font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-40 ${
+                className={`w-full py-3.5 rounded-2xl font-black text-sm flex items-center justify-center gap-2 shadow-lg transition-all active:scale-98 disabled:opacity-40 ${
                   gatewayMode === 'admin'
-                    ? 'bg-amber-500 hover:bg-amber-600 text-slate-950 shadow-amber-500/20'
-                    : 'bg-blue-600 hover:bg-blue-700 text-white shadow-blue-600/20'
+                    ? 'bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-slate-950 shadow-amber-500/25'
+                    : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white shadow-blue-600/25'
                 }`}
               >
                 <Lock className="w-4 h-4" />
                 <span>
-                  {gatewayMode === 'admin' 
-                    ? 'Unlock Admin Console' 
-                    : 'Unlock Company E-Portal'}
+                  {isVerifying ? 'Verifying Credentials...' : gatewayMode === 'admin' ? 'Unlock Admin Console' : 'Unlock Company E-Portal'}
                 </span>
               </button>
             </form>
 
             {/* Official Credentials Hint for Evaluator/Testing */}
-            <div className="pt-3 border-t border-slate-800/80 space-y-2 text-xs">
-              <p className="text-[11px] text-slate-400 font-semibold">Testing Credentials (Password Required Every Time):</p>
-              <div className="text-[11px] text-slate-300 font-mono space-y-1">
-                <p>Admin: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-amber-400 font-bold">admin@yeana.com.bd</code> | Password: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-amber-300 font-bold">admin123</code></p>
-                <p>Company: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-cyan-400 font-bold">partner@yeana.bd</code> | Password: <code className="bg-slate-900 px-1.5 py-0.5 rounded border border-slate-800 text-cyan-300 font-bold">partner123</code></p>
+            <div className="pt-4 border-t border-slate-800/90 space-y-2 text-xs">
+              <p className="text-[11px] text-slate-400 font-semibold">Testing Credentials (Required Every Session):</p>
+              <div className="text-[11px] text-slate-300 font-mono space-y-1.5 max-w-md mx-auto">
+                <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800">
+                  <span>Admin: <strong className="text-amber-400">admin@yeana.com.bd</strong></span>
+                  <span className="text-amber-300 bg-amber-500/10 px-2 py-0.5 rounded border border-amber-500/30">Pass: admin123</span>
+                </div>
+                <div className="flex items-center justify-between p-2 rounded-xl bg-slate-900/90 border border-slate-800">
+                  <span>Partner: <strong className="text-cyan-400">partner@yeana.bd</strong></span>
+                  <span className="text-cyan-300 bg-blue-500/10 px-2 py-0.5 rounded border border-blue-500/30">Pass: partner123</span>
+                </div>
               </div>
 
               {onBackToHome && (
-                <div className="pt-2">
+                <div className="pt-3">
                   <button
                     type="button"
                     onClick={onBackToHome}
-                    className="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold transition-all"
+                    className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white text-xs font-bold transition-all border border-slate-800"
                   >
-                    Return to Traveler Home
+                    ← Return to Traveler Home
                   </button>
                 </div>
               )}
@@ -831,16 +885,16 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
         </div>
       )}
 
-      {/* Navigation Tabs */}
-      <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
+      {/* Navigation Tabs - Modern Segmented Control Dock */}
+      <div className="bg-slate-100/90 backdrop-blur-md p-1.5 rounded-3xl border border-slate-200/90 flex items-center gap-1.5 overflow-x-auto scrollbar-none shadow-inner">
         {[
           { id: 'portal', label: '🏢 Company E-Portal (কোম্পানি ই-পোর্টাল)', icon: Building2 },
-          { id: 'hotels', label: `Manage Hotels (${hotels.length})`, icon: HotelIcon },
-          { id: 'transports', label: `Manage Transport (${transports.length})`, icon: Bus },
-          { id: 'rides', label: `Manage Rides & Rentals (${rides.length})`, icon: Car },
-          { id: 'inquiries', label: `Traveler Inquiries & Choices (${inquiries.length})`, icon: MessageSquare, badge: unreadAdminCount },
-          { id: 'places', label: `Manage Places (${places.length})`, icon: Compass },
-          { id: 'restaurants', label: `Manage Restaurants (${restaurants.length})`, icon: Utensils },
+          { id: 'hotels', label: `Hotels (${hotels.length})`, icon: HotelIcon },
+          { id: 'transports', label: `Transport (${transports.length})`, icon: Bus },
+          { id: 'rides', label: `Rides & Rentals (${rides.length})`, icon: Car },
+          { id: 'inquiries', label: `Traveler Inquiries (${inquiries.length})`, icon: MessageSquare, badge: unreadAdminCount },
+          { id: 'places', label: `Places (${places.length})`, icon: Compass },
+          { id: 'restaurants', label: `Restaurants (${restaurants.length})`, icon: Utensils },
         ]
         .filter(tab => {
           if (isCompany && !isAdmin) {
@@ -859,10 +913,10 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
               className={`px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-200 active:scale-95 ${
                 isActive 
                   ? 'bg-slate-900 text-white shadow-md font-black scale-102 ring-1 ring-slate-800' 
-                  : 'bg-white/90 border border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-white hover:border-slate-300 shadow-2xs hover:shadow-xs'
+                  : 'bg-white/80 text-slate-700 hover:text-slate-950 hover:bg-white border border-transparent hover:border-slate-200/80 shadow-2xs'
               }`}
             >
-              <Icon className="w-4 h-4" />
+              <Icon className={`w-4 h-4 ${isActive ? 'text-amber-400' : 'text-slate-500'}`} />
               <span>{tab.label}</span>
               {tab.badge && tab.badge > 0 ? (
                 <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse shadow-xs">
