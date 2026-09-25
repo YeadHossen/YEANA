@@ -317,7 +317,7 @@ const AppContent: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased overflow-x-hidden w-full max-w-full">
+    <div className="min-h-screen flex flex-col bg-slate-50 text-slate-900 font-sans antialiased overflow-x-clip w-full max-w-full">
       
       {/* Top Navigation */}
       <Navbar
@@ -331,7 +331,7 @@ const AppContent: React.FC = () => {
 
       {/* Universal Quick Back Breadcrumb Bar (Hidden for Company Portal to keep view clean) */}
       {!(isCompany && !isAdmin) && (historyStack.length > 0 || selectedPlace !== null || currentTab !== 'home') && (
-        <div className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-16 z-30 px-4 sm:px-6 py-2 transition-all">
+        <div className="bg-white/90 backdrop-blur-md border-b border-slate-200/80 sticky top-16 md:top-20 z-30 px-4 sm:px-6 py-2 transition-all">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
             <button
               onClick={handleBack}

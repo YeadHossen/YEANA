@@ -95,12 +95,13 @@ export const Navbar: React.FC<NavbarProps> = ({
   };
 
   return (
-    <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-2xl border-b border-white/70 shadow-glass transition-all">
-      {/* Radiant Heritage Accent Top Line */}
-      <div className="h-[2.5px] w-full bg-gradient-to-r from-emerald-600 via-teal-400 via-amber-400 to-sky-500 opacity-90 shadow-xs" />
+    <>
+      <header className="fixed top-0 left-0 right-0 w-full z-50 bg-white/95 backdrop-blur-2xl border-b border-slate-200/80 shadow-xs transition-all">
+        {/* Radiant Heritage Accent Top Line */}
+        <div className="h-[2.5px] w-full bg-gradient-to-r from-emerald-600 via-teal-400 via-amber-400 to-sky-500 opacity-90 shadow-xs" />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 md:h-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between h-16 md:h-20">
           
           {/* Logo & Tagline */}
           <div 
@@ -377,12 +378,18 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Mobile Menu Toggle Button */}
+            {/* Mobile Menu Toggle Button (Fixed with the screen for easy one-tap access) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 rounded-xl text-slate-600 hover:bg-slate-100"
+              className={`xl:hidden p-2 rounded-xl transition-all flex items-center justify-center border shadow-2xs active:scale-95 ${
+                mobileMenuOpen 
+                  ? 'bg-rose-50 text-rose-600 border-rose-200 ring-2 ring-rose-400/30' 
+                  : 'bg-slate-100/90 text-slate-700 hover:text-slate-900 hover:bg-slate-200/90 border-slate-200/80'
+              }`}
+              aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              title="Menu"
             >
-              {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
 
@@ -391,7 +398,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Dropdown Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
+        <div className="xl:hidden border-t border-slate-200 bg-white/98 backdrop-blur-2xl px-4 pt-3 pb-8 space-y-3 shadow-2xl max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain animate-in slide-in-from-top-2 duration-150">
           {/* User Account Bar with Sign Out / Sign In option */}
           {isAuthenticated ? (
             <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2 shadow-xs">
@@ -473,5 +480,18 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
       )}
     </header>
-  );
+
+    {/* Outside click backdrop when mobile menu is open */}
+    {mobileMenuOpen && (
+      <div
+        className="fixed inset-0 top-16 md:top-20 bg-slate-950/40 backdrop-blur-xs z-40 xl:hidden animate-in fade-in duration-150"
+        onClick={() => setMobileMenuOpen(false)}
+        aria-hidden="true"
+      />
+    )}
+
+    {/* Structural Layout Spacer: Guarantees page content starts precisely below the fixed menu bar */}
+    <div className="h-16 md:h-20 shrink-0 pointer-events-none" aria-hidden="true" />
+  </>
+);
 };

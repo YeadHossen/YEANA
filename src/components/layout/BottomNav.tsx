@@ -106,8 +106,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
   const tabs = (isCompany && !isAdmin) ? companyTabs : travelerTabs;
 
   return (
-    <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-2 pt-1 safe-area-bottom pointer-events-none">
-      <div className="max-w-md mx-auto bg-white/92 backdrop-blur-2xl border border-white/85 shadow-[0_12px_40px_-5px_rgba(15,23,42,0.18),inset_0_1.5px_0_rgba(255,255,255,0.95)] rounded-2xl px-2 py-1.5 flex items-center justify-around pointer-events-auto">
+    <nav className="xl:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-2 pt-1 safe-area-bottom pointer-events-none" aria-label="Mobile Navigation Bar">
+      <div className="max-w-md mx-auto bg-white/96 backdrop-blur-2xl border border-slate-200/90 shadow-[0_12px_40px_-5px_rgba(15,23,42,0.18),inset_0_1.5px_0_rgba(255,255,255,0.95)] rounded-2xl px-2 py-1.5 flex items-center justify-around pointer-events-auto">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = currentTab === tab.id;
@@ -142,6 +142,6 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
           );
         })}
       </div>
-    </div>
+    </nav>
   );
 };
