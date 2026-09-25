@@ -245,9 +245,9 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             ) : null}
 
-            {/* User Profile & Sign Out Controls */}
+            {/* User Profile on Desktop (Hidden on mobile so the right side only shows the Menu Bar) */}
             {isAuthenticated ? (
-              <div className="flex items-center gap-1.5 sm:gap-2">
+              <div className="hidden xl:flex items-center gap-2">
                 {/* User Dropdown Trigger */}
                 <div className="relative">
                   <button
@@ -260,7 +260,7 @@ export const Navbar: React.FC<NavbarProps> = ({
                       alt={user?.full_name || 'User'}
                       className="w-8 h-8 rounded-lg object-cover ring-2 ring-brand-500/20"
                     />
-                    <span className="text-xs font-semibold text-slate-700 hidden lg:inline max-w-[100px] truncate">
+                    <span className="text-xs font-semibold text-slate-700 max-w-[100px] truncate">
                       {user?.full_name?.split(' ')[0]}
                     </span>
                   </button>
@@ -357,34 +357,24 @@ export const Navbar: React.FC<NavbarProps> = ({
                     </div>
                   )}
                 </div>
-
-                {/* Direct Sign Out Button in the Menu Bar */}
-                <button
-                  onClick={handleSignOut}
-                  className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200/80 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs active:scale-95"
-                  title="Sign Out and back to Sign In / Login page"
-                >
-                  <LogOut className="w-3.5 h-3.5 text-rose-500" />
-                  <span className="hidden sm:inline">{t('nav.logout')}</span>
-                </button>
               </div>
             ) : (
               <button
                 onClick={onOpenAuth}
-                className="px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm shadow-brand-700/20 transition-all flex items-center gap-1.5"
+                className="hidden xl:flex px-3.5 py-2 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-semibold shadow-sm shadow-brand-700/20 transition-all items-center gap-1.5"
               >
                 <User className="w-3.5 h-3.5" />
                 <span>{t('nav.login')}</span>
               </button>
             )}
 
-            {/* Mobile Menu Toggle Button (Fixed with the screen for easy one-tap access) */}
+            {/* Mobile Menu Toggle Button (Directly visible on the right side) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`xl:hidden p-2 rounded-xl transition-all flex items-center justify-center border shadow-2xs active:scale-95 ${
+              className={`xl:hidden p-2 rounded-xl transition-all flex items-center justify-center border shadow-xs active:scale-95 ${
                 mobileMenuOpen 
                   ? 'bg-rose-50 text-rose-600 border-rose-200 ring-2 ring-rose-400/30' 
-                  : 'bg-slate-100/90 text-slate-700 hover:text-slate-900 hover:bg-slate-200/90 border-slate-200/80'
+                  : 'bg-slate-100/90 text-slate-800 hover:text-slate-950 hover:bg-slate-200/90 border-slate-300'
               }`}
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               title="Menu"
