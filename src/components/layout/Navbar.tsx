@@ -61,6 +61,16 @@ export const Navbar: React.FC<NavbarProps> = ({
     { id: 'emergency', label: t('nav.emergency'), icon: ShieldAlert, color: 'text-rose-600', active: 'bg-rose-50/90 text-rose-900 border-rose-200/90 shadow-rose-950/5', dot: 'bg-rose-500' },
   ];
 
+  // Company Portal strictly sees ONLY Company E-Portal, Hotel, Transport, and Ride
+  const companyNavLinks = [
+    { id: 'admin', label: language === 'bn' ? 'কোম্পানি ই-পোর্টাল' : 'Company E-Portal', icon: Building2, color: 'text-blue-600', active: 'bg-blue-50/90 text-blue-900 border-blue-200/90 shadow-blue-950/5', dot: 'bg-blue-500' },
+    { id: 'hotels', label: t('nav.hotels'), icon: Hotel, color: 'text-indigo-600', active: 'bg-indigo-50/90 text-indigo-900 border-indigo-200/90 shadow-indigo-950/5', dot: 'bg-indigo-500' },
+    { id: 'transport', label: t('nav.transport'), icon: Bus, color: 'text-sky-600', active: 'bg-sky-50/90 text-sky-900 border-sky-200/90 shadow-sky-950/5', dot: 'bg-sky-500' },
+    { id: 'ride', label: t('nav.ride'), icon: Car, color: 'text-rose-600', active: 'bg-rose-50/90 text-rose-900 border-rose-200/90 shadow-rose-950/5', dot: 'bg-rose-500' },
+  ];
+
+  const activeNavLinks = (isCompany && !isAdmin) ? companyNavLinks : navLinks;
+
   const [isOnline, setIsOnline] = useState<boolean>(() => typeof navigator !== 'undefined' ? navigator.onLine : true);
 
   useEffect(() => {
@@ -74,6 +84,16 @@ export const Navbar: React.FC<NavbarProps> = ({
     };
   }, []);
 
+  const handleSignOut = async () => {
+    setUserDropdownOpen(false);
+    setMobileMenuOpen(false);
+    await logout();
+    if (currentTab === 'admin' || currentTab === 'profile') {
+      setCurrentTab('home');
+    }
+    onOpenAuth();
+  };
+
   return (
     <header className="sticky top-0 z-40 bg-white/90 backdrop-blur-2xl border-b border-white/70 shadow-glass transition-all">
       {/* Radiant Heritage Accent Top Line */}
@@ -84,7 +104,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           
           {/* Logo & Tagline */}
           <div 
-            onClick={() => { setCurrentTab('home'); }} 
+            onClick={() => { setCurrentTab(isCompany && !isAdmin ? 'admin' : 'home'); }} 
             className="cursor-pointer group select-none"
           >
             <BrandLogo size="md" />
@@ -92,7 +112,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           {/* Desktop Navigation Links */}
           <nav className="hidden xl:flex items-center gap-1 p-1 rounded-2xl bg-slate-100/80 border border-slate-200/70 backdrop-blur-md">
-            {navLinks.map(link => {
+            {activeNavLinks.map(link => {
               const Icon = link.icon;
               const isActive = currentTab === link.id;
               return (
@@ -131,15 +151,17 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>{isOnline ? 'Live Online' : 'Offline'}</span>
             </div>
 
-            {/* Global Search Trigger */}
-            <button
-              onClick={onOpenSearch}
-              className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100/90 hover:bg-white hover:border-emerald-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 transition-all flex items-center gap-2 text-sm shadow-xs"
-              title="Search places, hotels, transport..."
-            >
-              <Search className="w-4 h-4 text-slate-500" />
-              <span className="hidden md:inline text-xs text-slate-500 font-medium pr-1">Search...</span>
-            </button>
+            {/* Global Search Trigger (Traveler only) */}
+            {!(isCompany && !isAdmin) && (
+              <button
+                onClick={onOpenSearch}
+                className="p-2 sm:px-3 sm:py-2 rounded-xl bg-slate-100/90 hover:bg-white hover:border-emerald-200 text-slate-600 hover:text-slate-900 border border-slate-200/70 transition-all flex items-center gap-2 text-sm shadow-xs"
+                title="Search places, hotels, transport..."
+              >
+                <Search className="w-4 h-4 text-slate-500" />
+                <span className="hidden md:inline text-xs text-slate-500 font-medium pr-1">Search...</span>
+              </button>
+            )}
 
             {/* Language Switcher (EN / বাংলা) */}
             <button
@@ -151,35 +173,39 @@ export const Navbar: React.FC<NavbarProps> = ({
               <span>{language === 'en' ? 'বাংলা' : 'English'}</span>
             </button>
 
-            {/* Favorites Button (Desktop/Tablet - on mobile accessible via BottomNav) */}
-            <button
-              onClick={() => setCurrentTab('favorites')}
-              className={`hidden sm:flex p-2.5 rounded-xl transition-colors relative ${
-                currentTab === 'favorites' ? 'bg-rose-50 text-rose-600' : 'bg-slate-100/80 text-slate-600 hover:text-rose-600'
-              }`}
-              title="Favorites & Saved Items"
-            >
-              <Heart className="w-4 h-4" />
-              {favorites.length > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                  {favorites.length}
-                </span>
-              )}
-            </button>
+            {/* Favorites Button (Desktop/Tablet - Traveler only) */}
+            {!(isCompany && !isAdmin) && (
+              <button
+                onClick={() => setCurrentTab('favorites')}
+                className={`hidden sm:flex p-2.5 rounded-xl transition-colors relative ${
+                  currentTab === 'favorites' ? 'bg-rose-50 text-rose-600' : 'bg-slate-100/80 text-slate-600 hover:text-rose-600'
+                }`}
+                title="Favorites & Saved Items"
+              >
+                <Heart className="w-4 h-4" />
+                {favorites.length > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-rose-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                    {favorites.length}
+                  </span>
+                )}
+              </button>
+            )}
 
-            {/* Support Concierge Chat Button for Travelers (Desktop/Tablet) */}
-            <button
-              onClick={() => openTravelerChat()}
-              className="hidden md:flex p-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-brand-600 transition-colors relative"
-              title="Chat with YEANA Concierge / Tour Support"
-            >
-              <MessageSquare className="w-4 h-4" />
-              {unreadTravelerCount > 0 && (
-                <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                  {unreadTravelerCount}
-                </span>
-              )}
-            </button>
+            {/* Support Concierge Chat Button for Travelers */}
+            {!(isCompany && !isAdmin) && (
+              <button
+                onClick={() => openTravelerChat()}
+                className="hidden md:flex p-2.5 rounded-xl bg-slate-100/80 hover:bg-slate-200/80 text-slate-600 hover:text-brand-600 transition-colors relative"
+                title="Chat with YEANA Concierge / Tour Support"
+              >
+                <MessageSquare className="w-4 h-4" />
+                {unreadTravelerCount > 0 && (
+                  <span className="absolute -top-1 -right-1 w-4 h-4 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                    {unreadTravelerCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             {/* Portal / Admin Access: Strictly Role-Adaptive (Hidden for Travelers) */}
             {isAdmin ? (
@@ -218,89 +244,128 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             ) : null}
 
-            {/* User Profile / Login */}
+            {/* User Profile & Sign Out Controls */}
             {isAuthenticated ? (
-              <div className="relative">
-                <button
-                  onClick={() => setUserDropdownOpen(!userDropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
-                >
-                  <img
-                    src={user?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                    alt={user?.full_name || 'User'}
-                    className="w-8 h-8 rounded-lg object-cover ring-2 ring-brand-500/20"
-                  />
-                  <span className="text-xs font-semibold text-slate-700 hidden lg:inline max-w-[100px] truncate">
-                    {user?.full_name?.split(' ')[0]}
-                  </span>
-                </button>
-
-                {userDropdownOpen && (
-                  <div 
-                    className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
-                    onMouseLeave={() => setUserDropdownOpen(false)}
+              <div className="flex items-center gap-1.5 sm:gap-2">
+                {/* User Dropdown Trigger */}
+                <div className="relative">
+                  <button
+                    onClick={() => setUserDropdownOpen(!userDropdownOpen)}
+                    className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors"
+                    title="User Profile Menu"
                   >
-                    <div className="px-4 py-2 border-b border-slate-100">
-                      <p className="text-xs text-slate-400 font-medium">Signed in as</p>
-                      <p className="text-sm font-bold text-slate-800 truncate">{user?.full_name}</p>
-                      <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
+                    <img
+                      src={user?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
+                      alt={user?.full_name || 'User'}
+                      className="w-8 h-8 rounded-lg object-cover ring-2 ring-brand-500/20"
+                    />
+                    <span className="text-xs font-semibold text-slate-700 hidden lg:inline max-w-[100px] truncate">
+                      {user?.full_name?.split(' ')[0]}
+                    </span>
+                  </button>
+
+                  {userDropdownOpen && (
+                    <div 
+                      className="absolute right-0 mt-2 w-56 bg-white rounded-2xl shadow-xl border border-slate-100 py-2 z-50 animate-in fade-in zoom-in-95 duration-150"
+                      onMouseLeave={() => setUserDropdownOpen(false)}
+                    >
+                      <div className="px-4 py-2 border-b border-slate-100">
+                        <p className="text-xs text-slate-400 font-medium">Signed in as</p>
+                        <p className="text-sm font-bold text-slate-800 truncate">{user?.full_name}</p>
+                        <p className="text-[11px] text-slate-500 truncate">{user?.email}</p>
+                      </div>
+
+                      {isCompany && !isAdmin ? (
+                        <>
+                          <button
+                            onClick={() => { setCurrentTab('admin'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-bold text-blue-700 hover:bg-blue-50 flex items-center gap-2"
+                          >
+                            <Building2 className="w-3.5 h-3.5 text-blue-600" />
+                            <span>Company E-Portal</span>
+                          </button>
+                          <button
+                            onClick={() => { setCurrentTab('hotels'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-indigo-50 hover:text-indigo-700 flex items-center gap-2"
+                          >
+                            <Hotel className="w-3.5 h-3.5 text-indigo-600" />
+                            <span>{t('nav.hotels')}</span>
+                          </button>
+                          <button
+                            onClick={() => { setCurrentTab('transport'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-sky-50 hover:text-sky-700 flex items-center gap-2"
+                          >
+                            <Bus className="w-3.5 h-3.5 text-sky-600" />
+                            <span>{t('nav.transport')}</span>
+                          </button>
+                          <button
+                            onClick={() => { setCurrentTab('ride'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-semibold text-slate-700 hover:bg-rose-50 hover:text-rose-700 flex items-center gap-2"
+                          >
+                            <Car className="w-3.5 h-3.5 text-rose-600" />
+                            <span>{t('nav.ride')}</span>
+                          </button>
+                        </>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => { setCurrentTab('profile'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-700 flex items-center gap-2"
+                          >
+                            <User className="w-3.5 h-3.5" />
+                            <span>{t('nav.profile')}</span>
+                          </button>
+
+                          <button
+                            onClick={() => { setCurrentTab('trips'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-700 flex items-center gap-2"
+                          >
+                            <Calendar className="w-3.5 h-3.5" />
+                            <span>{t('nav.trips')}</span>
+                          </button>
+
+                          <button
+                            onClick={() => { setCurrentTab('notes'); setUserDropdownOpen(false); }}
+                            className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2"
+                          >
+                            <Receipt className="w-3.5 h-3.5 text-emerald-600" />
+                            <span>{t('nav.notes')}</span>
+                          </button>
+
+                          {isAdmin && (
+                            <button
+                              onClick={() => { setCurrentTab('admin'); setUserDropdownOpen(false); }}
+                              className="w-full px-4 py-2 text-left text-xs font-bold text-amber-700 hover:bg-amber-50 flex items-center gap-2"
+                            >
+                              <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
+                              <span>{t('nav.admin')}</span>
+                            </button>
+                          )}
+                        </>
+                      )}
+
+                      <div className="border-t border-slate-100 my-1"></div>
+
+                      <button
+                        onClick={handleSignOut}
+                        className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        <span>{t('nav.logout')}</span>
+                      </button>
                     </div>
+                  )}
+                </div>
 
-                    <button
-                      onClick={() => { setCurrentTab('profile'); setUserDropdownOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-700 flex items-center gap-2"
-                    >
-                      <User className="w-3.5 h-3.5" />
-                      <span>{t('nav.profile')}</span>
-                    </button>
-
-                    <button
-                      onClick={() => { setCurrentTab('trips'); setUserDropdownOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-brand-50 hover:text-brand-700 flex items-center gap-2"
-                    >
-                      <Calendar className="w-3.5 h-3.5" />
-                      <span>{t('nav.trips')}</span>
-                    </button>
-
-                    <button
-                      onClick={() => { setCurrentTab('notes'); setUserDropdownOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-xs font-medium text-slate-700 hover:bg-emerald-50 hover:text-emerald-700 flex items-center gap-2"
-                    >
-                      <Receipt className="w-3.5 h-3.5 text-emerald-600" />
-                      <span>{t('nav.notes')}</span>
-                    </button>
-
-                    {isAdmin && (
-                      <button
-                        onClick={() => { setCurrentTab('admin'); setUserDropdownOpen(false); }}
-                        className="w-full px-4 py-2 text-left text-xs font-bold text-amber-700 hover:bg-amber-50 flex items-center gap-2"
-                      >
-                        <ShieldCheck className="w-3.5 h-3.5 text-amber-600" />
-                        <span>{t('nav.admin')}</span>
-                      </button>
-                    )}
-
-                    {isCompany && (
-                      <button
-                        onClick={() => { setCurrentTab('admin'); setUserDropdownOpen(false); }}
-                        className="w-full px-4 py-2 text-left text-xs font-bold text-blue-700 hover:bg-blue-50 flex items-center gap-2"
-                      >
-                        <Building2 className="w-3.5 h-3.5 text-blue-600" />
-                        <span>Company E-Portal</span>
-                      </button>
-                    )}
-
-                    <div className="border-t border-slate-100 my-1"></div>
-
-                    <button
-                      onClick={() => { logout(); setUserDropdownOpen(false); }}
-                      className="w-full px-4 py-2 text-left text-xs font-medium text-rose-600 hover:bg-rose-50 flex items-center gap-2"
-                    >
-                      <LogOut className="w-3.5 h-3.5" />
-                      <span>{t('nav.logout')}</span>
-                    </button>
-                  </div>
-                )}
+                {/* Direct Sign Out Button in the Menu Bar */}
+                <button
+                  onClick={handleSignOut}
+                  className="px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-600 hover:text-rose-700 border border-rose-200/80 text-xs font-bold transition-all flex items-center gap-1.5 shadow-2xs active:scale-95"
+                  title="Sign Out and back to Sign In / Login page"
+                >
+                  <LogOut className="w-3.5 h-3.5 text-rose-500" />
+                  <span className="hidden sm:inline">{t('nav.logout')}</span>
+                </button>
               </div>
             ) : (
               <button
@@ -326,9 +391,50 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Dropdown Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-2 pb-6 space-y-1 shadow-lg">
-          <div className="grid grid-cols-2 gap-2 pt-2">
-            {navLinks.map(link => {
+        <div className="xl:hidden border-t border-slate-200 bg-white px-4 pt-3 pb-6 space-y-3 shadow-lg">
+          {/* User Account Bar with Sign Out / Sign In option */}
+          {isAuthenticated ? (
+            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2 shadow-xs">
+              <div 
+                onClick={() => { 
+                  setCurrentTab(isCompany && !isAdmin ? 'admin' : 'profile'); 
+                  setMobileMenuOpen(false); 
+                }}
+                className="flex items-center gap-2.5 min-w-0 cursor-pointer"
+              >
+                <img
+                  src={user?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
+                  alt={user?.full_name || 'User'}
+                  className="w-9 h-9 rounded-xl object-cover ring-2 ring-emerald-500/20 shrink-0"
+                />
+                <div className="min-w-0">
+                  <p className="text-xs font-bold text-slate-800 truncate">{user?.full_name}</p>
+                  <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
+                </div>
+              </div>
+              <button
+                onClick={handleSignOut}
+                className="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all shrink-0 active:scale-95"
+              >
+                <LogOut className="w-3.5 h-3.5" />
+                <span>{t('nav.logout')}</span>
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onOpenAuth();
+              }}
+              className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95"
+            >
+              <User className="w-4 h-4" />
+              <span>{t('nav.login')} / Sign In</span>
+            </button>
+          )}
+
+          <div className="grid grid-cols-2 gap-2 pt-1">
+            {activeNavLinks.map(link => {
               const Icon = link.icon;
               const isActive = currentTab === link.id;
               return (
@@ -361,19 +467,6 @@ export const Navbar: React.FC<NavbarProps> = ({
               >
                 <ShieldCheck className="w-4 h-4" />
                 <span>{t('nav.admin')}</span>
-              </button>
-            )}
-
-            {isCompany && (
-              <button
-                onClick={() => {
-                  setCurrentTab('admin');
-                  setMobileMenuOpen(false);
-                }}
-                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-blue-600 text-white flex items-center justify-center gap-2 shadow-sm"
-              >
-                <Building2 className="w-4 h-4" />
-                <span>Company E-Portal</span>
               </button>
             )}
           </div>

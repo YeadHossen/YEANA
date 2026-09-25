@@ -32,7 +32,8 @@ import {
   X,
   FileSpreadsheet,
   Zap,
-  Layers
+  Layers,
+  Save
 } from 'lucide-react';
 import { 
   TransportBooking, 
@@ -82,6 +83,10 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
   const [isSyncing, setIsSyncing] = useState<boolean>(false);
   const [actionSuccess, setActionSuccess] = useState<string>('');
 
+  // Pricing and Batch State
+  const [editingFare, setEditingFare] = useState<number>(0);
+  const [editingRoomPrices, setEditingRoomPrices] = useState<Record<string, number>>({});
+
   // List of unique companies
   const transportCompanies = Array.from(new Set(transports.map(t => t.company)));
   const hotelCompanies = Array.from(new Set(hotels.map(h => h.name)));
@@ -117,6 +122,13 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
       setIsSyncing(false);
     }
   };
+
+  useEffect(() => {
+    const route = transports.find(t => t.id === selectedRouteId);
+    if (route) {
+      setEditingFare(route.price_min);
+    }
+  }, [selectedRouteId, transports]);
 
   useEffect(() => {
     loadPortalData();
@@ -222,7 +234,86 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
     );
     const updated = await DataService.getHotelRoomAvailability(selectedHotelId);
     setRoomInventory(updated);
-    showToast(`🏨 Room inventory for "${roomType}" updated! Available: ${newAvailable}`);
+  };
+
+  // Company Save Route Ticket Fare
+  const handleSaveRouteFare = async () => {
+    const route = transports.find(t => t.id === selectedRouteId);
+    if (!route || editingFare <= 0) return;
+    const updated: TransportRoute = {
+      ...route,
+      price_min: editingFare,
+      price_max: Math.max(editingFare, route.price_max || Math.round(editingFare * 1.3))
+    };
+    await DataService.saveTransport(updated);
+    showToast(`💰 Ticket fare for ${route.company} (${route.from_district} ➔ ${route.to_district}) updated to ৳${editingFare.toLocaleString()}!`);
+  };
+
+  // Company Batch Seat Block / Release
+  const handleBatchSeatBlock = async (action: 'block_all' | 'release_all') => {
+    if (!selectedRouteId) return;
+    const seatsToUpdate = action === 'block_all'
+      ? seatInventory.filter(s => s.status === 'available')
+      : seatInventory.filter(s => s.status === 'blocked');
+
+    if (seatsToUpdate.length === 0) {
+      showToast(action === 'block_all' ? 'All seats are already booked or blocked.' : 'No blocked seats to release.');
+      return;
+    }
+
+    for (const s of seatsToUpdate) {
+      await DataService.blockOrReleaseSeat(
+        selectedRouteId,
+        activeDate,
+        s.seat_id,
+        action === 'block_all' ? 'block' : 'release',
+        action === 'block_all' ? 'Company Counter Hold' : ''
+      );
+    }
+    const updated = await DataService.getTransportSeatAvailability(selectedRouteId, activeDate);
+    setSeatInventory(updated);
+    showToast(action === 'block_all' ? `🔒 ${seatsToUpdate.length} seats marked as Blocked/Not Available!` : `🟢 ${seatsToUpdate.length} seats released as Available!`);
+  };
+
+  // Company Toggle Room Availability (Sold Out / Available)
+  const handleToggleRoomAvailability = async (roomType: string) => {
+    if (!selectedHotelId) return;
+    const current = roomInventory.find(r => r.room_type === roomType);
+    if (!current) return;
+    
+    const isSoldOut = current.available_rooms <= 0;
+    const newAvailable = isSoldOut ? Math.max(1, current.total_rooms - current.booked_rooms) : 0;
+    
+    await DataService.updateHotelRoomInventory(
+      selectedHotelId,
+      roomType,
+      current.total_rooms,
+      newAvailable,
+      current.price_per_night,
+      isSoldOut ? 0 : current.total_rooms - current.booked_rooms
+    );
+    const updated = await DataService.getHotelRoomAvailability(selectedHotelId);
+    setRoomInventory(updated);
+    showToast(isSoldOut ? `🟢 Room "${roomType}" is now AVAILABLE (${newAvailable} open)!` : `🔴 Room "${roomType}" is now marked as SOLD OUT!`);
+  };
+
+  // Company Edit Room Price
+  const handleUpdateRoomPrice = async (roomType: string, newPrice: number) => {
+    if (!selectedHotelId || newPrice <= 0) return;
+    const current = roomInventory.find(r => r.room_type === roomType);
+    if (!current) return;
+    
+    await DataService.updateHotelRoomInventory(
+      selectedHotelId,
+      roomType,
+      current.total_rooms,
+      current.available_rooms,
+      newPrice,
+      current.blocked_rooms
+    );
+    const updated = await DataService.getHotelRoomAvailability(selectedHotelId);
+    setRoomInventory(updated);
+    showToast(`💰 Room price for "${roomType}" updated to ৳${newPrice.toLocaleString()} / night!`);
   };
 
   // Instant Booking Simulator for Live Demo
@@ -453,10 +544,12 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
 
         const totalSeatsSold = stats?.transport?.seatsSold ?? transportBookings.reduce((s, b) => s + b.seat_count, 0);
         const totalSeatsCapacity = 160;
+        const totalSeatsAvailable = Math.max(0, totalSeatsCapacity - totalSeatsSold);
         const transportOccupancy = Math.min(100, Math.round((totalSeatsSold / totalSeatsCapacity) * 100));
 
         const totalRoomsBooked = stats?.hotel?.roomsBooked ?? hotelBookings.reduce((s, b) => s + b.room_count, 0);
         const totalRoomsCapacity = 85;
+        const totalRoomsAvailable = Math.max(0, totalRoomsCapacity - totalRoomsBooked);
         const hotelOccupancy = Math.min(100, Math.round((totalRoomsBooked / totalRoomsCapacity) * 100));
 
         const totalRevenue = stats?.summary?.totalRevenue ?? (
@@ -465,9 +558,73 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
         );
 
         return (
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            {/* Live Transport Seats & Tickets Inventory */}
+            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Tickets & Seats</span>
+                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs">
+                  <Armchair className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                <div>
+                  <span className="text-[10px] font-bold uppercase text-rose-500 block">Sold</span>
+                  <p className="text-2xl font-black text-rose-700 font-mono">{totalSeatsSold}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase text-emerald-600 block">Available</span>
+                  <p className="text-2xl font-black text-emerald-700 font-mono">{totalSeatsAvailable}</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500">
+                  <span>Occupancy: {transportOccupancy}%</span>
+                  <span>Cap: {totalSeatsCapacity} seats</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-emerald-500 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${transportOccupancy}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Live Hotel Rooms Inventory */}
+            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Hotel Rooms</span>
+                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-black text-xs">
+                  <BedDouble className="w-4 h-4" />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-2 bg-slate-50 p-2.5 rounded-2xl border border-slate-100">
+                <div>
+                  <span className="text-[10px] font-bold uppercase text-rose-500 block">Sold / Booked</span>
+                  <p className="text-2xl font-black text-rose-700 font-mono">{totalRoomsBooked}</p>
+                </div>
+                <div>
+                  <span className="text-[10px] font-bold uppercase text-sky-600 block">Available</span>
+                  <p className="text-2xl font-black text-sky-700 font-mono">{totalRoomsAvailable}</p>
+                </div>
+              </div>
+              <div className="space-y-1">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500">
+                  <span>Occupancy: {hotelOccupancy}%</span>
+                  <span>Total: {totalRoomsCapacity} rooms</span>
+                </div>
+                <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+                  <div
+                    className="bg-sky-500 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${hotelOccupancy}%` }}
+                  />
+                </div>
+              </div>
+            </div>
+
             {/* Total Bookings */}
-            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-2">
+            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Total Bookings</span>
                 <div className="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center font-black text-xs">
@@ -478,64 +635,17 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
                 {totalBookingsCount}
               </p>
               <div className="flex items-center gap-2 text-[11px] text-slate-500">
-                <span>🚌 {transportBookingsCount} Transport</span>
+                <span>🚌 {transportBookingsCount} Tickets</span>
                 <span>•</span>
-                <span>🏨 {hotelBookingsCount} Hotel</span>
+                <span>🏨 {hotelBookingsCount} Rooms</span>
               </div>
-            </div>
-
-            {/* Live Transport Seats Occupancy */}
-            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Transport Seat Occupancy</span>
-                <div className="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-black text-xs">
-                  <Armchair className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <p className="text-3xl font-black text-emerald-700 font-mono">
-                  {transportOccupancy}%
-                </p>
-                <span className="text-xs text-slate-400 font-bold">
-                  ({totalSeatsSold}/{totalSeatsCapacity} Seats)
-                </span>
-              </div>
-              {/* Progress Bar */}
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div
-                  className="bg-emerald-500 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${transportOccupancy}%` }}
-                />
-              </div>
-            </div>
-
-            {/* Live Hotel Room Occupancy */}
-            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Hotel Room Occupancy</span>
-                <div className="w-9 h-9 rounded-xl bg-sky-50 text-sky-600 flex items-center justify-center font-black text-xs">
-                  <BedDouble className="w-4 h-4" />
-                </div>
-              </div>
-              <div className="flex items-baseline gap-2">
-                <p className="text-3xl font-black text-sky-700 font-mono">
-                  {hotelOccupancy}%
-                </p>
-                <span className="text-xs text-slate-400 font-bold">
-                  ({totalRoomsBooked}/{totalRoomsCapacity} Rooms)
-                </span>
-              </div>
-              {/* Progress Bar */}
-              <div className="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
-                <div
-                  className="bg-sky-500 h-full rounded-full transition-all duration-500"
-                  style={{ width: `${hotelOccupancy}%` }}
-                />
-              </div>
+              <p className="text-[10px] text-emerald-600 font-bold bg-emerald-50 px-2 py-1 rounded-lg">
+                ✓ Live synchronized across portals
+              </p>
             </div>
 
             {/* Gross Revenue */}
-            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-2">
+            <div className="p-5 rounded-3xl bg-white border border-slate-200/80 shadow-card space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400">Gross Booking Value</span>
                 <div className="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center font-black text-xs">
@@ -546,8 +656,11 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
                 ৳{totalRevenue.toLocaleString()}
               </p>
               <p className="text-[11px] text-slate-400 font-medium">
-                Real-time synced across all channels
+                Live automated payout calculations
               </p>
+              <div className="text-[10px] text-slate-400">
+                Updated just now
+              </div>
             </div>
           </div>
         );
@@ -620,6 +733,47 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
                   </div>
                 </div>
 
+                <div className="flex items-center gap-2 flex-wrap">
+                  {/* Direct Route Ticket Fare Editor */}
+                  <div className="flex items-center gap-1.5 bg-slate-800/90 border border-slate-700 px-2.5 py-1.5 rounded-xl">
+                    <span className="text-[11px] text-slate-300 font-bold">Ticket Fare:</span>
+                    <span className="text-emerald-400 font-bold text-xs">৳</span>
+                    <input
+                      type="number"
+                      value={editingFare}
+                      onChange={(e) => setEditingFare(Number(e.target.value) || 0)}
+                      className="w-20 bg-slate-900 border border-slate-600 rounded-lg px-2 py-1 text-xs font-mono font-black text-white focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                      placeholder="Fare"
+                    />
+                    <button
+                      onClick={handleSaveRouteFare}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-[11px] flex items-center gap-1 transition-all"
+                      title="Save Route Ticket Price"
+                    >
+                      <Save className="w-3 h-3" />
+                      <span>Save Price</span>
+                    </button>
+                  </div>
+
+                  {/* Batch Seat Controls */}
+                  <div className="flex items-center gap-1.5">
+                    <button
+                      onClick={() => handleBatchSeatBlock('block_all')}
+                      className="px-2.5 py-1.5 rounded-xl bg-amber-500/20 border border-amber-500/40 text-amber-300 hover:bg-amber-500/30 text-[11px] font-bold transition-all"
+                      title="Mark all open seats as Blocked/Not Available"
+                    >
+                      🔒 Block All Open Seats
+                    </button>
+                    <button
+                      onClick={() => handleBatchSeatBlock('release_all')}
+                      className="px-2.5 py-1.5 rounded-xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/30 text-[11px] font-bold transition-all"
+                      title="Release all blocked seats to Available"
+                    >
+                      🟢 Release All Seats
+                    </button>
+                  </div>
+                </div>
+
                 <div className="flex items-center gap-3 text-xs font-bold">
                   <span className="flex items-center gap-1 text-emerald-400">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400" /> Online Available ({seatInventory.filter(s => s.status === 'available').length || 28})
@@ -636,7 +790,7 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
               {/* Vehicle Seat Grid for Operator */}
               <div>
                 <p className="text-[11px] text-slate-400 mb-2 font-medium">
-                  💡 <strong>Operator Control:</strong> Click on any seat to <strong>Block (VIP / Offline Counter)</strong> or <strong>Release</strong> it back to online travelers.
+                  💡 <strong>Operator Seat Control:</strong> Click any individual seat below to toggle availability (<strong>Block / Make Unavailable</strong> or <strong>Release to Available</strong> for travelers).
                 </p>
 
                 <div className="grid grid-cols-4 sm:grid-cols-8 md:grid-cols-10 gap-2">
@@ -900,20 +1054,57 @@ export const CompanyPortalSection: React.FC<CompanyPortalSectionProps> = ({
                       </div>
                     </div>
 
-                    {/* Adjust Availability Buttons */}
-                    <div className="flex items-center justify-between pt-1 text-xs">
-                      <span className="text-[10px] text-slate-400 font-medium">Adjust Capacity:</span>
-                      <div className="flex items-center gap-1.5">
+                    {/* Edit Nightly Price */}
+                    <div className="flex items-center gap-1.5 pt-1 bg-slate-900/60 p-2 rounded-lg border border-slate-800">
+                      <span className="text-[10px] text-slate-300 font-bold">Fare: ৳</span>
+                      <input
+                        type="number"
+                        value={editingRoomPrices[room.room_type] !== undefined ? editingRoomPrices[room.room_type] : room.price_per_night}
+                        onChange={(e) => setEditingRoomPrices({
+                          ...editingRoomPrices,
+                          [room.room_type]: Number(e.target.value) || 0
+                        })}
+                        className="w-20 bg-slate-950 border border-slate-700 rounded-lg px-2 py-0.5 text-xs font-mono font-black text-emerald-400 focus:outline-none focus:ring-1 focus:ring-emerald-500"
+                        placeholder="Price"
+                      />
+                      <span className="text-[10px] text-slate-400">/night</span>
+                      <button
+                        onClick={() => handleUpdateRoomPrice(room.room_type, editingRoomPrices[room.room_type] ?? room.price_per_night)}
+                        className="ml-auto px-2 py-1 rounded-md bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-black text-[10px] flex items-center gap-1 transition-all"
+                        title="Save Nightly Room Rate"
+                      >
+                        <Save className="w-2.5 h-2.5" />
+                        <span>Save</span>
+                      </button>
+                    </div>
+
+                    {/* Adjust Availability Controls */}
+                    <div className="flex items-center justify-between gap-2 pt-1">
+                      <button
+                        onClick={() => handleToggleRoomAvailability(room.room_type)}
+                        className={`flex-1 py-1.5 px-2 rounded-lg text-[10px] font-black uppercase transition-all ${
+                          room.available_rooms <= 0
+                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white'
+                            : 'bg-rose-500/20 border border-rose-500/40 text-rose-300 hover:bg-rose-500/30'
+                        }`}
+                        title={room.available_rooms <= 0 ? "Make this room type available for online bookings" : "Mark this room type as sold out"}
+                      >
+                        {room.available_rooms <= 0 ? '🟢 Mark Available' : '🔴 Mark Sold Out'}
+                      </button>
+
+                      <div className="flex items-center gap-1">
                         <button
                           onClick={() => handleAdjustRoomCount(room.room_type, -1)}
                           disabled={room.available_rooms <= 0}
-                          className="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-black flex items-center justify-center disabled:opacity-30 transition-all"
+                          className="w-7 h-7 rounded-lg bg-slate-700 hover:bg-slate-600 text-white font-black flex items-center justify-center disabled:opacity-30 transition-all text-xs"
+                          title="Decrease available room count"
                         >
                           -
                         </button>
                         <button
                           onClick={() => handleAdjustRoomCount(room.room_type, 1)}
-                          className="w-7 h-7 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-black flex items-center justify-center transition-all"
+                          className="w-7 h-7 rounded-lg bg-sky-600 hover:bg-sky-500 text-white font-black flex items-center justify-center transition-all text-xs"
+                          title="Increase available room count"
                         >
                           +
                         </button>

@@ -372,10 +372,13 @@ export const ProfileView: React.FC<ProfileViewProps> = ({ onNavigateTab, onOpenA
               <p className="text-slate-400">Log out of your traveler account on this device</p>
             </div>
             <button
-              onClick={logout}
-              className="px-4 py-2 rounded-xl bg-slate-100 text-slate-700 hover:bg-slate-200 font-bold flex items-center gap-1.5 transition-all"
+              onClick={async () => {
+                await logout();
+                onOpenAuth();
+              }}
+              className="px-4 py-2 rounded-xl bg-rose-50 text-rose-700 hover:bg-rose-100 border border-rose-200/80 font-bold flex items-center gap-1.5 transition-all text-xs"
             >
-              <LogOut className="w-4 h-4" />
+              <LogOut className="w-4 h-4 text-rose-500" />
               <span>Sign Out</span>
             </button>
           </div>

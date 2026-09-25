@@ -81,12 +81,22 @@ const ViewLoadingFallback: React.FC = () => (
 );
 
 const AppContent: React.FC = () => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, isCompany, isAdmin } = useAuth();
   const [currentTab, setCurrentTab] = useState<string>('home');
   const [selectedPlace, setSelectedPlace] = useState<Place | null>(null);
   const [selectedHotelModal, setSelectedHotelModal] = useState<Hotel | null>(null);
   const [selectedDistrictId, setSelectedDistrictId] = useState<string | undefined>(undefined);
   const [searchInitialQuery, setSearchInitialQuery] = useState<string>('');
+
+  // When signed in as company partner, strictly land in and stay within Company Portal
+  useEffect(() => {
+    if (isAuthenticated && isCompany && !isAdmin) {
+      const allowedCompanyTabs = ['admin', 'hotels', 'transport', 'ride'];
+      if (!allowedCompanyTabs.includes(currentTab)) {
+        setCurrentTab('admin');
+      }
+    }
+  }, [isAuthenticated, isCompany, isAdmin, currentTab]);
 
   // Navigation History Stack for going back from anywhere
   const [historyStack, setHistoryStack] = useState<NavigationState[]>([]);
@@ -241,6 +251,14 @@ const AppContent: React.FC = () => {
       setSelectedDistrictId(filterData.districtId);
     }
     setSelectedPlace(null);
+    if (isAuthenticated && isCompany && !isAdmin) {
+      const allowedCompanyTabs = ['admin', 'hotels', 'transport', 'ride'];
+      if (!allowedCompanyTabs.includes(tab)) {
+        setCurrentTab('admin');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        return;
+      }
+    }
     setCurrentTab(tab);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -286,8 +304,7 @@ const AppContent: React.FC = () => {
       <>
         <LoginView 
           onLoginSuccess={() => {
-            setCurrentTab('home');
-            showToast('✓ Welcome to YEANA Travel Bangladesh!');
+            showToast('✓ Welcome to YEANA!');
           }} 
           onOpenPrivacy={() => setIsPrivacyOpen(true)} 
         />
@@ -312,8 +329,8 @@ const AppContent: React.FC = () => {
         onOpenAuth={() => setIsAuthOpen(true)}
       />
 
-      {/* Universal Quick Back Breadcrumb Bar */}
-      {(historyStack.length > 0 || selectedPlace !== null || currentTab !== 'home') && (
+      {/* Universal Quick Back Breadcrumb Bar (Hidden for Company Portal to keep view clean) */}
+      {!(isCompany && !isAdmin) && (historyStack.length > 0 || selectedPlace !== null || currentTab !== 'home') && (
         <div className="bg-white/80 backdrop-blur-md border-b border-slate-200/80 sticky top-16 z-30 px-4 sm:px-6 py-2 transition-all">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-3 text-xs">
             <button
@@ -442,18 +459,20 @@ const AppContent: React.FC = () => {
               )}
 
               {currentTab === 'admin' && (
-                <AdminView onBackToHome={() => handleNavigateTab('home')} />
+                <AdminView onBackToHome={() => handleNavigateTab(isCompany && !isAdmin ? 'admin' : 'home')} />
               )}
             </>
           )}
         </React.Suspense>
       </main>
 
-      {/* Footer */}
-      <Footer 
-        onNavigate={handleNavigateTab} 
-        onOpenPrivacy={() => setIsPrivacyOpen(true)}
-      />
+      {/* Footer (Hidden for Company Portal to keep enterprise workspace dedicated) */}
+      {!(isCompany && !isAdmin) && (
+        <Footer 
+          onNavigate={handleNavigateTab} 
+          onOpenPrivacy={() => setIsPrivacyOpen(true)}
+        />
+      )}
 
       {/* Mobile Bottom Navigation */}
       <BottomNav

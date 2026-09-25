@@ -26,10 +26,12 @@ import {
   ChevronRight, 
   Building2,
   Lock,
-  ArrowLeft
+  ArrowLeft,
+  Eye,
+  Save
 } from 'lucide-react';
 import { DataService } from '../services/dataService';
-import { Place, Hotel, Restaurant, TransportRoute, District, TravelerInquiry, InquiryCategory, InquiryStatus } from '../types';
+import { Place, Hotel, Restaurant, TransportRoute, District, TravelerInquiry, InquiryCategory, InquiryStatus, Ride } from '../types';
 import { useAuth } from '../context/AuthContext';
 import { useChat } from '../context/ChatContext';
 import { CompanyPortalSection } from '../components/admin/CompanyPortalSection';
@@ -67,12 +69,15 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
     unreadInquiries: 0
   });
 
-  const [activeTab, setActiveTab] = useState<'portal' | 'inquiries' | 'places' | 'hotels' | 'restaurants' | 'transports'>('portal');
+  const [activeTab, setActiveTab] = useState<'portal' | 'inquiries' | 'places' | 'hotels' | 'restaurants' | 'transports' | 'rides'>('portal');
   const [places, setPlaces] = useState<Place[]>([]);
   const [hotels, setHotels] = useState<Hotel[]>([]);
   const [restaurants, setRestaurants] = useState<Restaurant[]>([]);
   const [transports, setTransports] = useState<TransportRoute[]>([]);
+  const [rides, setRides] = useState<Ride[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
+  const [editingRidePrices, setEditingRidePrices] = useState<Record<string, number>>({});
+  const [previewHotel, setPreviewHotel] = useState<Hotel | null>(null);
 
   // Inquiries Filtering & Messaging State
   const [inquirySearch, setInquirySearch] = useState('');
@@ -125,13 +130,14 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const loadAll = async () => {
-    const [st, p, h, r, tr, d] = await Promise.all([
+    const [st, p, h, r, tr, d, rd] = await Promise.all([
       DataService.getAdminStats(),
       DataService.getPlaces(),
       DataService.getHotels(),
       DataService.getRestaurants(),
       DataService.getTransports(),
-      DataService.getDistricts()
+      DataService.getDistricts(),
+      DataService.getRides()
     ]);
     setStats(st);
     setPlaces(p);
@@ -139,6 +145,32 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
     setRestaurants(r);
     setTransports(tr);
     setDistricts(d);
+    setRides(rd);
+  };
+
+  const handleUpdateRidePrice = async (ride: Ride, newPrice: number) => {
+    if (newPrice <= 0) return;
+    const updated: Ride = { ...ride, price_per_day: newPrice };
+    await DataService.saveRide(updated);
+    await loadAll();
+    setSuccessToast(`🚗 Rental fare for ${ride.model} updated to ৳${newPrice.toLocaleString()} / day!`);
+    setTimeout(() => setSuccessToast(''), 3000);
+  };
+
+  const handleToggleRideStatus = async (ride: Ride, newStatus: 'Available' | 'Booked' | 'Under Maintenance') => {
+    const updated: Ride = { ...ride, availability_status: newStatus };
+    await DataService.saveRide(updated);
+    await loadAll();
+    setSuccessToast(`🚗 Availability status for ${ride.model} updated to "${newStatus}"!`);
+    setTimeout(() => setSuccessToast(''), 3000);
+  };
+
+  const handleDeleteRide = async (id: string) => {
+    if (!confirm('Are you sure you want to remove this vehicle from rentals?')) return;
+    await DataService.deleteRide(id);
+    await loadAll();
+    setSuccessToast('Vehicle removed from rental platform.');
+    setTimeout(() => setSuccessToast(''), 3000);
   };
 
   useEffect(() => {
@@ -701,7 +733,7 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
         </div>
       ) : (
         /* Company Partner Specific Metrics */
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
           <div 
             onClick={() => setActiveTab('portal')}
             className={`p-4 rounded-3xl border cursor-pointer transition-all ${
@@ -717,37 +749,14 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                 <Building2 className="w-4 h-4" />
               </div>
               <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-white text-[10px] font-black">
-                Live Portal
+                Live E-Portal
               </span>
             </div>
-            <p className="text-lg font-black font-sans">Seat & Room Allocation</p>
+            <p className="text-lg font-black font-sans">Seat & Room Inventory</p>
             <p className={`text-[10px] font-bold uppercase tracking-wider ${
               activeTab === 'portal' ? 'text-blue-200' : 'text-slate-400'
             }`}>
-              Company E-Portal Control
-            </p>
-          </div>
-
-          <div 
-            onClick={() => setActiveTab('transports')}
-            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
-              activeTab === 'transports' 
-                ? 'bg-emerald-900 text-white border-emerald-800 shadow-lg' 
-                : 'bg-white border-slate-200 hover:border-emerald-400 shadow-card'
-            }`}
-          >
-            <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                activeTab === 'transports' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'
-              }`}>
-                <Bus className="w-4 h-4" />
-              </div>
-            </div>
-            <p className="text-2xl font-black font-mono">{stats.totalTransports}</p>
-            <p className={`text-[10px] font-bold uppercase tracking-wider ${
-              activeTab === 'transports' ? 'text-emerald-200' : 'text-slate-400'
-            }`}>
-              Fleet Routes & Schedules
+              Live Channel Control
             </p>
           </div>
 
@@ -766,11 +775,57 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                 <HotelIcon className="w-4 h-4" />
               </div>
             </div>
-            <p className="text-2xl font-black font-mono">{stats.totalHotels}</p>
+            <p className="text-2xl font-black font-mono">{hotels.length}</p>
             <p className={`text-[10px] font-bold uppercase tracking-wider ${
               activeTab === 'hotels' ? 'text-sky-200' : 'text-slate-400'
             }`}>
-              Accommodation Partner Listings
+              Hotel Properties
+            </p>
+          </div>
+
+          <div 
+            onClick={() => setActiveTab('transports')}
+            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+              activeTab === 'transports' 
+                ? 'bg-emerald-900 text-white border-emerald-800 shadow-lg' 
+                : 'bg-white border-slate-200 hover:border-emerald-400 shadow-card'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                activeTab === 'transports' ? 'bg-white/20 text-white' : 'bg-emerald-50 text-emerald-700'
+              }`}>
+                <Bus className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-black font-mono">{transports.length}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              activeTab === 'transports' ? 'text-emerald-200' : 'text-slate-400'
+            }`}>
+              Transport Routes
+            </p>
+          </div>
+
+          <div 
+            onClick={() => setActiveTab('rides')}
+            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+              activeTab === 'rides' 
+                ? 'bg-purple-900 text-white border-purple-800 shadow-lg' 
+                : 'bg-white border-slate-200 hover:border-purple-400 shadow-card'
+            }`}
+          >
+            <div className="flex items-center justify-between mb-2">
+              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
+                activeTab === 'rides' ? 'bg-white/20 text-white' : 'bg-purple-50 text-purple-700'
+              }`}>
+                <Car className="w-4 h-4" />
+              </div>
+            </div>
+            <p className="text-2xl font-black font-mono">{rides.length}</p>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              activeTab === 'rides' ? 'text-purple-200' : 'text-slate-400'
+            }`}>
+              Rental Rides & Fleet
             </p>
           </div>
         </div>
@@ -780,16 +835,17 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
       <div className="flex items-center gap-2 overflow-x-auto pb-2 border-b border-slate-200">
         {[
           { id: 'portal', label: '🏢 Company E-Portal (কোম্পানি ই-পোর্টাল)', icon: Building2 },
+          { id: 'hotels', label: `Manage Hotels (${hotels.length})`, icon: HotelIcon },
+          { id: 'transports', label: `Manage Transport (${transports.length})`, icon: Bus },
+          { id: 'rides', label: `Manage Rides & Rentals (${rides.length})`, icon: Car },
           { id: 'inquiries', label: `Traveler Inquiries & Choices (${inquiries.length})`, icon: MessageSquare, badge: unreadAdminCount },
           { id: 'places', label: `Manage Places (${places.length})`, icon: Compass },
-          { id: 'hotels', label: `Manage Hotels (${hotels.length})`, icon: HotelIcon },
           { id: 'restaurants', label: `Manage Restaurants (${restaurants.length})`, icon: Utensils },
-          { id: 'transports', label: `Manage Transport (${transports.length})`, icon: Bus },
         ]
         .filter(tab => {
           if (isCompany && !isAdmin) {
-            // Company partners access Company E-Portal, Transports, and Hotels
-            return tab.id === 'portal' || tab.id === 'transports' || tab.id === 'hotels';
+            // Company partners ONLY see Hotel, Ride, and Transport menus (+ E-Portal overview)
+            return tab.id === 'portal' || tab.id === 'hotels' || tab.id === 'transports' || tab.id === 'rides';
           }
           return true;
         })
@@ -1371,13 +1427,23 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                     <td className="p-4 font-bold text-amber-600">⭐ {h.rating}</td>
                     <td className="p-4 text-slate-500">{h.contact_phone}</td>
                     <td className="p-4 text-right">
-                      <button
-                        onClick={() => handleDeleteItem('hotel', h.id)}
-                        className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors"
-                        title="Delete hotel"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
+                      <div className="flex items-center justify-end gap-1.5">
+                        <button
+                          onClick={() => setPreviewHotel(h)}
+                          className="px-2.5 py-1 rounded-xl bg-sky-50 text-sky-700 hover:bg-sky-100 font-bold text-xs flex items-center gap-1 transition-all"
+                          title="View Hotel Details & Real Photos"
+                        >
+                          <Eye className="w-3.5 h-3.5" />
+                          <span>View Details</span>
+                        </button>
+                        <button
+                          onClick={() => handleDeleteItem('hotel', h.id)}
+                          className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Delete hotel"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </div>
                     </td>
                   </tr>
                 ))}
@@ -1471,6 +1537,144 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
                     </td>
                   </tr>
                 ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* ========================================================================= */}
+      {/* 6. RIDES & VEHICLE RENTALS TABLE                                          */}
+      {/* ========================================================================= */}
+      {activeTab === 'rides' && (
+        <div className="bg-white rounded-3xl border border-slate-200 shadow-card overflow-hidden space-y-4 p-6">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-2xl bg-purple-50 border border-purple-100 flex items-center justify-center text-purple-700 font-bold">
+                <Car className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="font-black text-slate-900 text-base">Vehicle & Bike Rentals Fleet</h3>
+                <p className="text-xs text-slate-400 font-medium">Edit daily rental prices and toggle live vehicle availability for travelers.</p>
+              </div>
+            </div>
+
+            <div className="text-xs font-bold text-slate-500">
+              Total Fleet: <span className="font-mono text-purple-700 font-black">{rides.length} Vehicles</span>
+            </div>
+          </div>
+
+          <div className="overflow-x-auto border border-slate-100 rounded-2xl">
+            <table className="w-full text-left text-xs">
+              <thead className="bg-slate-50 border-b border-slate-200 text-slate-500 font-black uppercase text-[10px] tracking-wider">
+                <tr>
+                  <th className="p-3.5">Vehicle / Model</th>
+                  <th className="p-3.5">District & Sadar</th>
+                  <th className="p-3.5">Category</th>
+                  <th className="p-3.5">Rental Mode</th>
+                  <th className="p-3.5">Daily Rental Price (৳)</th>
+                  <th className="p-3.5">Live Availability Status</th>
+                  <th className="p-3.5">Owner / Contact</th>
+                  <th className="p-3.5 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100 font-medium text-slate-700">
+                {rides.map(rd => {
+                  const currentPrice = editingRidePrices[rd.id] !== undefined ? editingRidePrices[rd.id] : rd.price_per_day;
+
+                  return (
+                    <tr key={rd.id} className="hover:bg-slate-50/80 transition-colors">
+                      <td className="p-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <img
+                            src={rd.image_url}
+                            alt=""
+                            className="w-10 h-10 rounded-xl object-cover shrink-0 border border-slate-200"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1549399542-7e3f8b79c341?w=400';
+                            }}
+                          />
+                          <div>
+                            <p className="font-black text-slate-900">{rd.model}</p>
+                            <span className="text-[10px] text-purple-600 font-bold">{rd.vehicle_type}</span>
+                          </div>
+                        </div>
+                      </td>
+
+                      <td className="p-3.5">
+                        <p className="font-bold text-slate-800">{rd.district_name || rd.district_id}</p>
+                        <p className="text-[10px] text-slate-400">{rd.location}</p>
+                      </td>
+
+                      <td className="p-3.5">
+                        <span className="px-2 py-0.5 rounded-md bg-purple-50 text-purple-700 font-black text-[10px] uppercase">
+                          {rd.vehicle_type}
+                        </span>
+                      </td>
+
+                      <td className="p-3.5 text-slate-600 font-bold">
+                        {rd.rental_type}
+                      </td>
+
+                      {/* Edit Daily Price */}
+                      <td className="p-3.5">
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-slate-400 font-bold">৳</span>
+                          <input
+                            type="number"
+                            value={currentPrice}
+                            onChange={(e) => setEditingRidePrices({
+                              ...editingRidePrices,
+                              [rd.id]: Number(e.target.value) || 0
+                            })}
+                            className="w-20 px-2 py-1 rounded-lg border border-slate-300 font-mono font-black text-xs text-slate-900 focus:outline-none focus:ring-1 focus:ring-purple-500"
+                          />
+                          <button
+                            onClick={() => handleUpdateRidePrice(rd, currentPrice)}
+                            className="p-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-bold transition-all shadow-xs"
+                            title="Save Daily Price"
+                          >
+                            <Save className="w-3 h-3" />
+                          </button>
+                        </div>
+                      </td>
+
+                      {/* Edit Availability Status */}
+                      <td className="p-3.5">
+                        <select
+                          value={rd.availability_status}
+                          onChange={(e) => handleToggleRideStatus(rd, e.target.value as any)}
+                          className={`px-2.5 py-1 rounded-xl text-[11px] font-black border focus:outline-none cursor-pointer ${
+                            rd.availability_status === 'Available'
+                              ? 'bg-emerald-50 text-emerald-800 border-emerald-300'
+                              : rd.availability_status === 'Booked'
+                              ? 'bg-rose-50 text-rose-800 border-rose-300'
+                              : 'bg-amber-50 text-amber-800 border-amber-300'
+                          }`}
+                        >
+                          <option value="Available">🟢 Available</option>
+                          <option value="Booked">🔴 Booked</option>
+                          <option value="Under Maintenance">⚠️ Maintenance</option>
+                        </select>
+                      </td>
+
+                      <td className="p-3.5">
+                        <p className="text-xs font-bold text-slate-900">{rd.owner_name}</p>
+                        <p className="text-[11px] text-slate-400 font-mono">{rd.contact_phone}</p>
+                      </td>
+
+                      <td className="p-3.5 text-right">
+                        <button
+                          onClick={() => handleDeleteRide(rd.id)}
+                          className="p-1.5 rounded-lg text-rose-600 hover:bg-rose-50 transition-colors"
+                          title="Delete vehicle rental"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
@@ -1865,6 +2069,127 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
               </form>
             )}
 
+          </div>
+        </div>
+      )}
+
+      {/* PREVIEW HOTEL DETAILS MODAL (LAPTOP OPTIMIZED 2-COLUMN VIEW) */}
+      {previewHotel && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/70 backdrop-blur-md overflow-y-auto animate-in fade-in"
+          onClick={() => setPreviewHotel(null)}
+        >
+          <div
+            className="w-full max-w-5xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col lg:flex-row relative"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Left column: Hotel Picture & Verified Badge */}
+            <div className="lg:w-[45%] flex flex-col shrink-0 bg-slate-950 text-white border-b lg:border-b-0 lg:border-r border-slate-800 overflow-y-auto no-scrollbar">
+              <div className="relative h-56 sm:h-64 lg:h-72 overflow-hidden bg-slate-900">
+                <img
+                  src={previewHotel.image_url}
+                  alt={previewHotel.name}
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-slate-950/20" />
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <span className="px-2.5 py-1 rounded-xl bg-emerald-500 text-slate-950 text-[10px] font-black uppercase shadow-md">
+                    Verified Property
+                  </span>
+                  <span className="px-2.5 py-1 rounded-xl bg-amber-500 text-slate-950 text-[10px] font-black uppercase shadow-md">
+                    ⭐ {previewHotel.rating}
+                  </span>
+                </div>
+                <div className="absolute bottom-3 left-4 right-4 text-white">
+                  <h3 className="font-black text-xl leading-tight">{previewHotel.name}</h3>
+                  <p className="text-xs text-slate-300 flex items-center gap-1 mt-1">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                    <span>{previewHotel.location}</span>
+                  </p>
+                </div>
+              </div>
+
+              <div className="p-4 space-y-3 bg-slate-950">
+                <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-1 text-xs">
+                  <span className="text-slate-400 font-bold uppercase text-[10px]">Front Desk Helpline</span>
+                  <p className="font-mono font-bold text-white text-sm">{previewHotel.contact_phone}</p>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-center text-xs">
+                  <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block text-[10px] font-bold">CHECK-IN</span>
+                    <strong className="text-white">12:00 PM</strong>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block text-[10px] font-bold">CHECK-OUT</span>
+                    <strong className="text-white">11:00 AM</strong>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Right column: Clear Details, Amenities & Room Types */}
+            <div className="lg:w-[55%] flex-1 flex flex-col overflow-hidden bg-white text-slate-800">
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-center justify-between shrink-0 bg-white">
+                <div>
+                  <h3 className="text-lg font-black text-slate-900">{previewHotel.name}</h3>
+                  <p className="text-xs text-slate-500 font-medium">Nightly Standard Rate: <strong className="text-emerald-700 font-mono">৳{previewHotel.price_per_night.toLocaleString()}</strong></p>
+                </div>
+                <button
+                  onClick={() => setPreviewHotel(null)}
+                  className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shadow-xs"
+                >
+                  <X className="w-5 h-5" />
+                </button>
+              </div>
+
+              <div className="p-5 sm:p-6 overflow-y-auto space-y-5 flex-1">
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-1">Property Description</h4>
+                  <p className="text-xs sm:text-sm text-slate-600 leading-relaxed">
+                    {previewHotel.description || `Verified hotel property located at ${previewHotel.location}. Offering standard and luxury rooms with authentic local hospitality.`}
+                  </p>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-2">Amenities</h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-xs font-bold text-slate-700">
+                    {previewHotel.has_wifi && <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">📶 High-Speed WiFi</div>}
+                    {previewHotel.has_ac && <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">❄️ Air Conditioning</div>}
+                    {previewHotel.has_parking && <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">🚗 Secure Parking</div>}
+                    {previewHotel.has_restaurant && <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">🍽️ In-House Dining</div>}
+                    <div className="p-2 rounded-xl bg-slate-50 border border-slate-100">🛡️ 24/7 Security</div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-xs font-black uppercase tracking-wider text-slate-700 mb-2">Available Room Types</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs">
+                    {(previewHotel.room_types || ['Standard AC Couple Room', 'Executive Family Suite']).map((rt, idx) => (
+                      <div key={idx} className="p-3 rounded-2xl bg-sky-50/60 border border-sky-100 flex items-center justify-between">
+                        <div>
+                          <p className="font-black text-slate-900">{typeof rt === 'string' ? rt : (rt as any).name}</p>
+                          <p className="text-[11px] text-slate-500">Instant Online Confirmation</p>
+                        </div>
+                        <span className="text-xs font-mono font-black text-emerald-700">
+                          ৳{previewHotel.price_per_night.toLocaleString()}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <span className="text-xs text-slate-500 font-medium">Front Desk: <strong>{previewHotel.contact_phone}</strong></span>
+                <button
+                  onClick={() => setPreviewHotel(null)}
+                  className="px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  Close Preview
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       )}

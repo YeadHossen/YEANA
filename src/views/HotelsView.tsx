@@ -725,170 +725,229 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
           onClick={handleCloseModal}
         >
           <div 
-            className="w-full max-w-4xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col relative"
+            className="w-full max-w-6xl bg-white rounded-3xl shadow-2xl border border-slate-200 overflow-hidden max-h-[92vh] flex flex-col lg:flex-row relative"
             onClick={(e) => e.stopPropagation()}
           >
-            
-            {/* Close Button */}
+            {/* Mobile Close Floating Button */}
             <button
               onClick={handleCloseModal}
-              className="absolute top-4 right-4 p-2.5 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-md transition-all z-30 shadow-lg"
+              className="lg:hidden absolute top-3 right-3 p-2 rounded-full bg-slate-900/80 hover:bg-slate-900 text-white backdrop-blur-md transition-all z-30 shadow-lg"
             >
-              <X className="w-5 h-5" />
+              <X className="w-4 h-4" />
             </button>
 
             {/* ========================================================================= */}
-            {/* 1. INTERACTIVE REAL PHOTO SHOWCASE & HERO BANNER */}
+            {/* 1. LEFT COLUMN: REAL PHOTO GALLERY & FRONT DESK CONTACT                   */}
             {/* ========================================================================= */}
-            <div className="relative h-64 sm:h-80 overflow-hidden bg-slate-950 shrink-0 select-none group">
-              <img
-                src={activePhoto?.url || activeHotel.image_url}
-                alt={activePhoto?.title || activeHotel.name}
-                className="w-full h-full object-cover transition-all duration-300"
-                onError={(e) => {
-                  (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&auto=format&fit=crop&q=85';
-                }}
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-slate-950/20" />
-              
-              {/* Top Bar Badges */}
-              <div className="absolute top-4 left-4 right-16 flex items-center justify-between gap-2 z-20">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="bg-emerald-500 text-slate-950 text-[11px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-md">
-                    <CheckCircle className="w-3.5 h-3.5" />
-                    Verified Real Photos
-                  </span>
-                  <span className="bg-amber-500 text-slate-950 text-[11px] font-black px-2.5 py-1 rounded-xl flex items-center gap-1 shadow-md">
-                    <Star className="w-3.5 h-3.5 fill-slate-950 text-slate-950" /> 
-                    {activeHotel.star_category || 4}-Star
-                  </span>
-                </div>
-
-                <button
-                  onClick={() => {
-                    setLightboxIndex(selectedPhotoIndex);
-                    setIsLightboxOpen(true);
+            <div className="lg:w-[45%] flex flex-col shrink-0 bg-slate-950 text-white border-b lg:border-b-0 lg:border-r border-slate-800 overflow-y-auto no-scrollbar">
+              {/* Photo Hero Banner */}
+              <div className="relative h-48 sm:h-60 lg:h-72 overflow-hidden bg-slate-950 shrink-0 select-none group">
+                <img
+                  src={activePhoto?.url || activeHotel.image_url}
+                  alt={activePhoto?.title || activeHotel.name}
+                  className="w-full h-full object-cover transition-all duration-300"
+                  onError={(e) => {
+                    (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&auto=format&fit=crop&q=85';
                   }}
-                  className="bg-slate-900/80 hover:bg-emerald-600 text-white px-3 py-1.5 rounded-xl text-xs font-bold backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1.5 transition-all"
-                  title="Open Fullscreen Lightbox"
-                >
-                  <Maximize2 className="w-3.5 h-3.5" />
-                  <span className="hidden sm:inline">Fullscreen</span>
-                </button>
-              </div>
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/30 to-slate-950/20" />
+                
+                {/* Top Bar Badges */}
+                <div className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 z-20">
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="bg-emerald-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-md">
+                      <CheckCircle className="w-3 h-3" />
+                      Verified
+                    </span>
+                    <span className="bg-amber-500 text-slate-950 text-[10px] font-black px-2 py-0.5 rounded-lg flex items-center gap-1 shadow-md">
+                      <Star className="w-3 h-3 fill-slate-950 text-slate-950" /> 
+                      {activeHotel.star_category || 4}-Star
+                    </span>
+                  </div>
 
-              {/* Next / Previous Photo Buttons over Hero */}
-              {hotelPhotos.length > 1 && (
-                <>
                   <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedPhotoIndex((prev) => (prev - 1 + hotelPhotos.length) % hotelPhotos.length);
+                    onClick={() => {
+                      setLightboxIndex(selectedPhotoIndex);
+                      setIsLightboxOpen(true);
                     }}
-                    className="absolute left-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg z-20"
-                    title="Previous Photo"
+                    className="bg-slate-900/80 hover:bg-emerald-600 text-white px-2.5 py-1 rounded-lg text-[11px] font-bold backdrop-blur-md border border-white/20 shadow-md flex items-center gap-1 transition-all"
+                    title="Open Fullscreen Lightbox"
                   >
-                    <ChevronLeft className="w-5 h-5" />
+                    <Maximize2 className="w-3 h-3" />
+                    <span>Fullscreen</span>
                   </button>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedPhotoIndex((prev) => (prev + 1) % hotelPhotos.length);
-                    }}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg z-20"
-                    title="Next Photo"
-                  >
-                    <ChevronRight className="w-5 h-5" />
-                  </button>
-                </>
-              )}
-
-              {/* Bottom Caption & Hotel Information */}
-              <div className="absolute bottom-3 left-4 right-4 text-white space-y-1.5 z-20">
-                <div className="flex items-center justify-between gap-2">
-                  <span className="bg-slate-900/90 text-emerald-300 text-[11px] font-bold px-2.5 py-0.5 rounded-lg border border-emerald-500/30 flex items-center gap-1.5">
-                    <Camera className="w-3 h-3 text-emerald-400" />
-                    <span>Photo {selectedPhotoIndex + 1} of {hotelPhotos.length}: {activePhoto?.title}</span>
-                  </span>
-                  <span className="text-xs text-slate-300 font-medium hidden sm:inline">
-                    ★ {activeHotel.rating} ({activeHotel.reviews_count || 120} reviews)
-                  </span>
                 </div>
 
-                <h2 className="text-xl sm:text-2xl font-black">{activeHotel.name}</h2>
-                <p className="text-xs text-slate-300 flex items-center gap-1.5 font-medium">
-                  <MapPin className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>{activeHotel.address || activeHotel.location}</span>
-                </p>
-              </div>
-            </div>
-
-            {/* Photo Category Filter Tabs & Interactive Real Thumbnail Strip */}
-            <div className="bg-slate-900 px-4 py-3 border-b border-slate-800 space-y-2">
-              {/* Category Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar pb-1 text-xs">
-                <span className="text-[11px] text-slate-400 font-bold uppercase shrink-0 mr-1 flex items-center gap-1">
-                  <Layers className="w-3 h-3 text-emerald-400" /> Filter Gallery:
-                </span>
-                {[
-                  { id: 'all', label: `All Photos (${hotelPhotos.length})` },
-                  { id: 'rooms', label: '🛏️ Rooms & Suites' },
-                  { id: 'pool', label: '🌊 Pool & Views' },
-                  { id: 'dining', label: '🍽️ Dining & Buffet' },
-                  { id: 'exterior', label: '🏛️ Exterior & Grounds' }
-                ].map(tab => (
-                  <button
-                    key={tab.id}
-                    onClick={() => setPhotoCategoryFilter(tab.id as any)}
-                    className={`px-3 py-1 rounded-xl text-xs font-bold transition-all shrink-0 ${
-                      photoCategoryFilter === tab.id
-                        ? 'bg-emerald-500 text-slate-950 shadow-md'
-                        : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
-                    }`}
-                  >
-                    {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Thumbnail Strip */}
-              <div className="flex items-center gap-2 overflow-x-auto pb-1 no-scrollbar">
-                {filteredPhotos.map((photo, pIdx) => {
-                  const globalIdx = hotelPhotos.findIndex(p => p.url === photo.url);
-                  const isSelected = selectedPhotoIndex === globalIdx;
-
-                  return (
+                {/* Next / Previous Photo Buttons over Hero */}
+                {hotelPhotos.length > 1 && (
+                  <>
                     <button
-                      key={pIdx}
-                      onClick={() => setSelectedPhotoIndex(globalIdx >= 0 ? globalIdx : 0)}
-                      className={`relative w-16 h-12 sm:w-20 sm:h-14 rounded-xl overflow-hidden shrink-0 border-2 transition-all group ${
-                        isSelected 
-                          ? 'border-emerald-400 ring-2 ring-emerald-500/50 scale-105 shadow-md' 
-                          : 'border-slate-700 opacity-60 hover:opacity-100'
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPhotoIndex((prev) => (prev - 1 + hotelPhotos.length) % hotelPhotos.length);
+                      }}
+                      className="absolute left-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg z-20"
+                      title="Previous Photo"
+                    >
+                      <ChevronLeft className="w-4 h-4" />
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedPhotoIndex((prev) => (prev + 1) % hotelPhotos.length);
+                      }}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white backdrop-blur-md transition-all opacity-80 group-hover:opacity-100 shadow-lg z-20"
+                      title="Next Photo"
+                    >
+                      <ChevronRight className="w-4 h-4" />
+                    </button>
+                  </>
+                )}
+
+                {/* Bottom Caption & Photo Counter */}
+                <div className="absolute bottom-2 left-3 right-3 text-white flex items-center justify-between text-[11px] z-20">
+                  <span className="bg-slate-900/90 text-emerald-300 font-bold px-2 py-0.5 rounded-lg border border-emerald-500/30 flex items-center gap-1">
+                    <Camera className="w-3 h-3 text-emerald-400" />
+                    <span>Photo {selectedPhotoIndex + 1}/{hotelPhotos.length}: {activePhoto?.title}</span>
+                  </span>
+                  <span className="text-[11px] bg-slate-900/80 px-2 py-0.5 rounded-lg text-slate-300 font-medium">
+                    ★ {activeHotel.rating} ({activeHotel.reviews_count || 120})
+                  </span>
+                </div>
+              </div>
+
+              {/* Photo Filter Categories & Thumbnails */}
+              <div className="p-3 border-b border-slate-800 space-y-2 bg-slate-900/60">
+                <div className="flex items-center gap-1 overflow-x-auto no-scrollbar pb-0.5 text-[11px]">
+                  {[
+                    { id: 'all', label: `All (${hotelPhotos.length})` },
+                    { id: 'rooms', label: '🛏️ Rooms' },
+                    { id: 'pool', label: '🌊 Pool/View' },
+                    { id: 'dining', label: '🍽️ Dining' },
+                    { id: 'exterior', label: '🏛️ Exterior' }
+                  ].map(tab => (
+                    <button
+                      key={tab.id}
+                      onClick={() => setPhotoCategoryFilter(tab.id as any)}
+                      className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition-all shrink-0 ${
+                        photoCategoryFilter === tab.id
+                          ? 'bg-emerald-500 text-slate-950 font-black shadow-xs'
+                          : 'bg-slate-800 text-slate-300 hover:bg-slate-700'
                       }`}
                     >
-                      <img
-                        src={photo.url}
-                        alt={photo.title}
-                        className="w-full h-full object-cover"
-                        loading="lazy"
-                        onError={(e) => {
-                          (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&auto=format&fit=crop&q=80';
-                        }}
-                      />
-                      {isSelected && (
-                        <div className="absolute inset-0 bg-emerald-950/30 flex items-center justify-center">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-300 drop-shadow" />
-                        </div>
-                      )}
+                      {tab.label}
                     </button>
-                  );
-                })}
+                  ))}
+                </div>
+
+                {/* Thumbnails Strip */}
+                <div className="flex items-center gap-1.5 overflow-x-auto pb-1 no-scrollbar">
+                  {filteredPhotos.map((photo, pIdx) => {
+                    const globalIdx = hotelPhotos.findIndex(p => p.url === photo.url);
+                    const isSelected = selectedPhotoIndex === globalIdx;
+
+                    return (
+                      <button
+                        key={pIdx}
+                        onClick={() => setSelectedPhotoIndex(globalIdx >= 0 ? globalIdx : 0)}
+                        className={`relative w-14 h-10 sm:w-16 sm:h-11 rounded-lg overflow-hidden shrink-0 border-2 transition-all group ${
+                          isSelected 
+                            ? 'border-emerald-400 ring-2 ring-emerald-500/50 scale-105 shadow-md' 
+                            : 'border-slate-700 opacity-60 hover:opacity-100'
+                        }`}
+                      >
+                        <img
+                          src={photo.url}
+                          alt={photo.title}
+                          className="w-full h-full object-cover"
+                          loading="lazy"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=200&auto=format&fit=crop&q=80';
+                          }}
+                        />
+                        {isSelected && (
+                          <div className="absolute inset-0 bg-emerald-950/30 flex items-center justify-center">
+                            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-300" />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Property Contact & Front Desk Card */}
+              <div className="p-3.5 space-y-2.5 hidden lg:block text-xs bg-slate-950">
+                <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-slate-400 text-[10px] font-bold uppercase">Front Desk Support</span>
+                    <span className="text-[10px] text-emerald-400 font-bold">24/7 Verified</span>
+                  </div>
+                  <div className="flex items-center justify-between gap-2">
+                    <span className="font-mono font-bold text-white text-xs">{activeHotel.contact_phone || '+880 1700-000000'}</span>
+                    <a
+                      href={`tel:${activeHotel.contact_phone}`}
+                      className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-black text-[11px] flex items-center gap-1 transition-all"
+                    >
+                      <Phone className="w-3 h-3" />
+                      <span>Call Now</span>
+                    </a>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-2 text-center text-[10px]">
+                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block font-bold">CHECK-IN</span>
+                    <strong className="text-white">12:00 PM</strong>
+                  </div>
+                  <div className="p-2 rounded-xl bg-slate-900 border border-slate-800">
+                    <span className="text-slate-400 block font-bold">CHECK-OUT</span>
+                    <strong className="text-white">11:00 AM</strong>
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Modal Scrollable Content */}
-            <div className="p-6 overflow-y-auto space-y-6 flex-1 text-slate-800">
+            {/* ========================================================================= */}
+            {/* 2. RIGHT COLUMN: PROPERTY DETAILS, AMENITIES, ROOMS & BOOKING (HIGH VIS)  */}
+            {/* ========================================================================= */}
+            <div className="lg:w-[55%] flex-1 flex flex-col overflow-hidden bg-white text-slate-800">
+              {/* Sticky Top Header on Right */}
+              <div className="p-4 sm:p-5 border-b border-slate-100 flex items-start justify-between gap-3 shrink-0 bg-white">
+                <div>
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
+                    <span className="px-2 py-0.5 rounded-md bg-sky-100 text-sky-800 text-[10px] font-black uppercase">
+                      {activeHotel.upazila_name || activeHotel.district_name || 'Verified Property'}
+                    </span>
+                    <span className="text-xs text-amber-500 font-black flex items-center gap-1">
+                      ★ {activeHotel.rating} <span className="text-slate-400 font-normal">({activeHotel.reviews_count || 120} reviews)</span>
+                    </span>
+                  </div>
+                  <h2 className="text-lg sm:text-xl font-black text-slate-900 font-heading leading-tight">{activeHotel.name}</h2>
+                  <p className="text-xs text-slate-500 flex items-center gap-1.5 mt-1 font-medium">
+                    <MapPin className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                    <span>{activeHotel.address || activeHotel.location}</span>
+                  </p>
+                </div>
+
+                <div className="flex items-center gap-3 shrink-0">
+                  <div className="text-right hidden sm:block">
+                    <span className="text-[10px] text-slate-400 block font-bold uppercase">Starting From</span>
+                    <span className="text-lg font-mono font-black text-emerald-700">৳{activeHotel.price_per_night.toLocaleString()}</span>
+                    <span className="text-[10px] text-slate-400 block">/night</span>
+                  </div>
+                  <button
+                    onClick={handleCloseModal}
+                    className="p-2 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-700 transition-all shadow-xs"
+                    title="Close Modal"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+              </div>
+
+              {/* Modal Scrollable Content on Right */}
+              <div className="p-4 sm:p-6 overflow-y-auto space-y-6 flex-1 text-slate-800">
               
               {/* Hotel Overview & Description */}
               <div className="space-y-2">
@@ -1257,23 +1316,24 @@ export const HotelsView: React.FC<HotelsViewProps> = ({
 
               </div>
 
-            </div>
+              {/* Modal Bottom Close inside Right Column */}
+              <div className="p-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between shrink-0">
+                <span className="text-xs text-slate-500 font-medium">
+                  Front Desk Helpline: <strong className="text-slate-800">{activeHotel.contact_phone}</strong>
+                </span>
+                <button
+                  onClick={handleCloseModal}
+                  className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all shadow-xs"
+                >
+                  Close Window
+                </button>
+              </div>
 
-            {/* Modal Bottom Close */}
-            <div className="p-4 bg-slate-100 border-t border-slate-200 flex items-center justify-between">
-              <span className="text-xs text-slate-500 font-medium">
-                Helpline: <strong className="text-slate-800">{activeHotel.contact_phone}</strong>
-              </span>
-              <button
-                onClick={handleCloseModal}
-                className="px-5 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold transition-all"
-              >
-                Close Window
-              </button>
             </div>
 
           </div>
         </div>
+      </div>
       )}
 
       {/* ========================================================================= */}

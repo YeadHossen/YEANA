@@ -643,6 +643,32 @@ export const DataService = {
     return getLocal<Ride>(STORAGE_KEYS.RIDES, INITIAL_RIDES);
   },
 
+  async saveRide(ride: Ride): Promise<Ride> {
+    if (isSupabaseConfigured && supabase) {
+      const { data, error } = await supabase.from('rides').upsert(ride).select().single();
+      if (!error && data) return data as Ride;
+    }
+    const list = getLocal<Ride>(STORAGE_KEYS.RIDES, INITIAL_RIDES);
+    const index = list.findIndex(r => r.id === ride.id);
+    if (index >= 0) {
+      list[index] = ride;
+    } else {
+      list.unshift(ride);
+    }
+    setLocal(STORAGE_KEYS.RIDES, list);
+    return ride;
+  },
+
+  async deleteRide(id: string): Promise<boolean> {
+    if (isSupabaseConfigured && supabase) {
+      const { error } = await supabase.from('rides').delete().eq('id', id);
+      if (!error) return true;
+    }
+    const list = getLocal<Ride>(STORAGE_KEYS.RIDES, INITIAL_RIDES).filter(r => r.id !== id);
+    setLocal(STORAGE_KEYS.RIDES, list);
+    return true;
+  },
+
   // Reviews
   async getReviews(targetType?: string, targetId?: string): Promise<Review[]> {
     const url = targetId ? `/api/reviews?target_id=${targetId}` : '/api/reviews';

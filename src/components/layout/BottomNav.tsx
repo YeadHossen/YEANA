@@ -1,18 +1,30 @@
 import React from 'react';
-import { Compass, MapPin, Calendar, Heart, User } from 'lucide-react';
+import { Compass, MapPin, Calendar, Heart, User, Building2, Hotel, Bus, Car } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFavorites } from '../../context/FavoritesContext';
+import { useAuth } from '../../context/AuthContext';
 
 interface BottomNavProps {
   currentTab: string;
   setCurrentTab: (tab: string) => void;
 }
 
+interface TabItem {
+  id: string;
+  label: string;
+  icon: React.ComponentType<{ className?: string }>;
+  activeColor: string;
+  activeBg: string;
+  labelColor: string;
+  badge?: number;
+}
+
 export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab }) => {
   const { t } = useLanguage();
   const { favorites } = useFavorites();
+  const { isCompany, isAdmin } = useAuth();
 
-  const tabs = [
+  const travelerTabs: TabItem[] = [
     { 
       id: 'home', 
       label: t('nav.home'), 
@@ -55,6 +67,43 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
       labelColor: 'text-indigo-800'
     },
   ];
+
+  const companyTabs: TabItem[] = [
+    { 
+      id: 'admin', 
+      label: 'E-Portal', 
+      icon: Building2,
+      activeColor: 'text-blue-700',
+      activeBg: 'bg-blue-50/90 border-blue-200/80',
+      labelColor: 'text-blue-900'
+    },
+    { 
+      id: 'hotels', 
+      label: t('nav.hotels'), 
+      icon: Hotel,
+      activeColor: 'text-indigo-600',
+      activeBg: 'bg-indigo-50/90 border-indigo-200/80',
+      labelColor: 'text-indigo-900'
+    },
+    { 
+      id: 'transport', 
+      label: t('nav.transport'), 
+      icon: Bus,
+      activeColor: 'text-sky-600',
+      activeBg: 'bg-sky-50/90 border-sky-200/80',
+      labelColor: 'text-sky-900'
+    },
+    { 
+      id: 'ride', 
+      label: t('nav.ride'), 
+      icon: Car,
+      activeColor: 'text-rose-600',
+      activeBg: 'bg-rose-50/90 border-rose-200/80',
+      labelColor: 'text-rose-900'
+    },
+  ];
+
+  const tabs = (isCompany && !isAdmin) ? companyTabs : travelerTabs;
 
   return (
     <div className="xl:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-2 pt-1 safe-area-bottom pointer-events-none">
