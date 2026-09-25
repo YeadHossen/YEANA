@@ -368,18 +368,28 @@ export const Navbar: React.FC<NavbarProps> = ({
               </button>
             )}
 
-            {/* Mobile Menu Toggle Button (Directly visible on the right side) */}
+            {/* Mobile Menu Toggle Button (Clearly visible on the right side) */}
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className={`xl:hidden p-2 rounded-xl transition-all flex items-center justify-center border shadow-xs active:scale-95 ${
+              className={`xl:hidden px-3 py-2 rounded-2xl transition-all flex items-center justify-center gap-1.5 border shadow-xs active:scale-90 ${
                 mobileMenuOpen 
                   ? 'bg-rose-50 text-rose-600 border-rose-200 ring-2 ring-rose-400/30' 
-                  : 'bg-slate-100/90 text-slate-800 hover:text-slate-950 hover:bg-slate-200/90 border-slate-300'
+                  : 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white border-emerald-500 shadow-md shadow-emerald-950/20 hover:brightness-105'
               }`}
               aria-label={mobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
               title="Menu"
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? (
+                <>
+                  <X className="w-4 h-4" />
+                  <span className="text-xs font-black">Close</span>
+                </>
+              ) : (
+                <>
+                  <Menu className="w-4 h-4" />
+                  <span className="text-xs font-black tracking-wide">Menu</span>
+                </>
+              )}
             </button>
           </div>
 
@@ -388,30 +398,39 @@ export const Navbar: React.FC<NavbarProps> = ({
 
       {/* Mobile Dropdown Navigation Menu */}
       {mobileMenuOpen && (
-        <div className="xl:hidden border-t border-slate-200 bg-white/98 backdrop-blur-2xl px-4 pt-3 pb-8 space-y-3 shadow-2xl max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain animate-in slide-in-from-top-2 duration-150">
+        <div className="xl:hidden border-t border-slate-200/80 bg-white/98 backdrop-blur-3xl px-4 pt-3 pb-8 space-y-4 shadow-2xl max-h-[calc(100dvh-4.5rem)] overflow-y-auto overscroll-contain animate-in slide-in-from-top-2 duration-200">
+          
           {/* User Account Bar with Sign Out / Sign In option */}
           {isAuthenticated ? (
-            <div className="p-3 rounded-2xl bg-slate-50 border border-slate-200/80 flex items-center justify-between gap-2 shadow-xs">
+            <div className="p-3.5 rounded-2xl bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 text-white border border-slate-800 flex items-center justify-between gap-3 shadow-lg">
               <div 
                 onClick={() => { 
                   setCurrentTab(isCompany && !isAdmin ? 'admin' : 'profile'); 
                   setMobileMenuOpen(false); 
                 }}
-                className="flex items-center gap-2.5 min-w-0 cursor-pointer"
+                className="flex items-center gap-3 min-w-0 cursor-pointer flex-1"
               >
-                <img
-                  src={user?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
-                  alt={user?.full_name || 'User'}
-                  className="w-9 h-9 rounded-xl object-cover ring-2 ring-emerald-500/20 shrink-0"
-                />
+                <div className="relative shrink-0">
+                  <img
+                    src={user?.avatar_url || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}
+                    alt={user?.full_name || 'User'}
+                    className="w-10 h-10 rounded-xl object-cover ring-2 ring-emerald-400/30"
+                  />
+                  <span className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-500 rounded-full border-2 border-slate-950" />
+                </div>
                 <div className="min-w-0">
-                  <p className="text-xs font-bold text-slate-800 truncate">{user?.full_name}</p>
-                  <p className="text-[10px] text-slate-500 truncate">{user?.email}</p>
+                  <div className="flex items-center gap-1.5">
+                    <p className="text-xs font-black text-white truncate font-heading">{user?.full_name}</p>
+                    <span className="px-1.5 py-0.2 rounded-md bg-emerald-500/20 text-emerald-300 text-[9px] font-bold uppercase border border-emerald-500/30 shrink-0">
+                      {isAdmin ? 'Admin' : isCompany ? 'Partner' : 'Traveler'}
+                    </span>
+                  </div>
+                  <p className="text-[10px] text-slate-400 truncate font-mono mt-0.5">{user?.email}</p>
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="px-3 py-1.5 rounded-xl bg-rose-500 hover:bg-rose-600 text-white text-xs font-bold flex items-center gap-1.5 shadow-xs transition-all shrink-0 active:scale-95"
+                className="px-3 py-1.5 rounded-xl bg-rose-500/90 hover:bg-rose-600 text-white text-xs font-bold flex items-center gap-1 shadow-md transition-all shrink-0 active:scale-95 border border-rose-400/40"
               >
                 <LogOut className="w-3.5 h-3.5" />
                 <span>{t('nav.logout')}</span>
@@ -423,50 +442,97 @@ export const Navbar: React.FC<NavbarProps> = ({
                 setMobileMenuOpen(false);
                 onOpenAuth();
               }}
-              className="w-full py-2.5 rounded-xl bg-brand-600 hover:bg-brand-700 text-white text-xs font-bold flex items-center justify-center gap-2 shadow-xs transition-all active:scale-95"
+              className="w-full py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-black flex items-center justify-center gap-2 shadow-lg shadow-emerald-950/25 transition-all active:scale-95"
             >
               <User className="w-4 h-4" />
               <span>{t('nav.login')} / Sign In</span>
             </button>
           )}
 
-          <div className="grid grid-cols-2 gap-2 pt-1">
-            {activeNavLinks.map(link => {
-              const Icon = link.icon;
-              const isActive = currentTab === link.id;
-              return (
+          {/* Quick Support & Helplines Strip */}
+          <div className="grid grid-cols-2 gap-2 text-xs">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                openTravelerChat();
+              }}
+              className="p-2.5 rounded-2xl bg-emerald-50/80 hover:bg-emerald-100/80 text-emerald-800 border border-emerald-200/80 flex items-center gap-2 font-bold transition-all text-left shadow-2xs active:scale-95"
+            >
+              <div className="w-7 h-7 rounded-xl bg-emerald-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <MessageSquare className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[11px] font-black">24/7 Concierge</span>
+                <span className="block text-[9px] text-emerald-600 truncate font-medium">Live Tour Help</span>
+              </div>
+            </button>
+
+            <a
+              href="tel:999"
+              className="p-2.5 rounded-2xl bg-rose-50/80 hover:bg-rose-100/80 text-rose-800 border border-rose-200/80 flex items-center gap-2 font-bold transition-all text-left shadow-2xs active:scale-95"
+            >
+              <div className="w-7 h-7 rounded-xl bg-rose-500 text-white flex items-center justify-center shrink-0 shadow-xs">
+                <ShieldAlert className="w-3.5 h-3.5" />
+              </div>
+              <div className="min-w-0">
+                <span className="block text-[11px] font-black">Emergency 999</span>
+                <span className="block text-[9px] text-rose-600 truncate font-medium">Police & Rescue</span>
+              </div>
+            </a>
+          </div>
+
+          {/* Categorized Navigation Grid */}
+          <div>
+            <div className="flex items-center justify-between pb-2 px-1">
+              <span className="text-[10px] font-black tracking-wider uppercase text-slate-400">All Travel Hubs</span>
+              <span className="text-[10px] text-emerald-700 font-bold">{activeNavLinks.length} Services</span>
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              {activeNavLinks.map(link => {
+                const Icon = link.icon;
+                const isActive = currentTab === link.id;
+                return (
+                  <button
+                    key={link.id}
+                    onClick={() => {
+                      setCurrentTab(link.id);
+                      setMobileMenuOpen(false);
+                    }}
+                    className={`p-3 rounded-2xl text-xs font-bold flex items-center gap-2.5 border transition-all text-left ${
+                      isActive 
+                        ? `${link.active} shadow-md scale-102 ring-1 ring-emerald-500/30` 
+                        : 'bg-slate-50/90 text-slate-800 border-slate-200/80 hover:bg-white hover:border-slate-300 hover:shadow-xs active:scale-95'
+                    }`}
+                  >
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center shrink-0 shadow-xs ${isActive ? 'bg-white' : 'bg-white border border-slate-200/60'}`}>
+                      <Icon className={`w-4 h-4 ${link.color}`} />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <span className="block font-black truncate text-xs">{link.label}</span>
+                      {isActive && (
+                        <span className="block text-[9px] text-emerald-600 font-semibold">Active View</span>
+                      )}
+                    </div>
+                  </button>
+                );
+              })}
+
+              {isAdmin && (
                 <button
-                  key={link.id}
                   onClick={() => {
-                    setCurrentTab(link.id);
+                    setCurrentTab('admin');
                     setMobileMenuOpen(false);
                   }}
-                  className={`p-2.5 rounded-xl text-xs font-bold flex items-center gap-2 border transition-all ${
-                    isActive 
-                      ? `${link.active} shadow-xs font-black` 
-                      : 'bg-slate-50/90 text-slate-700 border-slate-200/70 hover:bg-white hover:border-slate-300'
-                  }`}
+                  className="col-span-2 p-3 rounded-2xl text-xs font-black bg-gradient-to-r from-amber-500 to-orange-500 text-white flex items-center justify-center gap-2 shadow-lg shadow-amber-950/20 active:scale-95"
                 >
-                  <div className={`w-6 h-6 rounded-lg flex items-center justify-center ${isActive ? 'bg-white shadow-xs' : 'bg-slate-100'}`}>
-                    <Icon className={`w-3.5 h-3.5 ${link.color}`} />
-                  </div>
-                  <span className="truncate">{link.label}</span>
+                  <ShieldCheck className="w-4 h-4" />
+                  <span>{t('nav.admin')} Console</span>
                 </button>
-              );
-            })}
-            {isAdmin && (
-              <button
-                onClick={() => {
-                  setCurrentTab('admin');
-                  setMobileMenuOpen(false);
-                }}
-                className="col-span-2 p-2.5 rounded-xl text-xs font-bold bg-amber-500 text-white flex items-center justify-center gap-2 shadow-sm"
-              >
-                <ShieldCheck className="w-4 h-4" />
-                <span>{t('nav.admin')}</span>
-              </button>
-            )}
+              )}
+            </div>
           </div>
+
         </div>
       )}
     </header>

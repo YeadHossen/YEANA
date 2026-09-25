@@ -232,11 +232,8 @@ export const HomeView: React.FC<HomeViewProps> = ({
   ];
 
   return (
-    <div className="space-y-12 sm:space-y-16 pb-20 bg-bangla-mesh w-full max-w-full overflow-x-hidden">
+    <div className="space-y-12 sm:space-y-16 pb-20 bg-bangla-mesh w-full max-w-full overflow-x-clip">
 
-      {/* ========================================================================= */}
-      {/* 1. HERO SECTION: ALL-IN-ONE BANGLADESHI TRAVEL HUB                       */}
-      {/* ========================================================================= */}
       {/* ========================================================================= */}
       {/* 1. HERO SECTION: ALL-IN-ONE BANGLADESHI TRAVEL HUB                       */}
       {/* ========================================================================= */}
@@ -471,19 +468,22 @@ export const HomeView: React.FC<HomeViewProps> = ({
               <button
                 key={cat.id}
                 onClick={() => onNavigateTab(cat.id)}
-                className={`p-4 rounded-3xl transition-all duration-300 flex flex-col items-center justify-center gap-2.5 group hover:-translate-y-1.5 relative overflow-hidden ${cat.cardClass}`}
+                className={`p-4 rounded-3xl transition-all duration-300 flex flex-col items-center justify-center gap-2.5 group hover:-translate-y-1.5 active:scale-95 relative overflow-hidden shadow-xs hover:shadow-lg ${cat.cardClass}`}
               >
+                {/* Specular Light Reflection Accent */}
+                <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/35 to-transparent pointer-events-none rounded-t-3xl" />
+
                 {/* Floating Micro Badge */}
-                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cat.badgeClass}`}>
+                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cat.badgeClass} relative z-10 shadow-2xs`}>
                   {cat.badge}
                 </span>
 
-                <div className={`w-12 h-12 rounded-2xl ${cat.iconBg} flex items-center justify-center group-hover:scale-110 group-hover:shadow-md transition-all duration-300`}>
+                <div className={`w-12 h-12 rounded-2xl ${cat.iconBg} flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md transition-all duration-300 relative z-10`}>
                   <Icon className={`w-6 h-6 ${cat.iconColor} transition-transform duration-300 group-hover:scale-105`} />
                 </div>
                 
-                <div className="text-center">
-                  <span className="text-xs font-black text-slate-900 tracking-tight block">
+                <div className="text-center relative z-10">
+                  <span className="text-xs font-black text-slate-900 tracking-tight block font-heading">
                     {cat.label}
                   </span>
                   <span className="text-[10px] text-slate-600 font-medium">

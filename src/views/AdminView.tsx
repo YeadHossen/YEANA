@@ -664,70 +664,70 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
           {/* Inquiries & Messaging Metric (Highlighted) */}
           <div 
             onClick={() => setActiveTab('inquiries')}
-            className={`p-4 rounded-3xl border cursor-pointer transition-all ${
+            className={`p-4 rounded-3xl border cursor-pointer transition-all duration-300 active:scale-95 ${
               activeTab === 'inquiries' 
-                ? 'bg-brand-900 text-white border-brand-800 shadow-lg' 
-                : 'bg-white border-brand-200 hover:border-brand-500 shadow-card'
+                ? 'bg-slate-900 text-white border-brand-500 shadow-xl ring-2 ring-brand-500/30' 
+                : 'bg-white/90 border-slate-200/90 hover:border-emerald-500 hover:-translate-y-1 shadow-card hover:shadow-lg'
             }`}
           >
             <div className="flex items-center justify-between mb-2">
-              <div className={`w-8 h-8 rounded-xl flex items-center justify-center ${
-                activeTab === 'inquiries' ? 'bg-white/20 text-white' : 'bg-brand-50 text-brand-700'
+              <div className={`w-9 h-9 rounded-2xl flex items-center justify-center shadow-xs ${
+                activeTab === 'inquiries' ? 'bg-brand-600 text-white' : 'bg-emerald-50 text-emerald-700 border border-emerald-200'
               }`}>
                 <MessageSquare className="w-4 h-4" />
               </div>
               {unreadAdminCount > 0 && (
-                <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse">
+                <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse shadow-xs">
                   {unreadAdminCount} New
                 </span>
               )}
             </div>
-            <p className="text-2xl font-black font-mono">{inquiries.length}</p>
+            <p className="text-2xl font-black font-heading tracking-tight">{inquiries.length}</p>
             <p className={`text-[10px] font-bold uppercase tracking-wider ${
-              activeTab === 'inquiries' ? 'text-brand-200' : 'text-slate-400'
+              activeTab === 'inquiries' ? 'text-brand-300' : 'text-slate-500'
             }`}>
               Traveler Inquiries
             </p>
           </div>
 
-          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-            <div className="w-8 h-8 rounded-xl bg-purple-50 text-purple-700 flex items-center justify-center mb-2">
+          <div className="p-4 rounded-3xl bg-white/90 border border-slate-200/90 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+            <div className="w-9 h-9 rounded-2xl bg-purple-50 text-purple-700 border border-purple-200 flex items-center justify-center mb-2 shadow-xs">
               <Users className="w-4 h-4" />
             </div>
-            <p className="text-2xl font-black text-slate-900 font-mono">{stats.totalUsers}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase">Total Users</p>
+            <p className="text-2xl font-black text-slate-900 font-heading tracking-tight">{stats.totalUsers}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Users</p>
           </div>
 
-          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-            <div className="w-8 h-8 rounded-xl bg-teal-50 text-teal-700 flex items-center justify-center mb-2">
+          <div className="p-4 rounded-3xl bg-white/90 border border-slate-200/90 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+            <div className="w-9 h-9 rounded-2xl bg-teal-50 text-teal-700 border border-teal-200 flex items-center justify-center mb-2 shadow-xs">
               <Compass className="w-4 h-4" />
             </div>
-            <p className="text-2xl font-black text-teal-700 font-mono">{stats.totalPlaces}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase">Places</p>
+            <p className="text-2xl font-black text-teal-800 font-heading tracking-tight">{stats.totalPlaces}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Places</p>
           </div>
 
-          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-            <div className="w-8 h-8 rounded-xl bg-sky-50 text-sky-700 flex items-center justify-center mb-2">
+          <div className="p-4 rounded-3xl bg-white/90 border border-slate-200/90 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+            <div className="w-9 h-9 rounded-2xl bg-sky-50 text-sky-700 border border-sky-200 flex items-center justify-center mb-2 shadow-xs">
               <HotelIcon className="w-4 h-4" />
             </div>
-            <p className="text-2xl font-black text-sky-700 font-mono">{stats.totalHotels}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase">Hotels</p>
+            <p className="text-2xl font-black text-sky-800 font-heading tracking-tight">{stats.totalHotels}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Hotels</p>
           </div>
 
-          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-            <div className="w-8 h-8 rounded-xl bg-amber-50 text-amber-700 flex items-center justify-center mb-2">
+          <div className="p-4 rounded-3xl bg-white/90 border border-slate-200/90 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+            <div className="w-9 h-9 rounded-2xl bg-amber-50 text-amber-700 border border-amber-200 flex items-center justify-center mb-2 shadow-xs">
               <Utensils className="w-4 h-4" />
             </div>
-            <p className="text-2xl font-black text-amber-700 font-mono">{stats.totalRestaurants}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase">Restaurants</p>
+            <p className="text-2xl font-black text-amber-800 font-heading tracking-tight">{stats.totalRestaurants}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Restaurants</p>
           </div>
 
-          <div className="p-4 rounded-3xl bg-white border border-slate-200 shadow-card">
-            <div className="w-8 h-8 rounded-xl bg-emerald-50 text-emerald-700 flex items-center justify-center mb-2">
+          <div className="p-4 rounded-3xl bg-white/90 border border-slate-200/90 shadow-card hover:-translate-y-1 hover:shadow-lg transition-all duration-300">
+            <div className="w-9 h-9 rounded-2xl bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center justify-center mb-2 shadow-xs">
               <Bus className="w-4 h-4" />
             </div>
-            <p className="text-2xl font-black text-emerald-700 font-mono">{stats.totalTransports}</p>
-            <p className="text-[10px] text-slate-400 font-bold uppercase">Transports</p>
+            <p className="text-2xl font-black text-emerald-800 font-heading tracking-tight">{stats.totalTransports}</p>
+            <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Transports</p>
           </div>
 
         </div>
@@ -856,16 +856,16 @@ export const AdminView: React.FC<AdminViewProps> = ({ onBackToHome }) => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id as any)}
-              className={`px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all ${
+              className={`px-4 py-2.5 rounded-2xl text-xs font-bold flex items-center gap-2 whitespace-nowrap transition-all duration-200 active:scale-95 ${
                 isActive 
-                  ? 'bg-slate-900 text-white shadow-md' 
-                  : 'bg-white border border-slate-200 text-slate-700 hover:bg-slate-50'
+                  ? 'bg-slate-900 text-white shadow-md font-black scale-102 ring-1 ring-slate-800' 
+                  : 'bg-white/90 border border-slate-200/90 text-slate-700 hover:text-slate-950 hover:bg-white hover:border-slate-300 shadow-2xs hover:shadow-xs'
               }`}
             >
               <Icon className="w-4 h-4" />
               <span>{tab.label}</span>
               {tab.badge && tab.badge > 0 ? (
-                <span className="px-1.5 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black">
+                <span className="px-2 py-0.5 rounded-full bg-rose-500 text-white text-[10px] font-black animate-pulse shadow-xs">
                   {tab.badge}
                 </span>
               ) : null}

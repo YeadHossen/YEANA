@@ -106,8 +106,8 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
   const tabs = (isCompany && !isAdmin) ? companyTabs : travelerTabs;
 
   return (
-    <nav className="xl:hidden fixed bottom-0 left-0 right-0 z-40 px-3 pb-2 pt-1 safe-area-bottom pointer-events-none" aria-label="Mobile Navigation Bar">
-      <div className="max-w-md mx-auto bg-white/96 backdrop-blur-2xl border border-slate-200/90 shadow-[0_12px_40px_-5px_rgba(15,23,42,0.18),inset_0_1.5px_0_rgba(255,255,255,0.95)] rounded-2xl px-2 py-1.5 flex items-center justify-around pointer-events-auto">
+    <nav className="xl:hidden fixed bottom-1.5 inset-x-0 z-40 px-3 pb-1 safe-area-bottom pointer-events-none" aria-label="Mobile Navigation Bar">
+      <div className="max-w-md mx-auto bg-white/96 backdrop-blur-3xl border border-slate-200/90 shadow-[0_16px_40px_-6px_rgba(15,23,42,0.18),0_4px_16px_rgba(15,23,42,0.06),inset_0_1.5px_0_rgba(255,255,255,0.95)] rounded-3xl px-2 py-1.5 flex items-center justify-around pointer-events-auto">
         {tabs.map(tab => {
           const Icon = tab.icon;
           const isActive = currentTab === tab.id;
@@ -115,17 +115,17 @@ export const BottomNav: React.FC<BottomNavProps> = ({ currentTab, setCurrentTab 
             <button
               key={tab.id}
               onClick={() => setCurrentTab(tab.id)}
-              className={`flex flex-col items-center justify-center py-1 px-3 rounded-xl transition-all relative ${
+              className={`flex flex-col items-center justify-center py-1.5 px-3 rounded-2xl transition-all relative active:scale-90 ${
                 isActive 
-                  ? `${tab.activeColor} font-black scale-105` 
+                  ? `${tab.activeColor} font-black scale-102` 
                   : 'text-slate-500 hover:text-slate-900'
               }`}
             >
               {isActive && (
-                <span className={`absolute inset-0 ${tab.activeBg} rounded-xl -z-10 border shadow-xs`} />
+                <span className={`absolute inset-0 ${tab.activeBg} rounded-2xl -z-10 border shadow-2xs`} />
               )}
               <div className="relative flex flex-col items-center">
-                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? `${tab.activeColor} stroke-[2.5] -translate-y-0.5` : 'stroke-[1.75]'}`} />
+                <Icon className={`w-5 h-5 transition-transform duration-200 ${isActive ? `${tab.activeColor} stroke-[2.2] -translate-y-0.5` : 'stroke-[1.75]'}`} />
                 {isActive && (
                   <span className="w-1.5 h-1.5 rounded-full bg-current mt-0.5 animate-pulse" />
                 )}
