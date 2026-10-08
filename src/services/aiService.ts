@@ -12,7 +12,14 @@ import {
   AIChatResponse,
 } from '../types/ai';
 
-const LOCAL_SERVER_URL = 'http://localhost:5000';
+// Flexible API endpoint resolver (works on Vercel production, Vite proxy, and local Express)
+const getApiUrl = (path: string) => {
+  if (typeof window !== 'undefined' && window.location && window.location.origin) {
+    // In browser: relative path hits /api which Vercel or Vite proxy routes
+    return path;
+  }
+  return `http://localhost:5000${path}`;
+};
 
 export const aiService = {
   // 1. Send Message to YEANA AI
@@ -46,16 +53,19 @@ export const aiService = {
           console.warn('Supabase Edge Function notice:', error.message || error);
         }
       } catch (edgeErr: any) {
-        console.warn('Supabase Edge Function not reachable, trying local service:', edgeErr?.message);
+        console.warn('Supabase Edge Function not reachable, trying local/Vercel service:', edgeErr?.message);
       }
     }
 
-    // Step B: Fallback to Local Express Server
+    // Step B: Fallback to Vercel Serverless / Local Express Backend
     try {
       const session = supabase ? (await supabase.auth.getSession()).data.session : null;
       const userId = session?.user?.id || 'usr-local-demo';
 
-      const res = await fetch(`${LOCAL_SERVER_URL}/api/ai/chat`, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      const res = await fetch(getApiUrl('/api/ai/chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -64,7 +74,10 @@ export const aiService = {
           user_id: userId,
           context,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (res.ok) {
         const data = await res.json();
@@ -74,10 +87,10 @@ export const aiService = {
         }
       }
     } catch (localErr) {
-      console.warn('Local server not reachable, using offline assistant:', localErr);
+      console.warn('Backend API endpoint not reachable, using offline assistant engine:', localErr);
     }
 
-    // Step C: Fallback to Client-Side Offline Assistant
+    // Step C: Fallback to Client-Side Offline Assistant (Zero Failure Guarantee)
     return this.generateClientSideResponse(trimmedMessage, conversationId);
   },
 
@@ -102,7 +115,7 @@ export const aiService = {
     }
 
     try {
-      const res = await fetch(`${LOCAL_SERVER_URL}/api/ai/conversations`);
+      const res = await fetch(getApiUrl('/api/ai/conversations'));
       if (res.ok) {
         return await res.json();
       }
@@ -135,7 +148,7 @@ export const aiService = {
     }
 
     try {
-      const res = await fetch(`${LOCAL_SERVER_URL}/api/ai/conversations/${conversationId}/messages`);
+      const res = await fetch(getApiUrl(`/api/ai/conversations/${conversationId}/messages`));
       if (res.ok) {
         return await res.json();
       }
@@ -165,7 +178,7 @@ export const aiService = {
     }
 
     try {
-      await fetch(`${LOCAL_SERVER_URL}/api/ai/conversations/${conversationId}`, { method: 'DELETE' });
+      await fetch(getApiUrl(`/api/ai/conversations/${conversationId}`), { method: 'DELETE' });
     } catch (e) {}
 
     try {
@@ -200,7 +213,7 @@ export const aiService = {
     }
 
     try {
-      const res = await fetch(`${LOCAL_SERVER_URL}/api/ai/preferences`);
+      const res = await fetch(getApiUrl('/api/ai/preferences'));
       if (res.ok) return await res.json();
     } catch (e) {}
 
@@ -231,7 +244,7 @@ export const aiService = {
     }
 
     try {
-      await fetch(`${LOCAL_SERVER_URL}/api/ai/preferences`, {
+      await fetch(getApiUrl('/api/ai/preferences'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(prefs),
@@ -257,7 +270,7 @@ export const aiService = {
     }
 
     try {
-      await fetch(`${LOCAL_SERVER_URL}/api/ai/preferences`, { method: 'DELETE' });
+      await fetch(getApiUrl('/api/ai/preferences'), { method: 'DELETE' });
     } catch (e) {}
 
     try {

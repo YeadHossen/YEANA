@@ -14,7 +14,7 @@ import {
   AIChatRequest,
 } from '../types/ai';
 
-const LOCAL_SERVER_URL = 'http://localhost:5000'; // Default local Express server for offline testing
+const PROD_API_URL = 'https://yeana.com';
 
 export const aiService = {
   // 1. Send Message to YEANA AI
@@ -40,7 +40,6 @@ export const aiService = {
         });
 
         if (!error && data && data.success) {
-          // Cache response locally for offline access
           await this.cacheLocalMessage(data.conversation_id, data.message);
           return data as AIChatResponse;
         }
@@ -49,16 +48,19 @@ export const aiService = {
           console.warn('Supabase Edge Function notice:', error.message || error);
         }
       } catch (edgeErr: any) {
-        console.warn('Supabase Edge Function not reachable, trying local service:', edgeErr?.message);
+        console.warn('Supabase Edge Function not reachable, trying cloud API:', edgeErr?.message);
       }
     }
 
-    // Step B: Fallback to Local Express Backend / Offline Simulation
+    // Step B: Connect to Live YEANA Cloud AI API (yeana.com)
     try {
       const session = supabase ? (await supabase.auth.getSession()).data.session : null;
-      const userId = session?.user?.id || 'usr-local-demo';
+      const userId = session?.user?.id || 'usr-mobile-guest';
 
-      const res = await fetch(`${LOCAL_SERVER_URL}/api/ai/chat`, {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+      const res = await fetch(`${PROD_API_URL}/api/ai/chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -67,7 +69,10 @@ export const aiService = {
           user_id: userId,
           context,
         }),
+        signal: controller.signal,
       });
+
+      clearTimeout(timeoutId);
 
       if (res.ok) {
         const data = await res.json();
@@ -76,8 +81,8 @@ export const aiService = {
           return data as AIChatResponse;
         }
       }
-    } catch (localErr) {
-      console.warn('Local server not reachable, using offline assistant:', localErr);
+    } catch (networkErr) {
+      console.warn('Cloud API not reachable, using offline assistant:', networkErr);
     }
 
     // Step C: Resilient Client-Side Offline Assistant (Zero Failure Guarantee)

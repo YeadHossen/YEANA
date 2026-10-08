@@ -40,3 +40,4 @@ server/data/*.db-shm
 .expo/
 *.tsbuildinfo
 web-build/
+supabase/.temp/
