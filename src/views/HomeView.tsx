@@ -6,9 +6,7 @@ import {
   TrendingUp,
   Hotel as HotelIcon,
   Utensils,
-  Bus,
   ShoppingBag,
-  Car,
   ArrowRight,
   Compass,
   ShieldCheck,
@@ -390,111 +388,6 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
       </section>
 
-      {/* ========================================================================= */}
-      {/* 2. QUICK CATEGORY PILLS (MULTI-COLOR JEWEL-TONE CARDS)                   */}
-      {/* ========================================================================= */}
-      <section className="max-w-7xl mx-auto px-4 sm:px-6">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
-          {[
-            { 
-              id: 'places', 
-              label: language === 'bn' ? 'দর্শনীয় স্থান' : 'Places', 
-              en: 'Destinations', 
-              icon: Compass, 
-              cardClass: 'cat-card-emerald', 
-              iconColor: 'text-emerald-700', 
-              iconBg: 'bg-emerald-100/90 border border-emerald-300/80 shadow-xs', 
-              badge: '🌿 Natural', 
-              badgeClass: 'badge-jewel-emerald' 
-            },
-            { 
-              id: 'hotels', 
-              label: language === 'bn' ? 'হোটেল ও রিসোর্ট' : 'Hotels', 
-              en: 'Accommodations', 
-              icon: HotelIcon, 
-              cardClass: 'cat-card-indigo', 
-              iconColor: 'text-indigo-700', 
-              iconBg: 'bg-indigo-100/90 border border-indigo-300/80 shadow-xs', 
-              badge: '⭐ Verified', 
-              badgeClass: 'badge-jewel-sky' 
-            },
-            { 
-              id: 'food', 
-              label: language === 'bn' ? 'ঐতিহ্যবাহী খাবার' : 'Local Food', 
-              en: 'Cuisine & Dining', 
-              icon: Utensils, 
-              cardClass: 'cat-card-amber', 
-              iconColor: 'text-amber-700', 
-              iconBg: 'bg-amber-100/90 border border-amber-300/80 shadow-xs', 
-              badge: '🍛 GI Taste', 
-              badgeClass: 'badge-jewel-gold' 
-            },
-            { 
-              id: 'transport', 
-              label: language === 'bn' ? 'বাস ও ট্রেন সিট' : 'Transport', 
-              en: 'Transit Routes', 
-              icon: Bus, 
-              cardClass: 'cat-card-sky', 
-              iconColor: 'text-sky-700', 
-              iconBg: 'bg-sky-100/90 border border-sky-300/80 shadow-xs', 
-              badge: '🎫 Live Seats', 
-              badgeClass: 'badge-jewel-sky' 
-            },
-            { 
-              id: 'shopping', 
-              label: language === 'bn' ? 'তাঁত ও জিআই পণ্য' : 'Native Crafts', 
-              en: 'Regional Handloom', 
-              icon: ShoppingBag, 
-              cardClass: 'cat-card-purple', 
-              iconColor: 'text-purple-700', 
-              iconBg: 'bg-purple-100/90 border border-purple-300/80 shadow-xs', 
-              badge: '✨ Artisan', 
-              badgeClass: 'badge-jewel-purple' 
-            },
-            { 
-              id: 'ride', 
-              label: language === 'bn' ? 'গাড়ি ও রাইড' : 'Rentals', 
-              en: 'Cars & Jeeps', 
-              icon: Car, 
-              cardClass: 'cat-card-rose', 
-              iconColor: 'text-rose-700', 
-              iconBg: 'bg-rose-100/90 border border-rose-300/80 shadow-xs', 
-              badge: '🚙 4x4 Jeeps', 
-              badgeClass: 'badge-jewel-rose' 
-            },
-          ].map(cat => {
-            const Icon = cat.icon;
-            return (
-              <button
-                key={cat.id}
-                onClick={() => onNavigateTab(cat.id)}
-                className={`p-4 rounded-3xl transition-all duration-300 flex flex-col items-center justify-center gap-2.5 group hover:-translate-y-1.5 active:scale-95 relative overflow-hidden shadow-xs hover:shadow-lg ${cat.cardClass}`}
-              >
-                {/* Specular Light Reflection Accent */}
-                <div className="absolute top-0 inset-x-0 h-1/2 bg-gradient-to-b from-white/35 to-transparent pointer-events-none rounded-t-3xl" />
-
-                {/* Floating Micro Badge */}
-                <span className={`text-[9px] font-black uppercase tracking-wider px-2 py-0.5 rounded-full ${cat.badgeClass} relative z-10 shadow-2xs`}>
-                  {cat.badge}
-                </span>
-
-                <div className={`w-12 h-12 rounded-2xl ${cat.iconBg} flex items-center justify-center group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-md transition-all duration-300 relative z-10`}>
-                  <Icon className={`w-6 h-6 ${cat.iconColor} transition-transform duration-300 group-hover:scale-105`} />
-                </div>
-                
-                <div className="text-center relative z-10">
-                  <span className="text-xs font-black text-slate-900 tracking-tight block font-heading">
-                    {cat.label}
-                  </span>
-                  <span className="text-[10px] text-slate-600 font-medium">
-                    {cat.en}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-      </section>
 
       {/* ========================================================================= */}
       {/* 3. SEASONAL TRAVEL PICKS                                                  */}
