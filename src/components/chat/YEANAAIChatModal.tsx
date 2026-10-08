@@ -36,6 +36,110 @@ const STARTER_PROMPTS = [
   { title: 'Make a trip plan for 2 people', prompt: 'Make a trip plan for 2 people visiting Sreemangal tea gardens' },
 ];
 
+const renderInlineMarkdown = (text: string) => {
+  const parts = text.split(/(\*\*.*?\*\*|\*.*?\*)/g);
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="font-bold text-slate-900">{part.slice(2, -2)}</strong>;
+    }
+    if (part.startsWith('*') && part.endsWith('*')) {
+      return <em key={i} className="italic text-slate-600">{part.slice(1, -1)}</em>;
+    }
+    return part;
+  });
+};
+
+const AIMarkdownContent: React.FC<{ content: string; isUser?: boolean }> = ({ content, isUser }) => {
+  if (isUser) {
+    return <div className="whitespace-pre-wrap text-xs sm:text-sm font-medium">{content}</div>;
+  }
+
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let listItems: string[] = [];
+
+  const flushList = (keyPrefix: string) => {
+    if (listItems.length > 0) {
+      elements.push(
+        <ul key={`${keyPrefix}-list`} className="space-y-1.5 my-2 pl-0.5">
+          {listItems.map((item, idx) => (
+            <li key={idx} className="flex items-start gap-2 text-xs sm:text-sm text-slate-700 leading-relaxed">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 mt-2 shrink-0" />
+              <span>{renderInlineMarkdown(item)}</span>
+            </li>
+          ))}
+        </ul>
+      );
+      listItems = [];
+    }
+  };
+
+  lines.forEach((line, index) => {
+    const trimmed = line.trim();
+
+    if (!trimmed) {
+      flushList(`flush-${index}`);
+      elements.push(<div key={`space-${index}`} className="h-1.5" />);
+      return;
+    }
+
+    if (trimmed === '---') {
+      flushList(`hr-${index}`);
+      elements.push(<hr key={`hr-${index}`} className="my-2.5 border-slate-200" />);
+      return;
+    }
+
+    if (trimmed.startsWith('###')) {
+      flushList(`h3-${index}`);
+      const heading = trimmed.replace(/^###\s*/, '');
+      elements.push(
+        <h3 key={`h3-${index}`} className="text-sm sm:text-base font-bold text-slate-900 mt-3 mb-1.5 flex items-center gap-1.5">
+          {renderInlineMarkdown(heading)}
+        </h3>
+      );
+      return;
+    }
+
+    if (trimmed.startsWith('>')) {
+      flushList(`quote-${index}`);
+      const quote = trimmed.replace(/^>\s*/, '');
+      elements.push(
+        <div key={`quote-${index}`} className="my-2 p-2.5 sm:p-3 rounded-xl bg-emerald-50/90 border-l-4 border-emerald-500 text-xs sm:text-sm text-emerald-950 font-medium shadow-2xs">
+          {renderInlineMarkdown(quote)}
+        </div>
+      );
+      return;
+    }
+
+    if (trimmed.startsWith('- ') || trimmed.startsWith('* ')) {
+      listItems.push(trimmed.slice(2));
+      return;
+    }
+
+    const numMatch = trimmed.match(/^(\d+)\.\s*(.*)/);
+    if (numMatch) {
+      flushList(`num-${index}`);
+      elements.push(
+        <div key={`num-${index}`} className="flex items-start gap-2 my-1 text-xs sm:text-sm text-slate-700 leading-relaxed">
+          <span className="font-bold text-emerald-600 shrink-0">{numMatch[1]}.</span>
+          <span>{renderInlineMarkdown(numMatch[2])}</span>
+        </div>
+      );
+      return;
+    }
+
+    flushList(`p-${index}`);
+    elements.push(
+      <p key={`p-${index}`} className="text-xs sm:text-sm text-slate-700 leading-relaxed my-1">
+        {renderInlineMarkdown(trimmed)}
+      </p>
+    );
+  });
+
+  flushList('final');
+  return <div className="space-y-0.5">{elements}</div>;
+};
+
 export const YEANAAIChatModal: React.FC<Props> = ({
   isOpen,
   onClose,
@@ -317,9 +421,7 @@ export const YEANAAIChatModal: React.FC<Props> = ({
                         </div>
                       )}
 
-                      <div className="whitespace-pre-line text-xs sm:text-sm font-normal">
-                        {m.content}
-                      </div>
+                      <AIMarkdownContent content={m.content} isUser={isUser} />
 
                       {/* Trip Plan Card */}
                       {plan && !isUser && (

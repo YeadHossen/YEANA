@@ -12,6 +12,24 @@ interface Props {
 }
 
 // Simple text formatter for markdown-like syntax
+const renderInlineText = (text: string, baseStyle: any, boldStyle: any) => {
+  const parts = text.split(/(\*\*.*?\*\*)/g);
+  return (
+    <Text style={baseStyle}>
+      {parts.map((part, i) => {
+        if (part.startsWith('**') && part.endsWith('**')) {
+          return (
+            <Text key={i} style={boldStyle}>
+              {part.slice(2, -2)}
+            </Text>
+          );
+        }
+        return part;
+      })}
+    </Text>
+  );
+};
+
 const FormattedContent: React.FC<{ content: string; isUser: boolean }> = ({ content, isUser }) => {
   const lines = content.split('\n');
 
@@ -20,11 +38,16 @@ const FormattedContent: React.FC<{ content: string; isUser: boolean }> = ({ cont
       {lines.map((line, idx) => {
         const trimmed = line.trim();
         if (!trimmed) {
-          return <View key={idx} style={{ height: 6 }} />;
+          return <View key={idx} style={{ height: 4 }} />;
+        }
+
+        if (trimmed === '---') {
+          return <View key={idx} style={styles.divider} />;
         }
 
         // Heading ###
         if (trimmed.startsWith('###')) {
+          const headingText = trimmed.replace(/^###\s*/, '');
           return (
             <Text
               key={idx}
@@ -33,8 +56,22 @@ const FormattedContent: React.FC<{ content: string; isUser: boolean }> = ({ cont
                 isUser ? styles.textUser : styles.textAssistantHeading,
               ]}
             >
-              {trimmed.replace(/^###\s*/, '')}
+              {headingText}
             </Text>
+          );
+        }
+
+        // Blockquote > 💡
+        if (trimmed.startsWith('>')) {
+          const quoteText = trimmed.replace(/^>\s*/, '');
+          return (
+            <View key={idx} style={styles.quoteBox}>
+              {renderInlineText(
+                quoteText,
+                styles.quoteText,
+                styles.boldQuoteText
+              )}
+            </View>
           );
         }
 
@@ -43,15 +80,13 @@ const FormattedContent: React.FC<{ content: string; isUser: boolean }> = ({ cont
           return (
             <View key={idx} style={styles.bulletRow}>
               <View style={[styles.bulletDot, { backgroundColor: isUser ? '#FFFFFF' : '#059669' }]} />
-              <Text
-                style={[
-                  styles.bodyText,
-                  styles.bulletText,
-                  isUser ? styles.textUser : styles.textAssistant,
-                ]}
-              >
-                {cleanMarkdownFormatting(trimmed.substring(2))}
-              </Text>
+              <View style={styles.bulletText}>
+                {renderInlineText(
+                  trimmed.substring(2),
+                  [styles.bodyText, isUser ? styles.textUser : styles.textAssistant],
+                  styles.boldText
+                )}
+              </View>
             </View>
           );
         }
@@ -64,41 +99,31 @@ const FormattedContent: React.FC<{ content: string; isUser: boolean }> = ({ cont
               <Text style={[styles.numText, { color: isUser ? '#FFFFFF' : '#059669' }]}>
                 {numMatch[1]}.
               </Text>
-              <Text
-                style={[
-                  styles.bodyText,
-                  styles.bulletText,
-                  isUser ? styles.textUser : styles.textAssistant,
-                ]}
-              >
-                {cleanMarkdownFormatting(numMatch[2])}
-              </Text>
+              <View style={styles.bulletText}>
+                {renderInlineText(
+                  numMatch[2],
+                  [styles.bodyText, isUser ? styles.textUser : styles.textAssistant],
+                  styles.boldText
+                )}
+              </View>
             </View>
           );
         }
 
         // Standard body line
         return (
-          <Text
-            key={idx}
-            style={[
-              styles.bodyText,
-              isUser ? styles.textUser : styles.textAssistant,
-              trimmed.startsWith('**') && trimmed.endsWith('**') && styles.boldText,
-            ]}
-          >
-            {cleanMarkdownFormatting(trimmed)}
-          </Text>
+          <View key={idx} style={{ marginVertical: 1 }}>
+            {renderInlineText(
+              trimmed,
+              [styles.bodyText, isUser ? styles.textUser : styles.textAssistant],
+              styles.boldText
+            )}
+          </View>
         );
       })}
     </View>
   );
 };
-
-function cleanMarkdownFormatting(text: string): string {
-  // Strip bold markers for clean reading
-  return text.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
-}
 
 export const AIMessageBubble: React.FC<Props> = ({
   message,
@@ -271,6 +296,30 @@ const styles = StyleSheet.create({
   },
   boldText: {
     fontWeight: '700',
+    color: '#0F172A',
+  },
+  divider: {
+    height: 1,
+    backgroundColor: '#E2E8F0',
+    marginVertical: 6,
+  },
+  quoteBox: {
+    backgroundColor: '#ECFDF5',
+    borderLeftWidth: 3.5,
+    borderLeftColor: '#059669',
+    paddingHorizontal: 10,
+    paddingVertical: 8,
+    borderRadius: 8,
+    marginVertical: 4,
+  },
+  quoteText: {
+    fontSize: 13,
+    color: '#064E3B',
+    lineHeight: 18,
+  },
+  boldQuoteText: {
+    fontWeight: '700',
+    color: '#065F46',
   },
   bulletRow: {
     flexDirection: 'row',

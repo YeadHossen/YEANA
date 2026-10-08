@@ -1412,41 +1412,150 @@ app.post('/api/ai/chat', async (req, res) => {
       });
     }
 
-    // Formulate AI answer
+    // Formulate AI answer (ChatGPT / Claude / Gemini quality)
     let responseText = '';
-    const durDays = days || 2;
-    const estBudget = budget || (durDays * 2500);
+    const durDays = days || (intent === 'trip_planning' ? 2 : 1);
+    const estBudget = budget || (durDays * 2800);
+    const targetDest = district || 'Bangladesh';
 
     let tripPlan = null;
     if (intent === 'trip_planning' || days) {
       tripPlan = {
-        destination: district || 'Bangladesh Destination',
+        destination: targetDest,
         duration_days: durDays,
         travellers: 2,
         estimated_budget: estBudget,
         currency: 'BDT',
         days: Array.from({ length: durDays }).map((_, i) => ({
           day: i + 1,
-          title: `Day ${i + 1}: ${i === 0 ? 'Journey & Arrival' : i === durDays - 1 ? 'Memorable Sights & Return' : 'Adventure & Local Delicacies'}`,
+          title: `Day ${i + 1}: ${i === 0 ? 'Arrival, Check-in & Scenic Sunsets' : i === durDays - 1 ? 'Golden Dawn & Return Journey' : 'Immersive Sightseeing & Local Gastronomy'}`,
           estimated_cost: Math.round(estBudget / durDays)
         }))
       };
 
-      responseText = `✈️ **YEANA AI Tour Plan: ${durDays}-Day Trip to ${district || 'Bangladesh'}**\n\n` +
-        `**Estimated Total Budget:** ৳${estBudget.toLocaleString()} BDT (for 2 travelers)\n` +
-        `**Recommended Stays & Transport:** Verified in the recommendation cards below.\n\n` +
-        `### Itinerary Outline:\n` +
-        tripPlan.days.map(d => `- **Day ${d.day}:** ${d.title} (Est: ৳${d.estimated_cost.toLocaleString()})`).join('\n') + '\n\n' +
-        `💡 *Enjoy your trip with YEANA verified bookings and 24/7 travel concierge!*`;
+      const daySections = [];
+      for (let i = 1; i <= durDays; i++) {
+        if (i === 1) {
+          daySections.push(
+            `### 🌅 Day 1: Journey, Mountain/Coastal Breeze & Sunset\n` +
+            `- **Morning (07:30 AM – 11:30 AM):** Depart for **${targetDest}**. Enjoy scenic highway or winding hill vistas. Stop for warm traditional breakfast (hot parathas, dal & fresh milk tea).\n` +
+            `- **Afternoon (12:30 PM – 03:30 PM):** Check into your verified accommodation. Unwind, freshen up, and enjoy a signature local lunch (fresh river fish or regional chicken).\n` +
+            `- **Late Afternoon (04:30 PM – 06:30 PM):** Visit the primary vantage point (Helipad, Beach Point, or Lake bank) to witness the golden-hour sunset.\n` +
+            `- **Evening & Dinner (07:30 PM – 10:00 PM):** Explore the local night market or indigenous bazaar. Savor barbecue dinner under the starry night sky.`
+          );
+        } else if (i === durDays) {
+          daySections.push(
+            `### 🌄 Day ${i}: Dawn Cloudscape, Cultural Heritage & Departure\n` +
+            `- **Early Morning (05:30 AM – 08:30 AM):** Catch the magical sunrise. Take photography walks through quiet morning landscapes and mist.\n` +
+            `- **Morning (09:00 AM – 11:30 AM):** Hearty breakfast followed by souvenir shopping (traditional handicrafts, locally grown tea or hill honey).\n` +
+            `- **Afternoon (12:00 PM – 03:00 PM):** Check out from hotel. Relish a farewell feast at a top-rated traditional eatery.\n` +
+            `- **Evening:** Board your return coach or intercity train back home with unforgettable memories!`
+          );
+        } else {
+          daySections.push(
+            `### 🌿 Day ${i}: Deep Exploration & Nature Adventures\n` +
+            `- **Morning (08:00 AM – 12:00 PM):** Embark on guided sightseeing (waterfalls, natural reserves, or crystal rivers). Ideal for trekking and photography.\n` +
+            `- **Lunch (01:00 PM – 02:30 PM):** Authentic tribal or regional feast (bamboo chicken, fresh shutki bhorta, or mustard hilsa).\n` +
+            `- **Afternoon (03:30 PM – 06:00 PM):** Leisure boat ride or walking tour through vibrant tea gardens and historic landmarks.\n` +
+            `- **Evening:** Traditional tea tasting and storytelling at local cafes.`
+          );
+        }
+      }
+
+      responseText = 
+        `✈️ **I would love to help you plan an unforgettable trip to ${targetDest}!**\n\n` +
+        `Here is a complete, thoughtfully curated **${durDays}-Day / ${durDays - 1 > 0 ? durDays - 1 : 1} Night Itinerary** designed to balance scenic sights, relaxation, authentic food, and smart budgeting.\n\n` +
+        `---\n\n` +
+        `**📋 Quick Tour Snapshot:**\n` +
+        `- **Destination:** ${targetDest}, Bangladesh\n` +
+        `- **Duration:** ${durDays} Days (2 Travelers)\n` +
+        `- **Estimated Budget:** ৳${estBudget.toLocaleString()} BDT total (approx ৳${Math.round(estBudget / 2).toLocaleString()} per person)\n` +
+        `- **Travel Style:** Scenic Nature, Authentic Food & Cultural Immersion\n\n` +
+        `---\n\n` +
+        daySections.join('\n\n') + '\n\n' +
+        `---\n\n` +
+        `### 💰 Estimated Budget Breakdown (for 2 Persons):\n` +
+        `- **Intercity & Local Commute:** ৳${Math.round(estBudget * 0.35).toLocaleString()}\n` +
+        `- **Accommodation (${durDays - 1 > 0 ? durDays - 1 : 1} Night):** ৳${Math.round(estBudget * 0.35).toLocaleString()}\n` +
+        `- **Meals & Regional Street Food:** ৳${Math.round(estBudget * 0.20).toLocaleString()}\n` +
+        `- **Entry Passes & Buffer Contingency:** ৳${Math.round(estBudget * 0.10).toLocaleString()}\n` +
+        `- **Total Estimated Budget:** **৳${estBudget.toLocaleString()} BDT**\n\n` +
+        `> 💡 **YEANA Local Insight:** Book your transportation and resort at least 1–2 weeks ahead during peak weekends. Always carry printed National ID copies for checkpoint clearance in hill tracts.\n\n` +
+        `*Would you like me to adjust this itinerary for a specific budget, recommend couple-friendly cottages, or find direct train/bus schedules for you?*`;
+
     } else if (intent === 'hotel_search') {
-      responseText = `🏨 **Verified Stays in ${district || 'Bangladesh'}**\n\n` +
-        `Here are the highest-rated accommodations verified by YEANA. Tap on any card below to view amenities and room details.`;
+      const hotelListText = hotels.length > 0 
+        ? hotels.map((h, idx) => `**${idx + 1}. ${h.name}** (${h.location})\n` +
+            `- *Rate:* ৳${h.price_per_night}/night • *Rating:* ⭐ ${h.rating}/5.0\n` +
+            `- *Highlights:* Verified clean rooms, complimentary WiFi, and great accessibility.\n`
+          ).join('\n')
+        : `- **YEANA Verified Stays in ${targetDest}:** Comfortable eco-resorts, family suites, and seaside hotels available.`;
+
+      responseText = 
+        `🏨 **Looking for the best places to stay in ${targetDest}? I've got you covered!**\n\n` +
+        `Whether you're after a cozy eco-cottage with panoramic views, a family-friendly suite, or a luxury beachfront resort, here are the top verified accommodations from YEANA's database:\n\n` +
+        `${hotelListText}\n` +
+        `> 💡 **YEANA Booking Tip:** Peak season rates in Bangladesh can fluctuate on long weekends. Booking directly via YEANA ensures verified check-in without hidden middleman fees.\n\n` +
+        `*Tap any card below for amenities, room galleries, and contact details. Would you like me to filter for luxury resorts or budget eco-cottages?*`;
+
     } else if (intent === 'restaurant_search') {
-      responseText = `🍽️ **Authentic Local Food & Restaurants**\n\n` +
-        `Discover top dining spots and regional culinary delicacies verified by travelers. Check out the cards below!`;
+      const restListText = rests.length > 0 
+        ? rests.map((r, idx) => `**${idx + 1}. ${r.name}** (${r.location})\n` +
+            `- *Rating:* ⭐ ${r.rating}/5.0 • *Price Bracket:* ${r.price_tier || '৳৳'}\n` +
+            `- *Signature Treats:* Authentic regional recipes prepared with fresh local ingredients.\n`
+          ).join('\n')
+        : `- **Famous Regional Delicacies:** Fresh fish curries, traditional bhortas, and aromatic rice platters.`;
+
+      responseText = 
+        `🍽️ **Craving authentic local flavors in ${targetDest}? You are in for a culinary treat!**\n\n` +
+        `Bangladesh's culinary heritage is rich with distinct regional specialties. Here are the top traveler-approved dining spots verified by YEANA:\n\n` +
+        `${restListText}\n` +
+        `### 🌶️ Must-Try Food Highlights:\n` +
+        `- **Signature Dish:** Ask for fresh local specialties prepared upon order.\n` +
+        `- **Street Food Culture:** Don't miss fresh coconut water, hot fuchka-chotpoti, and sweet matka chai in the evenings.\n\n` +
+        `> 💡 **YEANA Foodie Tip:** Always visit busy local eateries during peak meal hours (1:00 PM – 2:30 PM for lunch; 8:30 PM – 10:00 PM for dinner) to ensure maximum freshness and hot servings.\n\n` +
+        `*Would you like recommendations for fine dining, rooftop views, or traditional street food corners?*`;
+
+    } else if (intent === 'destination_search') {
+      const placeListText = places.length > 0
+        ? places.map((p, idx) => `**${idx + 1}. ${p.name}**\n` +
+            `- *Location:* ${p.location || p.district_name} • *Rating:* ⭐ ${p.rating || 4.7}/5.0\n` +
+            `- *What makes it special:* ${p.short_description || 'Stunning natural beauty and popular sightseeing spot.'}\n`
+          ).join('\n')
+        : `- **Top Sights in ${targetDest}:** Scenic viewpoints, historic landmarks, and peaceful water bodies.`;
+
+      responseText = 
+        `🗺️ **Exploring ${targetDest} is one of the most rewarding journeys in Bangladesh!**\n\n` +
+        `Here are the highest-rated landmarks and hidden gems you simply cannot miss:\n\n` +
+        `${placeListText}\n` +
+        `> 💡 **YEANA Explorer Insight:** Early mornings (before 9:00 AM) are the golden hour for sightseeing—minimal crowds, cool breeze, and the best lighting for memorable photographs.\n\n` +
+        `*Check out the verified destination cards below. Shall I help you design a day-by-day trip plan connecting these spots?*`;
+
+    } else if (intent === 'transport_search') {
+      const routeListText = routes.length > 0
+        ? routes.map((rt, idx) => `**${idx + 1}. ${rt.company} (${rt.transport_type})**\n` +
+            `- *Route:* ${rt.from_district} ➔ ${rt.to_district}\n` +
+            `- *Fare:* ৳${rt.price_min} - ৳${rt.price_max} • *Duration:* Approx ${rt.duration}\n`
+          ).join('\n')
+        : `- **Intercity Transit Options:** Available by luxury AC coach, intercity train, or local car rental.`;
+
+      responseText = 
+        `🚌 **Here are the best ways to travel to and from ${targetDest}:**\n\n` +
+        `Getting around Bangladesh is convenient with intercity railways, luxury highway coaches, and domestic flights:\n\n` +
+        `${routeListText}\n` +
+        `> 💡 **YEANA Commute Tip:** For train travel in Bangladesh, purchase e-tickets 10 days in advance via the Bangladesh Railway portal to secure AC berths or Snigdha seats.\n\n` +
+        `*Do you need door-to-door car rental contacts or intercity coach booking guidance?*`;
+
     } else {
-      responseText = `👋 **Hello! I'm YEANA AI, your personal travel assistant.**\n\n` +
-        `I found relevant verified travel options in Bangladesh based on your question. Take a look at the verified cards below or ask me to plan a full day-by-day itinerary with budget estimation!`;
+      responseText = 
+        `👋 **Hello! I'm YEANA AI, your personal travel companion for Bangladesh.**\n\n` +
+        `Whether you're dreaming of floating above the clouds in **Sajek Valley**, listening to the ocean waves in **Cox's Bazar**, cruising freshwater swamp forests in **Sylhet**, or exploring ancient terracotta temples in **Puthia**, I am here to help you every step of the way!\n\n` +
+        `### How I can help you today:\n` +
+        `- 🗺️ **Personalized Itineraries:** Ask *"Plan a 2-day trip to Sajek for 2 people"*.\n` +
+        `- 🏨 **Verified Stays:** Ask *"Find beachfront hotels in Cox's Bazar under ৳4,000"*.\n` +
+        `- 🍲 **Food & Delicacies:** Ask *"What are the famous foods to try in Sylhet?"*.\n` +
+        `- 🚌 **Transportation & Budget:** Ask *"How to go from Dhaka to Bandarban?"* or *"Estimate budget for Sreemangal"*\n\n` +
+        `> 💡 **Where would you like to travel next? Tell me your destination, travel dates, or budget!**`;
     }
 
     // Save User & Assistant Messages

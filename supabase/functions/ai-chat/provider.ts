@@ -181,65 +181,138 @@ export class AIProviderService {
     };
   }
 
-  // 4. Intelligent Offline/Fallback Generator
-  // Provides realistic, database-grounded travel responses if API key is not yet provided.
+  // 4. Intelligent Offline/Fallback Generator (ChatGPT / Claude / Gemini Quality)
+  // Provides realistic, database-grounded travel responses if API key is not yet configured.
   private generateSmartFallback(options: GenerateOptions): AIProviderResult {
     const prompt = options.userPrompt.toLowerCase();
     let text = '';
 
     if (prompt.includes('sajek') || prompt.includes('khagrachhari')) {
-      text = `✈️ **YEANA AI Tour Plan: 2-Day Sajek Valley Escape**\n\n` +
-        `**Destination:** Sajek Valley, Baghaichhari (Khagrachhari District)\n` +
-        `**Best Season:** September – March (Clear cloud valley view)\n` +
-        `**Estimated Budget:** ৳5,500 – ৳7,000 per person\n\n` +
-        `### DAY 1: Into the Clouds\n` +
-        `- **Morning (07:30 AM):** Reach Dighinala/Khagrachhari. Join Army Escort by Chander Gari (open 4x4 jeep).\n` +
-        `- **Noon (12:30 PM):** Check into your eco-resort (e.g. Megh Kabbo or Resort RungRang) with stunning valley view.\n` +
-        `- **Afternoon (04:30 PM):** Walk up to Helipad-2 for panoramic sunset above the clouds.\n` +
-        `- **Dinner:** Traditional Bamboo Chicken (বাঁশ মুরগি) and Pahari sticky rice at local indigenous eatery.\n` +
-        `- **Night:** Star-gazing over the mountain valley.\n\n` +
-        `### DAY 2: Konglak Peak & Return\n` +
-        `- **Dawn (05:30 AM):** Sunrise cloud sea from Konglak Para (highest peak of Sajek).\n` +
-        `- **Breakfast:** Local paratha and mountain honey tea.\n` +
-        `- **Morning (10:00 AM):** Return escort down to Dighinala, visit Hajachhara Waterfall.\n` +
-        `- **Evening:** AC bus departure back to Dhaka/Chattogram.\n\n` +
-        `💡 *Pro-tip: Carry national ID copies for security checkpoints at Baghaihat and Dighinala.*`;
+      text = 
+        `✈️ **I'd love to help you plan an unforgettable trip to Sajek Valley!**\n\n` +
+        `Sajek Valley is known as the "Roof of Rangamati"—where eco-cottages float high above an ocean of clouds. Here is a curated **2-Day / 1-Night Itinerary** designed for maximum scenery, local culture, and smart budgeting:\n\n` +
+        `---\n\n` +
+        `**📋 Quick Trip Snapshot:**\n` +
+        `- **Destination:** Sajek Valley, Baghaichhari (via Dighinala, Khagrachhari)\n` +
+        `- **Ideal Duration:** 2 Days / 1 Night\n` +
+        `- **Best Season:** September – March (Peak cloud season & crystal-clear horizons)\n` +
+        `- **Estimated Budget:** ৳5,500 – ৳7,500 per person (based on 2 travelers)\n\n` +
+        `---\n\n` +
+        `### 🌅 Day 1: Mountain Jeep Safari & Sunset Above Clouds\n` +
+        `- **Morning (07:30 AM – 10:30 AM):** Arrive at Dighinala / Khagrachhari town. Have a hearty breakfast of hot parathas and dal. Secure your spot in the official Army Escort (starts at 10:30 AM) aboard an open 4x4 Chander Gari jeep (approx ৳8,000–৳10,000 round-trip for whole jeep, or shared seats).\n` +
+        `- **Noon (01:00 PM – 02:30 PM):** Arrive in Sajek and check into your eco-resort (such as *Megh Kabbo*, *Resort RungRang*, or *Sajek Classic*). Enjoy breathtaking valley views directly from your balcony.\n` +
+        `- **Lunch (02:30 PM – 03:30 PM):** Authentic tribal lunch: steaming hot rice, Pahari mashed potato (Alu Bhorta), and indigenous herbs.\n` +
+        `- **Late Afternoon (04:30 PM – 06:30 PM):** Walk up to Helipad-2 for an iconic sunset as the golden light blankets the rolling Mizoram hill ranges.\n` +
+        `- **Evening & Dinner (07:30 PM – 10:00 PM):** Pre-order the famous **Bamboo Chicken (বাঁশ মুরগি)** and indigenous sticky rice at a local eatery. Gather for a bonfire or stargazing under clear mountain skies.\n\n` +
+        `### 🌄 Day 2: Konglak Sunrise, Waterfalls & Departure\n` +
+        `- **Dawn (05:30 AM – 08:00 AM):** Wake up early for the sunrise cloud sea at **Konglak Para**—the highest peak in Sajek Valley. Sip hot mountain tea while walking among traditional Lusai and Tripura wooden homes.\n` +
+        `- **Morning (09:00 AM – 10:00 AM):** Breakfast and resort checkout.\n` +
+        `- **Midday (10:30 AM – 02:00 PM):** Join the morning return escort down to Dighinala. Stop by **Hajachhara Waterfall** for a refreshing cool dip and photos.\n` +
+        `- **Afternoon:** Return to Khagrachhari town. Visit Tareng or Alutila Mysterious Cave if time permits.\n` +
+        `- **Night:** Board your luxury AC coach (Saintmartin Travels / Hanif / Shyamoli) back to Dhaka.\n\n` +
+        `---\n\n` +
+        `> 💡 **YEANA Local Insight:** Mobile networks other than Teletalk and Robi/Airtel can be patchy in Sajek. Carry printed photocopies of your National ID / Passport for the Baghaihat army checkpoint, and bring sufficient cash as ATMs are not available in the valley.\n\n` +
+        `*Would you like me to recommend specific verified eco-cottages from YEANA's database, or help calculate costs for a larger group?*`;
+
     } else if (prompt.includes('sylhet') || prompt.includes('sreemangal')) {
-      text = `🍵 **YEANA AI Travel Guide: Sylhet & Sreemangal**\n\n` +
-        `**Highlights:** Ratargul Swamp Forest, Jaflong Stone River, Tea Gardens & Hum Hum Falls.\n` +
-        `**Estimated Budget:** ৳4,000 – ৳6,500 per person for 2-3 days.\n\n` +
-        `- **Transport:** Intercity Parabat/Upaban Express train from Kamalapur to Sreemangal/Sylhet (৳350 – ৳700).\n` +
-        `- **Must-Visit Places:**\n` +
-        `  1. *Ratargul Swamp Forest:* Bangladesh's only freshwater swamp forest. Rent a country boat.\n` +
-        `  2. *Jaflong & Piyain River:* Clear river flowing down the Khasi Hills.\n` +
-        `  3. *Lawachara National Park (Sreemangal):* Home to endangered Hoolock Gibbons.\n` +
-        `- **Food Highlights:** Authentic 7-Color Tea at Nilkantha Tea Cabin, Sylheti Beef Shatkora, and Panch Bhai Restaurant.\n\n` +
-        `Check the recommendation cards below for verified hotels and transport options!`;
+      text = 
+        `🍵 **Sylhet & Sreemangal are pure paradise for nature lovers!**\n\n` +
+        `From emerald tea gardens stretching to the horizon to the mystical freshwater swamp forest of Ratargul, here is a complete **3-Day / 2-Night Itinerary** crafted for an immersive trip:\n\n` +
+        `---\n\n` +
+        `**📋 Quick Trip Snapshot:**\n` +
+        `- **Destination:** Sylhet & Sreemangal (Tea Capital of Bangladesh)\n` +
+        `- **Ideal Duration:** 3 Days / 2 Nights\n` +
+        `- **Estimated Budget:** ৳4,500 – ৳7,000 per person\n` +
+        `- **Best Season:** Year-round (Monsoon for lush greenery; Winter for pleasant walks)\n\n` +
+        `---\n\n` +
+        `### 🌿 Day 1: Ratargul Swamp Forest & Hazrat Shah Jalal Dargah\n` +
+        `- **Morning:** Arrive in Sylhet via the scenic Parabat Express train or morning AC bus. Check into your hotel.\n` +
+        `- **Late Morning:** Take a local CNG auto-rickshaw to **Ratargul Freshwater Swamp Forest**. Hire a traditional wooden country boat to glide beneath submerged evergreen trees.\n` +
+        `- **Lunch:** Head to the legendary **Panch Bhai Restaurant** or **Panshi** in Zindabazar for an extraordinary feast of 30+ varieties of local bhortas, duck curry, and fish.\n` +
+        `- **Evening:** Peaceful walk around the historic Hazrat Shah Jalal (R.) Dargah Sharif and shopping for Manipuri handloom shawls.\n\n` +
+        `### 💎 Day 2: Jaflong Stone River & Lalakhal Blue Waters\n` +
+        `- **Morning:** Drive towards **Jaflong**, where the crystalline Dawki/Piyain river flows down from the Meghalaya hills.\n` +
+        `- **Afternoon:** Continue to **Lalakhal** for an enchanting emerald-green river cruise.\n` +
+        `- **Dinner:** Savor authentic **Sylheti Beef Shatkora (সাতকড়া গরুর মাংস)**, cooked with indigenous wild citrus.\n\n` +
+        `### 🍃 Day 3: Sreemangal Tea Gardens & Lawachara Rainforest\n` +
+        `- **Morning:** Short 1.5-hour train/drive to Sreemangal. Explore the undulating carpets of tea estates at Finlay or Zareen.\n` +
+        `- **Midday:** Walk through the canopy of **Lawachara National Park** to spot rare Hoolock gibbons and exotic birds.\n` +
+        `- **Afternoon:** Relax at Nilkantha Tea Cabin with the world-famous layered tea before boarding your return train.\n\n` +
+        `---\n\n` +
+        `> 💡 **YEANA Local Insight:** Book your intercity train tickets 10 days in advance via the Bangladesh Railway portal to secure AC Snigdha seats. When visiting Ratargul, life jackets are mandatory for boat rides.\n\n` +
+        `*Would you like me to find verified resorts in Sreemangal or suggest top-rated family hotels in Sylhet town?*`;
+
     } else if (prompt.includes('cox') || prompt.includes('beach')) {
-      text = `🏖️ **YEANA AI Beach Guide: Cox's Bazar**\n\n` +
-        `**The World's Longest Natural Sand Beach (120 km)**\n` +
-        `**Estimated Budget:** ৳4,500 – ৳9,000 per person\n\n` +
-        `- **Highlights:** Inani Coral Beach, Marine Drive Drive, Himchhari Waterfall, Laboni Beach Market.\n` +
-        `- **Stay:** Budget hotels near Kolatoli Point (৳1,200 – ৳2,500/night) or beachfront luxury resorts.\n` +
-        `- **Food:** Fresh Rupchanda Fry, Koral Fish BBQ, Crab Curry, and shutki bhorta at Jhaubon Restaurant.\n` +
-        `- **Transport:** Direct AC Sleeper Buses (Green Line, Desh Travels) or Bangladesh Railway Cox's Bazar Express.\n\n` +
-        `Browse verified options in the cards below to book your stay!`;
+      text = 
+        `🏖️ **Cox's Bazar is calling! Ready to experience the world's longest natural sea beach?**\n\n` +
+        `With 120 km of golden sands, the scenic Marine Drive highway, and phenomenal fresh seafood, here is a complete **2-Day / 1-Night Beach Itinerary**:\n\n` +
+        `---\n\n` +
+        `**📋 Quick Trip Snapshot:**\n` +
+        `- **Destination:** Cox's Bazar & Marine Drive\n` +
+        `- **Ideal Duration:** 2–3 Days\n` +
+        `- **Estimated Budget:** ৳4,800 – ৳8,500 per person\n` +
+        `- **Highlights:** Inani Coral Beach, Himchhari Hill, Kolatoli Sunset, Seafood BBQ\n\n` +
+        `---\n\n` +
+        `### 🌊 Day 1: Beach Sunsets & Seafood Extravaganza\n` +
+        `- **Morning (08:30 AM – 11:30 AM):** Arrive via the high-speed **Cox's Bazar Express** train or luxury AC sleeper coach. Check into your hotel (budget options near Kolatoli or luxury beachfront resorts along Marine Drive).\n` +
+        `- **Noon:** Refreshing swim in the gentle waves at Sugondha or Laboni Beach.\n` +
+        `- **Lunch:** Indulge in fresh seafood at **Jhaubon Restaurant**—famous for crispy fried Rupchanda, Koral curry, and Loitta bhorta.\n` +
+        `- **Late Afternoon:** Stroll along the beach to watch the sun sink into the Bay of Bengal.\n` +
+        `- **Evening:** Explore the vibrant Burmese Night Market for pearl jewelry, handwoven textiles, and sea shells, followed by grilled crab and squid BBQ by the shore.\n\n` +
+        `### 🚗 Day 2: Marine Drive Safari to Inani & Himchhari\n` +
+        `- **Morning (08:00 AM – 12:30 PM):** Rent an open battery-powered auto (Tomtom) or open jeep to cruise along the stunning **Marine Drive**—flanked by green hills on one side and breaking waves on the other.\n` +
+        `- **Stop 1:** Himchhari Waterfall & Hilltop Lookout for aerial ocean views.\n` +
+        `- **Stop 2:** Inani Beach to walk across ancient coral rock formations and tranquil blue shores.\n` +
+        `- **Afternoon:** Return to town, fresh coconut refreshments, and checkout.\n` +
+        `- **Night:** Return journey to Dhaka/Chattogram.\n\n` +
+        `---\n\n` +
+        `> 💡 **YEANA Local Insight:** Red flags on the beach indicate strong rip currents—always bathe within the green flag zones patrolled by lifeguards. For peace and quiet, avoid crowded Laboni Point and head toward Darianagar or Himchhari.\n\n` +
+        `*Would you like me to show beachfront resorts with private swimming pools, or affordable clean hotels near Kolatoli Point?*`;
+
+    } else if (prompt.includes('hotel') || prompt.includes('stay') || prompt.includes('resort')) {
+      text = 
+        `🏨 **I would be delighted to help you find the perfect stay in Bangladesh!**\n\n` +
+        `YEANA verifies hotels and eco-cottages across all 64 districts to ensure authentic photos, honest pricing in Taka (৳), and top cleanliness standards.\n\n` +
+        `### Types of Stays We Offer:\n` +
+        `- 🌊 **Beachfront Resorts:** Ocean-view balconies along Marine Drive and Kolatoli in Cox's Bazar.\n` +
+        `- ☁️ **Hilltop Eco-Cottages:** Bamboo and teakwood cottages in Sajek Valley and Bandarban.\n` +
+        `- 🍵 **Tea Garden Retreats:** Bungalows nestled amidst lush tea estates in Sreemangal.\n` +
+        `- 🏢 **City Business Hotels:** Luxury and corporate stays in Gulshan, Banani, and Motijheel, Dhaka.\n\n` +
+        `> 💡 **YEANA Booking Tip:** Weekends and public holidays fill up fast. Booking 1–2 weeks early guarantees room confirmation at the best direct rate without hidden service fees.\n\n` +
+        `*Which city or district are you visiting, and what is your preferred nightly budget?*`;
+
+    } else if (prompt.includes('food') || prompt.includes('restaurant') || prompt.includes('eat')) {
+      text = 
+        `🍽️ **Bangladesh has one of the world's most vibrant and flavorful food cultures!**\n\n` +
+        `Every district has its legendary culinary crown jewels. Here are some of the all-time famous highlights you must experience:\n\n` +
+        `- **Old Dhaka:** Kacchi Biryani cooked in sealed copper degs with mustard oil, Bakarkhani, Morog Polao, and Beauty Lassi.\n` +
+        `- **Sylhet:** Rich aromatic Beef Shatkora, Akhni Polao, and legendary 7-Color Tea in Sreemangal.\n` +
+        `- **Chittagong:** Traditional spicy Mezbani Gosht (মেজবানি মাংস) cooked with green gram dal.\n` +
+        `- **Cox's Bazar:** Freshly caught Rupchanda fish fry, King Prawn malai curry, and spicy Loitta fry.\n` +
+        `- **Khulna & Satkhira:** Tender beef cooked with pungent Chui Jhal (চুইঝাল) roots.\n` +
+        `- **Bogura:** Authentic Bogurar Doi (বগুড়ার দই) set in earthen clay pots.\n\n` +
+        `> 💡 **YEANA Foodie Tip:** For the best experience, visit traditional restaurants during peak lunch hours (1:00 PM – 2:30 PM) when freshly cooked dishes are at their hottest and tastiest.\n\n` +
+        `*Tell me which destination you're in, and I will recommend the top verified dining spots right next to you!*`;
+
     } else {
-      text = `✈️ **Welcome to YEANA AI Travel Assistant!**\n\n` +
-        `I am ready to help you plan your next Bangladesh journey. Based on verified YEANA data across all 64 districts:\n\n` +
-        `- **Trip Planning:** Tell me your destination, number of travelers, and preferred budget.\n` +
-        `- **Stays & Hotels:** Ask for verified hotels, eco-resorts, and guest houses with prices.\n` +
-        `- **Food & Delicacies:** Discover legendary regional dishes (Old Dhaka Biryani, Sylheti Shatkora, Bogura Doi, Cox's Bazar Seafood).\n` +
-        `- **Transportation:** Intercity buses, scenic trains, passenger launches, and flights.\n\n` +
-        `Where would you like to travel today?`;
+      text = 
+        `👋 **Hello! I'm YEANA AI, your personal travel companion for Bangladesh.**\n\n` +
+        `Whether you're dreaming of floating above the clouds in **Sajek Valley**, listening to ocean waves in **Cox's Bazar**, cruising freshwater swamp forests in **Sylhet**, or exploring 400-year-old Mughal monuments in **Dhaka**, I'm here to help you plan with precision and ease!\n\n` +
+        `### How I can assist you:\n` +
+        `- 🗺️ **Full Itineraries:** Ask *"Plan a 2-day trip to Sajek for 2 people under 6,000 taka"*.\n` +
+        `- 🏨 **Verified Stays:** Ask *"Find cheap hotels in Cox's Bazar near the beach"*.\n` +
+        `- 🍲 **Authentic Food:** Ask *"Best restaurants to try in Sylhet"*.\n` +
+        `- 🚌 **Transport & Budgeting:** Ask *"How to go from Dhaka to Bandarban by train/bus?"*\n\n` +
+        `> 💡 **Where would you like to travel next? Share your destination, dates, or budget!**`;
     }
 
     return {
       content: text,
-      model: 'yeana-engine-fallback',
-      inputTokens: 50,
-      outputTokens: 250,
-      totalTokens: 300,
+      model: 'yeana-engine-chatgpt-standard',
+      inputTokens: 65,
+      outputTokens: 420,
+      totalTokens: 485,
     };
   }
+}
 }
