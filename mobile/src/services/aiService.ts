@@ -14,7 +14,8 @@ import {
   AIChatRequest,
 } from '../types/ai';
 
-const PROD_API_URL = 'https://yeana.com';
+// Active production Vercel deployment URL
+const PROD_API_URL = 'https://yeanao-muaw7fxdu-yead.vercel.app';
 
 export const aiService = {
   // 1. Send Message to YEANA AI
