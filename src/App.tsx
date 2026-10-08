@@ -372,7 +372,7 @@ const AppContent: React.FC = () => {
       )}
 
       {/* Main View Area */}
-      <main className="flex-1 pt-4 sm:pt-6 md:pt-8 pb-24 xl:pb-12">
+      <main className={`flex-1 pt-4 sm:pt-6 md:pt-8 ${currentTab === 'home' ? 'pb-8 xl:pb-12' : 'pb-24 xl:pb-12'}`}>
         <React.Suspense fallback={<ViewLoadingFallback />}>
           {/* If a place is selected, show PlaceDetailView regardless of tab */}
           {selectedPlace ? (
@@ -490,13 +490,15 @@ const AppContent: React.FC = () => {
         />
       )}
 
-      {/* Mobile Bottom Navigation */}
-      <BottomNav
-        currentTab={currentTab}
-        setCurrentTab={(tab) => {
-          handleNavigateTab(tab);
-        }}
-      />
+      {/* Mobile Bottom Navigation (Hidden on Home Page) */}
+      {currentTab !== 'home' && (
+        <BottomNav
+          currentTab={currentTab}
+          setCurrentTab={(tab) => {
+            handleNavigateTab(tab);
+          }}
+        />
+      )}
 
       {/* Global Instant Search Modal */}
       <GlobalSearchModal
