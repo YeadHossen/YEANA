@@ -26,9 +26,10 @@ import { DataService } from '../services/dataService';
 
 interface TripPlannerViewProps {
   onSelectPlace: (place: Place) => void;
+  onOpenAI?: (prompt?: string) => void;
 }
 
-export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace }) => {
+export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace, onOpenAI }) => {
   const { t, language } = useLanguage();
   const { trips, activeTrip, setActiveTrip, createTrip, addCustomStopToTrip, removeTripPlace, updateTripBudget, deleteTrip } = useTrip();
   const { downloadOfflinePackage, isOfflineReady } = useFavorites();
@@ -147,6 +148,16 @@ export const TripPlannerView: React.FC<TripPlannerViewProps> = ({ onSelectPlace 
               <Plus className="w-4 h-4 text-slate-950" />
               <span>Create New Tour Plan (নতুন ট্যুর প্ল্যান)</span>
             </button>
+
+            {onOpenAI && (
+              <button
+                onClick={() => onOpenAI('Help me plan a personalized Bangladesh tour itinerary with recommended hotels, transport, and estimated budget.')}
+                className="px-5 py-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-500 hover:to-teal-400 text-white text-xs font-black shadow-lg shadow-emerald-500/25 transition-all active:scale-95 flex items-center gap-2 border border-emerald-400/30"
+              >
+                <Sparkles className="w-4 h-4 text-emerald-200" />
+                <span>Plan with YEANA AI (এআই দিয়ে প্ল্যান করুন)</span>
+              </button>
+            )}
           </div>
         </div>
 

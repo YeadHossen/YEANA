@@ -1,0 +1,30 @@
+{
+  "expo": {
+    "name": "YEANA",
+    "slug": "yeana-travel-bangladesh",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#059669"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.yeana.travel"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#059669"
+      },
+      "package": "com.yeana.travel"
+    },
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  }
+}

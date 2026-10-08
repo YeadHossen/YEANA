@@ -340,4 +340,49 @@ CREATE TABLE IF NOT EXISTS chat_messages (
     timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+-- 19. AI CONVERSATIONS
+CREATE TABLE IF NOT EXISTS ai_conversations (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    title TEXT NOT NULL DEFAULT 'New Travel Chat',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
+-- 20. AI MESSAGES
+CREATE TABLE IF NOT EXISTS ai_messages (
+    id TEXT PRIMARY KEY,
+    conversation_id TEXT NOT NULL REFERENCES ai_conversations(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL,
+    role TEXT NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
+    content TEXT NOT NULL,
+    metadata TEXT DEFAULT '{}',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 21. AI USER PREFERENCES
+CREATE TABLE IF NOT EXISTS ai_user_preferences (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL UNIQUE,
+    preferred_destinations TEXT DEFAULT '[]',
+    preferred_activities TEXT DEFAULT '[]',
+    preferred_food TEXT DEFAULT '[]',
+    budget_preference REAL,
+    preferred_trip_type TEXT,
+    preferred_transport TEXT DEFAULT '[]',
+    preferred_hotel_type TEXT,
+    travel_companions TEXT,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- 22. AI USAGE
+CREATE TABLE IF NOT EXISTS ai_usage (
+    id TEXT PRIMARY KEY,
+    user_id TEXT NOT NULL,
+    conversation_id TEXT REFERENCES ai_conversations(id),
+    model TEXT NOT NULL,
+    input_tokens INTEGER DEFAULT 0,
+    output_tokens INTEGER DEFAULT 0,
+    total_tokens INTEGER DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);

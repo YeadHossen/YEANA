@@ -19,7 +19,8 @@ import {
   MessageSquare,
   Receipt,
   Building2,
-  ShieldAlert
+  ShieldAlert,
+  Sparkles
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -32,13 +33,15 @@ interface NavbarProps {
   setCurrentTab: (tab: string) => void;
   onOpenSearch: () => void;
   onOpenAuth: () => void;
+  onOpenAI?: () => void;
 }
 
 export const Navbar: React.FC<NavbarProps> = ({
   currentTab,
   setCurrentTab,
   onOpenSearch,
-  onOpenAuth
+  onOpenAuth,
+  onOpenAI
 }) => {
   const { language, toggleLanguage, t } = useLanguage();
   const { user, isAuthenticated, isAdmin, isCompany, logout } = useAuth();
@@ -205,6 +208,18 @@ export const Navbar: React.FC<NavbarProps> = ({
                     {unreadTravelerCount}
                   </span>
                 )}
+              </button>
+            )}
+
+            {/* YEANA AI Travel Assistant Button */}
+            {!(isCompany && !isAdmin) && onOpenAI && (
+              <button
+                onClick={onOpenAI}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-500 hover:from-emerald-700 hover:to-teal-600 text-white font-bold text-xs shadow-sm shadow-emerald-500/25 transition-all hover:scale-105 active:scale-95"
+                title="YEANA AI Travel Assistant"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-emerald-100" />
+                <span>YEANA AI</span>
               </button>
             )}
 
@@ -446,6 +461,28 @@ export const Navbar: React.FC<NavbarProps> = ({
             >
               <User className="w-4 h-4" />
               <span>{t('nav.login')} / Sign In</span>
+            </button>
+          )}
+
+          {/* YEANA AI Mobile Drawer Trigger */}
+          {!(isCompany && !isAdmin) && onOpenAI && (
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                onOpenAI();
+              }}
+              className="w-full py-2.5 px-3 rounded-2xl bg-gradient-to-r from-emerald-600 to-teal-500 text-white text-xs font-black flex items-center justify-between shadow-md shadow-emerald-950/20 active:scale-95 transition-all"
+            >
+              <div className="flex items-center gap-2">
+                <div className="w-7 h-7 rounded-xl bg-white/20 flex items-center justify-center">
+                  <Sparkles className="w-4 h-4 text-emerald-100" />
+                </div>
+                <div className="text-left">
+                  <div className="text-xs font-black">YEANA AI Assistant</div>
+                  <div className="text-[10px] text-emerald-100 font-medium">Smart Travel & Trip Planner</div>
+                </div>
+              </div>
+              <span className="text-[10px] bg-white/20 px-2 py-0.5 rounded-full font-bold">Open AI →</span>
             </button>
           )}
 

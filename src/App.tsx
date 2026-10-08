@@ -16,6 +16,7 @@ import { Footer } from './components/layout/Footer';
 import { GlobalSearchModal } from './components/common/GlobalSearchModal';
 import { AuthModal } from './components/auth/AuthModal';
 import { TravelerConciergeModal } from './components/chat/TravelerConciergeModal';
+import { YEANAAIChatModal } from './components/chat/YEANAAIChatModal';
 import { PrivacyPolicyModal } from './components/common/PrivacyPolicyModal';
 
 // Core views loaded immediately for instant initial render
@@ -104,6 +105,8 @@ const AppContent: React.FC = () => {
   const [isSearchOpen, setIsSearchOpen] = useState<boolean>(false);
   const [isAuthOpen, setIsAuthOpen] = useState<boolean>(false);
   const [isPrivacyOpen, setIsPrivacyOpen] = useState<boolean>(false);
+  const [isAIOpen, setIsAIOpen] = useState<boolean>(false);
+  const [aiInitialPrompt, setAiInitialPrompt] = useState<string | undefined>(undefined);
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   const { activeTrip, addPlaceToTrip } = useTrip();
@@ -157,6 +160,11 @@ const AppContent: React.FC = () => {
 
   // Universal Back Handler
   const handleBack = useCallback(() => {
+    if (isAIOpen) {
+      setIsAIOpen(false);
+      setAiInitialPrompt(undefined);
+      return;
+    }
     if (isPrivacyOpen) {
       setIsPrivacyOpen(false);
       return;
@@ -194,7 +202,7 @@ const AppContent: React.FC = () => {
       setSelectedPlace(null);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-  }, [isPrivacyOpen, isSearchOpen, isAuthOpen, selectedHotelModal, selectedPlace, historyStack, currentTab]);
+  }, [isAIOpen, isPrivacyOpen, isSearchOpen, isAuthOpen, selectedHotelModal, selectedPlace, historyStack, currentTab]);
 
   // Native Android Platform Setup & Hardware Back Button
   useEffect(() => {
@@ -206,7 +214,10 @@ const AppContent: React.FC = () => {
       } catch (e) {}
 
       const backListener = CapApp.addListener('backButton', () => {
-        if (isPrivacyOpen) {
+        if (isAIOpen) {
+          setIsAIOpen(false);
+          setAiInitialPrompt(undefined);
+        } else if (isPrivacyOpen) {
           setIsPrivacyOpen(false);
         } else if (isSearchOpen) {
           setIsSearchOpen(false);
@@ -229,7 +240,7 @@ const AppContent: React.FC = () => {
         backListener.then(sub => sub.remove()).catch(() => {});
       };
     }
-  }, [isPrivacyOpen, isSearchOpen, isAuthOpen, selectedHotelModal, selectedPlace, historyStack, currentTab, handleBack]);
+  }, [isAIOpen, isPrivacyOpen, isSearchOpen, isAuthOpen, selectedHotelModal, selectedPlace, historyStack, currentTab, handleBack]);
 
   // Listen to browser native back button
   useEffect(() => {
@@ -327,6 +338,7 @@ const AppContent: React.FC = () => {
         }}
         onOpenSearch={() => setIsSearchOpen(true)}
         onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAI={() => setIsAIOpen(true)}
       />
 
       {/* Universal Quick Back Breadcrumb Bar (Hidden for Company Portal to keep view clean) */}
@@ -430,6 +442,10 @@ const AppContent: React.FC = () => {
               {currentTab === 'trips' && (
                 <TripPlannerView
                   onSelectPlace={handleSelectPlace}
+                  onOpenAI={(prompt?: string) => {
+                    setAiInitialPrompt(prompt);
+                    setIsAIOpen(true);
+                  }}
                 />
               )}
 
@@ -506,6 +522,16 @@ const AppContent: React.FC = () => {
 
       {/* Global Traveler Concierge & Chat Modal */}
       <TravelerConciergeModal />
+
+      {/* Global YEANA AI Travel Assistant Modal */}
+      <YEANAAIChatModal
+        isOpen={isAIOpen}
+        onClose={() => {
+          setIsAIOpen(false);
+          setAiInitialPrompt(undefined);
+        }}
+        initialPrompt={aiInitialPrompt}
+      />
 
     </div>
   );
